@@ -1,0 +1,25 @@
+In alphabetic order.
+
+Bas Aartsen                           - Spanish translation
+Bernd Ahlers <bernd@openbsd.org>      - OpenBSD build fixes
+René Berber <r.berber@computer.org>   - stripline bugfix / horizontal scroll in main menu enhancement
+David Blank-Edelman <dnb@ccs.neu.edu> - Solaris 9 fixes
+Oliver Braun <obraun@unsane.org>      - FreeBSD packaging
+Lenny Cartier                         - Mandrake package
+Steve Christensen <sunfreeware@gmail.com> - SUN Solaris packages  http://www.sunfreeware.com/
+Rene Engelhard <rene@debian.org>      - Debian package, testing
+Doruk Fisek <dfisek@fisek.com.tr>     - packaging for Pardus distribution
+Udo van den Heuvel <udovdh@xs4all.nl> - lots of feedback and first draft of the wikipedia article
+Mads Martin Joergensen <mmj@mmj.dk>   - SuSE package
+Peterpaul Kloosterman <info@2pk.nl>   - Logo!
+Adam Lewandowski <adam@alewando.com>  - CygWin build fixes
+Dean Moore <dmoore@dbmnet.com>        - MacOS X fixes
+Peter Neilson                         - wikipedia article
+Kevin Piche                           - ArchLinux package
+Computer Services, www.smartcsc.com   - build on SCO
+Bennett Todd <bet@rahul.net>          - uClibc port
+Dries Verachtert <dries@ulyssis.org>  - RedHat Enterprise Linux packages
+Aaron Walker                          - GenToo package
+Dag Wieers <dag@wieers.com>           - RedHat Enterprise Linux packages
+Christian Weisgerber <naddy@mips.inka.de> - several bugreports and OpenBSD port issues
+Dr. Volker Zell <Dr.Volker.Zell@oracle.com> - CygWin packaging

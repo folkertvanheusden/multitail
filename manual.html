@@ -1,0 +1,212 @@
+<HTML>
+<HEAD>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-83568-2";
+urchinTracker();
+</script>
+<TITLE>An introduction to MultiTail</TITLE>
+<!-- Written by Folkert van Heusden - www.vanheusden.com -->
+</HEAD>
+<BODY>
+<H1>An introduction to MultiTail</H1>
+
+<H2>Introduction</H2>
+<H3>What is MultiTail?</H3>
+MultiTail lets you view one or multiple files like the original tail
+program. The difference is that it creates multiple windows on your
+console (with ncurses). Merging of 2 or even more logfiles is possible. It
+can also use colors while displaying the logfiles (through regular
+expressions), for faster recognition of what is important and what not. It
+can also filter lines (again with regular expressions). It has interactive
+menus for editing given regular expressions and deleting and adding
+windows. One can also have windows with the output of shell scripts and
+other software. When viewing the output of external software, MultiTail
+can mimic the functionality of tools like 'watch' and such.
+
+<H3>Why this text?</H3>
+When you start multitail without any parameters, it clears the screen and
+shows a couple of keys you can press together with a short explanation what
+they do. You can then press any of those keys or 'x', 'q' or 'CTRL'+'C' to
+exit the program. If you like to know what commandlineparameters can be
+given, start multitail with the '-h' parameter.<BR>
+The "help" that is given with the methods described above might not be
+sufficient, that's why this text was written. If there is still anything
+not clear after reading this, do not hesitate to contact me at the
+following e-mail address: <A HREF="http://www.vanheusden.com/feedbackform.php?subject=MultiTail%20document">folkert@vanheusden.com</A><BR>
+
+<H2>The Basics</H2>
+The most trivial use of MultiTail is as follows:
+<PRE>
+multitail [-i] file
+</PRE>
+This shows the file 'file' in your terminal-window. At the bottom, a line
+(the statusline) is displayed with the name of the file, its size and the
+date/time of when the last time the file changed. You can make this status-
+line static (not updated) with the '-d' commandline parameter. With '-D' no
+statusline is displayed at all.<BR>
+You only need to specify the '-i' when the filename starts with a dash ('-').
+Something a little more complex is this:
+<PRE>
+multitail [-i] file1 [-i] file2
+</PRE>
+This splits your terminalwindow in two windows. In each window, one file is
+displayed. Both windows have a statusline giving info. The window with
+'file1' is displayed above the window with 'file2'. Instead of above each
+other, you can also have them displayed side by side. For that, you can
+enter the parameter '-s' on the commandline or press the 'v' key while the
+program is running.<BR>
+Press keys 0 to 9 for adding a thick red line at the current position to window
+0 to 9.<BR>
+
+<H2>Scrolling</H2>
+Of course you can scroll in the shown files. For that, press the 'b' key.
+When you're viewing multiple files, you'll first get a fileselector. Then a
+window is displayed with the buffered contents of the selected file
+(=window). You can then scroll with the cursorkeys and the page-up and
+pagedown key. Press 'x' or 'q' to exit this window. You cannot scroll the
+whole file, only the last 100 lines. To reset this limit to something
+bigger (or smaller), press the 'm' key. You will then be asked to enter a
+new value, e.g. 1000. This parameter can also be set from the commandline
+with the '-m <B>value</B>' parameter. With '-m' you set the limit for the next
+file, with '-M <B>value</B>' you'll set this parameter for all following files
+on the commandline. When you press the 'm'-key, the current buffer is
+cleared. So it is also a replacement for pressing the enter key a few times
+when using 'tail -f' to view a file.<BR>
+
+<H2>Merging Files</H2>
+Then there's the '-I' commandline parameter. It is the same as '-i', only
+'-I' merges two or more files together. For example:
+<PRE>
+multitail [-i] file1 -I file2
+</PRE>
+a reallife example:
+<PRE>
+multitail /var/log/apache/access.log -I /var/log/apache/error.log
+</PRE>
+These two examples will merge the output of the given files into one
+window. This can be usefull with, for example, the files given in the
+second example: with this example you see what happend just before an
+error appeared in the Apache errorlog.
+
+<H2>Viewing Output of External Programs</H2>
+As I mentioned in the foreword, one can not only view files with
+MultiTail, also the output of other programs (scripts/executables/etc.)
+can be put inside one or more windows. To make this happen, you need to
+use the '-l' switch. For example:
+<PRE>
+multitail -l ls
+</PRE>
+another example:
+<PRE>
+multitail -l "ping localhost"
+</PRE>
+As you can see, you need to add doublequotes around the command when it
+needs parameters, otherwhise MultiTail would not be able to recognize
+what parameters are intended for the selected program or for MultiTail
+itself.<BR>
+You might have tried the example with the ls-command. You then saw that
+MultiTail automatically closes the window when the external command has
+finished. There are a few options you can use to control this behaviour.
+For example the '-z' parameter: when given, the window is just closed,
+the screen redrawed and MultiTail goes on without the popup window
+telling you that the program ended.<BR>
+Another option is: '-r <B>interval</B>': this will cause the command to be
+run every 'interval' seconds. Instead of '-r <B>interval</B>' also the '-R <B>interval</B>'
+option is available: when fed to MultiTail, it makes it run the next
+command with an interval of 'interval' seconds displaying only the
+difference with the previous run of the command! So if you run MultiTail
+like this:
+<PRE>
+multitail -R 3 -l "netstat -p tcp"
+</PRE>
+you will see state-changes for every TCP-connection: new connections
+and connections getting closed.<BR>
+As with '-I <B>file</B>', '-L <B>command</B>' also merges the output of the
+external command to the previous file or command. Yes: output of
+commands can be safely merged with logfiles. Multiple commands, multiple
+logfiles, most things you can think of are possible.<BR>
+
+<H2>Colors</H2>
+When you have been watching logfiles scrolling by, it can get a little
+though after a while to still recognize what is important and what not.
+Because of that, MultiTail has the ability to display logfiles in color.
+When you give the '-c' parameter, the next given file or command is
+showed in color. It decides what color to use by looking at the whole
+log-line. If you want it to only use at the programname causing that
+logline (when monitoring syslog logfiles for example), you can use the
+'-cs' switch. The last option is the '-cS <B>colorscheme</B>' switch. As
+parameter it needs the name of a colorscheme. The colorschemes are read
+from multitail.conf. In multitail.conf you set by entering regular
+expressions what color to use for what "patterns". By default, MultiTail
+looks for multitail.conf in the current directory and in the /etc directory.
+With the '-z' parameter you can explicitly define what file it should use.<BR>
+An example:
+<PRE>
+colorscheme:postfix
+cs_re:yellow:status=sent
+cs_re:magenta:queue active
+</PRE>
+The first line names the current colorscheme. The 'cs_re'-lines define
+combinations of regular expressions and a color. With the first 'cs_re'-
+line you define that if MultiTail encounters the string 'status=sent' in
+a logline that it should print it in the color yellow. The next line
+defines that the string 'queue active' must be printed in magenta.
+Another example, a little more complex:
+<PRE>
+colorscheme:syslog
+cs_re:green:\[|\]
+cs_re:blue:^... .. ..:..:..
+</PRE>
+The first 'cs_re'-line sets all occurences of '[' or ']' to green and
+all lines starting with a date in the format 'Mon DD HH:MM:SS' in blue.
+For more details on regular expressions: o'Reilly has <A HREF="http://www.oreillynet.com/search/index.ncsp?sp-q=regular+expressions&sp-k=all&search=search" TARGET="_new">few books</A> on this topic.<BR>
+One last thing on colors: if you use '-C' (uppercase 'C') instead of '-c', <I>all</I> following
+files will use the parameters you specify at that time, unless you override them with a new
+'-c<FONT SIZE=-1>x</FONT>' or '-C<FONT SIZE=-1>x</FONT>' parameter.
+
+<H2>Filtering using regular expressions</H2>
+For filtering MultiTail uses regular expressions. To keep things simple, it uses them the
+exact same way as 'grep' does: '-e' says: a regular expression follows and '-v' says: invert
+it. Since version 3.5.0 this has changed somewhat: if you want to match the lines that do NOT
+have a certain pattern, use -ev.<BR>
+Examples:
+<PRE>
+multitail -e "gnu-pop3d" /var/log/messages
+multitail -v -e "ssh" -v -e "gnu-pop3d" -e "localhost" /var/log/messages
+</PRE>
+The first example shows only lines from /var/log/messages which have the string "gnu-pop3d" somewhere in them. The second example only shows lines which do <I>not</I> have the string "ssh" and <I>not</I> have the string "gnu-pop3d" and <I>DO HAVE</I> the string "localhost" in them.
+
+<H2>Miscellaneous Options</H2>
+There are a few other options not fitting elsewhere, these are:
+<TABLE BORDER=1 WIDTH=75%>
+<TR><TD WIDTH=75>-f</TD><TD>This makes MultiTail follow the file. In case the original file
+gets renamed and a new file is created with the original filename, MultiTail will start
+watching the file with the original filename (the one you entered).</TD></TR>
+<TR><TD WIDTH=75>-u <B>seconds</B></TD><TD>When using MultiTail over a slow link (a modem connection or
+maybe even over HAM) you might want to have a little less frequent updates. With this parameter you
+set how frequently MultiTail updates the screen. The default is immediately.</TD></TR>
+<TR><TD WIDTH=75>-H <B>interval</B></TD><TD>If you have a connection to some host (on which
+you're using MultiTail) which gets automatically disconnected when nothing happens for a
+while, you can use '-H'. When used, MultiTail moves the cursor around the screen generating
+traffic, keeping your line up.</TD></TR>
+<TR><TD WIDTH=75>-V</TD><TD>In case you're wondering what version of MultiTail you're using,
+you can start it with the '-V' option. It'll then display its version and exit. You can
+also press the 'i' key while it is running.</TD></TR>
+</TABLE>
+
+<H2>Is that all?</H2>
+<I>Not everything</I> was covered in this manual. For a complete list of options and keys
+you can press while MultiTail runs, have a look at the man-page, the output of the '-h'
+commandline parameter and the help when you press 'h'-key while the program runs.<BR>
+And let's not forget the sourcecode!
+
+<BR>
+<BR>
+<BR>
+<BR>
+<FONT SIZE=-1>The latest version of MultiTail can always be found here: <A HREF="http://www.vanheusden.com/multitail/">http://www.vanheusden.com/multitail/</A></FONT>
+
+</BODY>
+</HTML>

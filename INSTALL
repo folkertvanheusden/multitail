@@ -1,0 +1,65 @@
+Type:
+make install
+That's it!
+
+*                                 *
+ +-------------------------------+
+ |Press q' to exit the program.  |
+ |For help at any time, press F1.|
+ +-------------------------------+
+*                                 *
+
+Since version 2.8.4 you can automatically send an e-mail
+with information of the system you're using. That way I
+have some statistics on the usage of MultiTail. It
+basically sends the output of 'uname -a'. To invoke all
+of this, enter:
+make thanks
+
+Is your company using MultiTail and you would like to be
+mentioned on http://www.vanheusden.com/multitail/usedby.html ?
+Then please send me a logo (not too big) and a link and I'll
+add it to that page.
+
+
+IRIX users
+----------
+Use:
+make -f makefile.irix install
+
+AIX users
+---------
+Make sure you have the GNU c-compiler installed.
+Then run:
+make install
+
+HP-UX users
+-----------
+You need the ncurses library!
+Then:
+make -f makefile.hpux install
+
+Solaris users
+-------------
+One needs at least version 7 of Solaris.
+Use:
+make -f makefile.solaris_gcc install
+or
+make -f makefile.solaris_sunwspro install
+(depending on the compiler you use).
+
+Mac OS X users:
+--------------
+Use:
+make -f makefile.macosx install
+
+IRIX users:
+--------------
+Use:
+make -f makefile.irix install
+
+SCO users:
+---------
+MultiTail has been tested to run on SCO OpenServer v6.
+Use:
+make -f makefile.sco-openserver6

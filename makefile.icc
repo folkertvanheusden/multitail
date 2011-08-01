@@ -1,0 +1,18 @@
+include version
+
+CONFIG_FILE=$(DESTDIR)/etc/multitail.conf
+
+CC=icc
+DEBUG=-g # -D_DEBUG
+LDFLAGS=-lpanel -lncurses -lutil -lm $(DEBUG)
+CFLAGS+=-D$(shell uname) -O2 -DVERSION=\"$(VERSION)\" $(DEBUG) -DCONFIG_FILE=\"$(CONFIG_FILE)\"
+
+OBJS=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o selbox.o stripstring.o color.o misc.o ui.o exec.o diff.o config.o cmdline.o globals.o history.o
+
+all: multitail
+
+multitail: $(OBJS)
+	$(CC) $(OBJS) $(LDFLAGS) -o multitail
+
+clean:
+	rm -f $(OBJS) multitail core gmon.out *.da

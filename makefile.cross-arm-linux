@@ -1,0 +1,30 @@
+include version
+
+CONFIG_FILE=$(DESTDIR)/etc/multitail.conf
+
+DEBUG=#-g -D_DEBUG #-pg #-fprofile-arcs
+LDFLAGS=-lpanel -lncurses -lutil -lm $(DEBUG)
+CFLAGS=-D$(shell uname) -O2 -Wall -DVERSION=\"$(VERSION)\" $(DEBUG) -DCONFIG_FILE=\"$(CONFIG_FILE)\"
+
+OBJS=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o selbox.o stripstring.o color.o misc.o ui.o exec.o diff.o config.o cmdline.o globals.o history.o
+
+all: multitail
+
+multitail: $(OBJS)
+	$(CC) -Wall -W $(OBJS) $(LDFLAGS) -o multitail
+	#
+	# +-=-------------------------------------------------------------=-+
+	# | There's a mailinglist!                                          |
+	# | Send an e-mail to minimalist@vanheusden.com with in the subject |
+	# | 'subscribe multitail' to subscribe.                             |
+	# +-=-------------------------------------------------------------=-+
+	#
+	# you might want to run 'make thanks' now :-)
+	#
+	# http://www.vanheusden.com/wishlist.php
+
+clean:
+	rm -f $(OBJS) multitail core gmon.out *.da
+
+thanks:
+	echo Automatic thank you e-mail for multitail $(VERSION) on a `uname -a` | mail -s "multitail $(VERSION)" folkert@vanheusden.com

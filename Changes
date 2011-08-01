@@ -1,0 +1,682 @@
+1.2 - can now also vertically split the screen
+
+1.3 - this version fixes an important bug: previous versions did not stop the tail-processes they started.
+
+1.4 - this version adds regular expressions. You can now define for each window (or for all) what lines should be displayed
+
+1.5 - this version adds a nice interactive menu for adding and deleting windows
+
+1.6 - fixed printing of extended ascii (accents etc.)
+    - added swapping of window-positions
+    - added toggling of windows verticalsplit
+    - switched on extended regular expressions parsing
+
+1.7 - small fixes and additions
+    - MultiTail should now compile on Solaris 8
+
+1.8 -  adds negation for regular expressions
+    - one can now also select the field which is used to determine the color (when you prefer to select the date, for example)
+    - some small fixes for FreeBSD.
+
+1.9 - you can now also tail external commands with MultiTail, for example the output of ping.
+
+1.91 - sometimes when using the '-l' command to get the output of other commands into MultiTail, nothing would appear in the window(s). this release should fix that.
+
+2.0 -  negating regular expressions did not work. fixed
+
+2.1 - this release features filename completion when adding files through the menu
+
+2.2 - fileselectors now shows the files sorted, has page up/down support and actually works.
+    - also the windows are now initially filled as much as possible.
+
+2.3 - field delimiters (for -cf) can be any size now (not just one character)
+    - statuslines are now optional
+    - if a window closes, a popup-box is displayed (can be switched off)
+    - fixed a small memory-leak
+    - fixed a potential segfault
+    - fixed a couple of (sp)lint-warnings
+    - radically changed the errorhandling
+    - some fixes to get thing work (again) on MacOS-X. WARNING: the installationlocation has been changed to /usr/bin! So first do make uninstall on the previous release!
+
+2.4 - --retry now also works on platforms where tail does not support --retry
+    - MultiTail works again on Solaris
+    - added "merge-mode": all files are merged into one window
+    - made window-selection into a scrollable window
+    - fixed compilation-warnings
+    - windows are filled as much as possible again on Solaris
+
+2.5 - file completion on current directory now no longer segfaults
+    - removed the "merge windows"-facility and added multiple files/commands per windows (for greater flexibility)
+    - cleaned up source
+    - re-introduced the window-numbers (for easier navigation)
+    - fixes for Solaris
+    - highlighting of regular expressions
+    - MultiTail can now write its own startup-scripts
+
+2.5.1 - fixed deleting of subwindows: sometimes left-over processes would still be in memory
+      - fixed regular expressions
+
+2.5.2 - one can now set the screenrefresh interval: usefull when you use MultiTail over a slow link
+      - sets the terminal explicit to 'dumb' when starting a process, so one can now use for example -l "top"
+      - several small fixes (long filenames would garble the screen, etc.)
+
+2.6 - compiles and works again when compiling with CygWin
+    - several small fixes
+    - one can now exit most menus by pressing q or x
+    - one can now set a mark in a window and scroll back (and forth)
+
+2.6.1 - some cosmetic changes
+      - one can now safely press ctrl+c
+
+2.6.2 - fixed important bug in scrollbackfunctionality
+      - also simplified scrollback a lot (no need to explicitly set a mark anymore)
+
+2.6.3 - memory leak fix
+      - small enhancements to userinterface
+      
+2.6.4 - MultiTail can now be started without any parameters: a menu is then presented enabling you to add windows on the fly
+
+2.7 - adding another entry to a 'merged' entry did not work correctly (would overwrite 2nd and further entries) - fixed
+
+2.7.1 - "follow filename" no longer worked: fixed
+
+2.7.2 - screen did not refresh after displaying info or help: fixed
+      - added a pause option ('p')
+
+2.7.3 - first release to run under Irix
+      - you can now set DESTDIR when running 'make install'
+      - ctrl+z works again
+
+2.7.4 - first release that runs on HP-UX
+
+2.8 - you can now run a command in a loop with a delay, like the 'watch' command (just starting watch with the -l parameter doesn't work since it wants to redraw the complete display)
+    - first release that runs on AIX
+
+2.8.1 - it is now possible to only have the difference printed for each run of a command
+
+2.8.2 - a couple of small fixes
+
+2.8.3 - added option which enables/disables linewrap
+      - can also set if you want everything from the right on
+
+2.8.4 - you can now explicitly set an offset for linewrap
+
+2.8.5 - multiple regular expressions per file are now possible
+      - no more need to explicitly set a regular expression when adding a file/command: you can do that through the new regular-expression edit menu
+
+2.9 - small enhancements to regularexpression edit window
+
+2.9.1 - you can now also let a beep be heard when a regular expression matches
+      - fixed a bug with regular expressions
+
+2.9.2 - code cleanup: a lot of redundant code was removed, making the application somewhat smaller and the code a little better to read
+
+2.9.3 - One can now set *what part* of a line is what color through regular expressions which are loaded from a file (see multitail.conf).
+
+2.9.4 - introduced default colorscheme
+      - couple of small fixes
+
+3.0.0 - added manual, fixed '-CS' switch
+
+3.0.1 - fixed get_load() for older GLIBC systems (thanks to Ville Herva)
+      - color-selection menu did not correctly handle the 'n'-key, fixed (thanks to Rene Engelhard)
+
+3.0.2 - the '-m'/'-M' (setting the number of buffered lines) did not work, fixed now
+      - the fileselector would sometimes segfault
+
+3.0.4 - adding windows would make MultiTail sometimes segfault
+
+3.0.5 - now the windows get only updated every there's really something to update
+      - the status-line will be updated ones for all current changes to a window
+      - keys 1...0 will add a marker-line to window 1...10(!)
+      - I had accidently left some debuggingcode in the scrollback-code, that is now removed
+
+3.0.6 - changed window-number of the markerline to 0...9
+
+3.1.0 - moved some functions from mt.c to utils.c/term.c
+      - added a statisticswindow ('t' in main window)
+      - small optimalisations
+      - added mailcheck: the statusline will become green if there's new mail
+      - configfile is now first loaded from /etc/multitail.conf and then from ~/.multitailrc
+      - fixed a couple of memory leaks (not all windows were cleaned-up after) and made screenredraw a little smarter
+      - One can now also select default colorschemes for files.
+
+3.1.1 - TABs are now also printed correctly
+      - tab-stop/width can be configured through the configurationfile
+
+3.1.2 - several small fixes
+      - more details are given when the compilation of a regular expression fails
+      - you can now always press 'q' to leave a popupwindowmenu
+      - window sizes are now configurable
+      - one can now bind actions (external programs) to keys which no current function in MultiTail (for example: 'g' starts /usr/bin/ping)
+
+3.1.3 - no longer fails if you use a maildir instead of a mailfile
+
+3.1.4 - improved scrolling in "scrollback-screen" quiet a lot
+      - -e switch did not work correctly
+      - added -ex/Ex which executes a given command if the regexp matches
+      - fixed small memoryleak that happened when multiple regexps fail
+
+3.1.5 - -ex did not work when there was a " or a ` in the matching string
+      - if the program executed did output anything, the screen got scrambled: output is now all redirected to /dev/null
+
+3.1.6 - one can now select the number of lines to tail initially
+      - scrollback would segfault for very large lines
+
+3.1.7 - code cleanup
+      - macosx now also uses ncurses, this means that you need at least MacOS X 10.2
+
+3.1.8 - the previous version would only compile on Linux
+      - in MacOS X 'off_t' is defined as a 64 bit integer, this requires some specific handling for printf()
+      - would fail when selecting colorschemes via the commandline
+      - The displayed modificationdate would also update if the terminal was resized.
+
+3.1.9 - more efficient use of terminal: no more empty line above the statusline
+
+3.1.91 - preventing (n)curses to redraw the whole display when only one window was cleared
+
+3.1.92 - one can now set the xterm title to some arbitrary text
+
+3.2.1 - when setting a nodename in the xterm titlebar, multitail would segfault.
+
+3.2.2 - multitail now also compiles and runs on Tru64 v5.1b and HP-UX v11.23
+
+3.2.3 - repeatingly executing the same command did not work
+
+3.3.0 - use information of getpwent() instead of environmentvariables
+      - xterm title is cleared when multitail exits
+      - statusline can be set to a descriptive description instead of the filename/commandline
+
+3.3.1 - rewrote terminal-resize code, should be much more stable now
+      - added code for handling 'F5': that refreshes the terminal
+      - one can now press 'F1' at any time to get context sensitive help
+      - some small layout fixes
+      - when adding a file one can select wether to follow the filename or the filedescriptor
+
+3.3.2 - in the first 5 seconds a message is now displayed in the statusline indicating that F1 will give help
+
+3.3.3 - one can now give a filepattern to look for: if a new file (more recent modification time) appears matching the given filepattern multitail will automatically start tailing that file (-iw pattern check_interval => don't forget the quotationmarks around the filepattern!)
+
+3.3.4 - if you enabled mailcheck and deleted the mail file
+      - multitail would exit with an error indicating it couldn't check the file for changes
+      - ^h (ctrl+h) now also shows you help
+
+3.3.5 - fixed the way parameters were given to the tail process (it worked, but it was not the correct way to do it)
+      - MultiTail should compile again on MacOS X
+      - code-cleanup
+      - it no longer bails out when the mailfolder did not exist
+      - removed C++-style comments
+      - fixed handling of wildcards
+
+3.3.6 - use default background color instead of black
+      - some changes
+      - makefile for CYGWIN (win32)
+
+3.3.7 - one can now explicitly select a configurationfile (using --conf filename)
+
+3.3.8 - added makefile for creating CSW packages
+
+3.4.0 - merged stable version 3.2.3 with development version 3.3.8
+
+3.4.1 - compiles again on CygWIN
+
+3.4.2 - added 'black' for color-output
+
+3.4.3 - added blink/underline/reverse/bold for color-output
+      - fixed compilation warning on SUN
+      - Solaris now also uses ncurses
+
+3.4.4 - output for certain logfiles and the output of some external commands (like wget) would show up garbled, that is now fixed
+
+3.4.5 - multitail is now 64bit safe: it can now monitor files > 2GB
+
+3.4.6 - compiles again on Free-, Open and NetBSD
+
+3.4.7 - in certain cases, lines would appear split in two
+
+3.4.8 - fixed a handle leak which occured when repeatingly viewing the output of an external command
+
+3.4.9 - compiles again on MacOS X, fixed typo in on-line help
+
+3.5.0 - replaced '-v -e[m]' by '-e[m]' (print if match) and '-ev' (print if not match). that is different from the previous situation: it a regular expression is found while checking the filter which says -e (or -em), output will only be given if the regexp matches with the pattern in the inputbuffer. -ev: only print if the regexp does NOT match. checking of the filters stops when there's a match for either -e[m] or -ev
+
+3.5.1 - fixed a segfault when scrolling back
+
+3.5.2 - fixed a segfault when giving incomplete commandline parameters
+      - 'l' now lists the user-keybindings defined in /etc/multitail.conf
+      - some UI fixes
+ 
+3.5.4 - checks for posix version 200112 and acts to it
+      - the 'pause'-key is now really working
+      - improved gui
+      - improved fileselector
+
+3.5.5 - improved fileselector (on can now see what entry is a directory)
+      - pause no really works
+
+3.5.6 - added functionality so that programs or files with terminal escape-codes in them for colors are displayed correctly (WITH their colors)
+
+3.5.7 - the 'r' was ignored when entering filenames (fixed)
+      - when the program was started without any parameters, only a blank screen was showed (fixed)
+
+3.6.0 - merged the stable release 3.4.8 with the development release 3.5.7
+      - replaced 'q' with ctrl+'g'
+
+3.6.1 - when cut-off (instead of linewrap) was switched on blank lines would appear, fixed
+
+3.6.2 - getloadavg doesn't exist in uClibc
+
+3.7.0 - SIGHUP now restarts the tail-processes
+      - one can now define in the configurationfile what program to use for tail: for example when one uses turbotail
+
+3.7.1 - one can now set each logfile to one (1) color; usefull when merging multiple logfiles
+      - starting multitail without any inputs and then adding a program would fail (fixed)
+
+3.7.2 - one can now have filesizes be abbreviated (to KB/MB/GB)
+
+3.7.3 - parts of the input-data can now be stripped using ranges, reg.exps or columns
+
+3.7.4 - the regexp edit menu now also display how often a regexp matched
+      - no more segfaults when exiting multitail while using '-E...'
+      - no more segfaults when the buffer was cleared
+      - the terminal can now be splitted in more then 2 columns
+      - number of windows per column can now be configured
+      - commandline parameters are now checked for validity
+      - when stripping using regexps: multiple matches are now processed correctly
+      - fixed some small memoryleaks
+
+3.7.5 - delimiters can now be multicharacters
+      - fixed a memory leak in the strip-code
+      - some fixes for compilers where a char is unsigned: statusline mode would not work, aborting a "yes/no" question would fail, monitoring of processes that stop would give errornous results
+      - when the 'o' (or 'O') is pressed in the main-menu, a window is cleared
+      - improved scrollback-searchfunction-regularexpression errorhandling
+      - code cleanups
+
+3.7.6 - updated a couple of help-pages
+      - 'O' (uppercase 'o') now clears all windows
+      - fixed saving scrollback-buffer to a file (would segfault)
+      - counting of matching regexps did not work
+
+3.7.7 - fixed small memory leak
+
+*** Current stable tree ***
+
+3.8.0 - merge with 3.7.7
+
+3.8.1 - on some platforms starting multitail would fail (HP-UX for example) due to the new strip-code
+      - stripping in a line with regexps would most of the time not work
+
+3.8.2 - specific colors (instead of a colorscheme) would not work
+      - a colorscheme was always used. that is now fixed.
+
+3.8.3 - if one (or more) window(s) was hidden, clearing that (or all) window would cause a segfault
+
+3.8.4 - fixed a memoryleak
+
+3.8.5 - running other programs from within multitail would not work on Solaris/AIX/HP-UX
+
+3.8.6 - in the scrollback screen (press 'b') the cursor keys up and down did not work
+
+3.8.7 - added complete GNU license textfile to the tarball instead of the website reference
+
+3.8.8 - fixes to make it compile on Solaris 10 with the www.sunfreeware.com gcc-package and the SUNWspro c-compiler
+
+3.8.9 - the 'toggle color'-menu did not fit in its window
+      - -s/-cS/-cT without a parameter would segfault
+
+3.8.10 - pressing delete when editing a line could give garbage
+       - searching in the scrollback window would give segfaults in certain situations, also "search next" would not work
+
+*** Current development tree ***
+
+3.9.0 - one can now set the backgroundcolor as well (for colorschemes and such)
+
+3.9.1 - when merging multiple inputs (e.g. logfiles) one can now prepend the logged line with the subwindow-number (-S) so that you can easily determine which one is logging
+      - one can now using -Z set the colors of the markerline
+      - one can now also get a timestamp in the markerline
+      - configfile can now be set in the makefile or via the commandline (-F)
+
+3.9.2 - fixed a segfault in scrollback caused by the changes to the markerline
+      - number of matches-counters are now updated every 2 seconds in the regexp edit menu
+      - in the regexp edit menu the popup window would get garbled under certain circumstances
+      - added a colorscheme for 'rsstail' (http://www.vanheusden.com/rsstail/)
+      - long filenames are now abbreviated with '...' in the middle
+
+3.9.3 - like the 'tee'-command or like using the '|' the input can now be written to a file or send to an other process, before or after filtering
+
+3.9.4 - removed heartbeat (bouncing cursor) as it didn't work anyway, merged fix from 3.8.5
+
+3.9.5 - added several colorschemes (for squid, asterisk, acctail, wtmptail, (isc-)dhcpd, smartd, firewall logging, bind9, kerberos, samba, httping, mailscanner, exim, sendmail, netstat and tcpdump)
+      - multiple colorscheme per file is now possible
+      - multitail can now convert ip-adresses to hostnames and seconds since the UNIX epoch to user configurable timeformats
+      - in case one is monitoring something without timestamps multitail can add them itself
+      - type ahead in the fileselector only worked for colorlists
+      - brought back the visual heartbeat (fixed it!)
+      - fixed the 'change color' menu (would sometimes not be big enough)
+      - fix for colorscheme substring regular expression, code cleanups.
+
+3.9.6 - added colorschemes for oracle and ntpd
+      - multitail can now check if values in the input are <, > or == and choose a color on the outcome
+      - previous versions would segfault on B&W terminals
+      - fixed scrolling up and down in the scrollback menu
+      - added scroll left/right in the scrollbackmenu
+      - one can now set the linewrap from within multitail
+      - if there are more colorschemes then will fit in one view it will scroll
+      - rewrote the "write script" fuctionality (to include all commandline parameters)
+
+3.9.7 - scrollup in the scrollback window when linewrap is disabled would give garbled output
+      - added menu for editing part-of-string-filters
+      - code cleanup
+      - added complete GNU license textfile to the tarball instead of the website reference
+      - one can now redirect output to multiple files and processes at once ('multitee')
+
+3.9.8: - fixes to make it compile on Solaris 10 with the www.sunfreeware.com gcc-package and the SUNWspro c-compiler
+       - multitail can now read from STDIN (like the original tail)
+
+3.9.9: - the next parameter behind "-j"/"-J" was (incorrectly) ignored
+       - added colorscheme for nagtail
+       - code cleanup
+
+3.9.10 - "edit/delete strip-regexp" while no regexps were defined would cause a segfault (same thing for horizontal split)
+       - added "--[no-]mergeall" switch
+       - added new coloschemes (for WebsPhere, procmail, nntpcache and Veritas Netbackup)
+       - "no linewrap"-mode in scrollback did not work
+       - reverse in colorschemes worked only for 1 character (the first one)
+       - one can choose to only display the filename and not the complete path in the statusline
+       - now multiple default colorschemes per file can be configured in multitail.conf
+       - fixed "diff"-view
+
+3.9.11 - certain invalid parameters would cause a segmentation fault instead of an error message
+       - several code cleanups
+       - (sub-)windows can now automatically be closed when longer idle then a given time in seconds
+       - extended ascii and control characters can now be suppresed via the configuration-file
+       - added "alternating colors"
+       - statusline timestamp format is now configurable
+       - can now convert errno to a descriptive string
+       - can convert decimal values to hex and vice versa
+       - '-cT' did not work when monitoring output of external commands
+       - -s/-cS/-cT without a parameter would segfault, added colorscheme for Checkpoint Firewall-1 logging
+
+3.9.12: - removed maximum colors per line limit
+        - buffersize can now be set in bytes instead of number of lines
+	- beep method can be changed (beep/flash/none)
+	- ported to SCO OpenServer (tested on v6)
+
+3.9.13: - control characters can be displayed in caret notation
+        - one can now send signals to running commands
+	- the last exit status of command (when using -l/-L with -R) is now displayed in the statusline
+	- when a window closes, the exitcode of the command that ran is displayed
+	- added pppd colorscheme
+	- added screendump functionality
+	- logfiles can now be truncated from within multitail (press 'T')
+	- fixed a memoryleak
+	- some small optimalizations
+	- improved line editor
+	- default umask for created files can be set in configurationfile
+	- fixed a bug where adding a new subwindow through the UI would fail
+	- 8 bit ascii was printed (incorrectly) in reverse
+
+3.9.14: - MultiTail can now automatically open a new window if a new file was found
+        - improved color selection interface
+	- statusline can now be put above the data window
+	- colors and attributes of statusline can be configured
+	- added colorscheme for Netscape Directory server (LDAP)
+	- added color for 'vmstat'
+	- multiple attributes (bold, underline, reverse, etc.) can now be set for a colorscheme
+	- repeating lines can be suppressed
+	- a line (like the syslog '--- mark ---' line) can be printed when there's no activity in a window for a configurable time
+	- improved navigating the on-line help text
+	- some fixes for default number of lines/kb to buffer
+	- pressing delete when editing a line could give garbage
+        - searching in the scrollback window would give segfaults in certain situations, also "search next" would not work
+	- added key for hiding all windows but the one selected
+	- added key for unhiding all windows at once
+
+3.9.14.1: - merging a window and then setting colors would cause a segfault
+          - csn prevents multitail from using inverted colors
+
+3.9.14.2: - 'write_script' sometimes wrote incorrect scripts
+          - width of the window-selectionbox was not always big enough
+	  - '---- MARK ----' is replaced by the usual markerline
+	  - some fixes in the veritas netbackup colorscheme
+
+3.9.15: - added colorscheme for log4j
+	- lines ending with '\' can now be reconnected into one again
+	- when multitail switches from one logfile to the other in one window, a markerline can be printed (like the original tail does)
+        - fixed a segfault that happened when adding a new non-merged window via the gui
+        - the colorscheme(s) in the "write script" functionality did not work
+        - -em/-ev etc. hopefully finally work
+        - cygwin version had problems finding its configfile
+        - some colorconfigurations produced back-on-black text
+        - fixed the code that decides on the sizes of the windows to display
+	- for the 'default parameters for filepattern' configurationfile settings the real path is used
+	- a window that closed by itself could cause an occasional segfault
+	- when the terminal gets resized, the current popup window is moved
+	- on really small windows the markerline would get garbled
+	- cursor key down in the scrollback window now goes back one line as it should
+	- the example multitail.conf is now copied to multitail.conf.new so that your own personalized version is not overwritten
+
+3.9.16: - color attributes were not always correctly emitted when writing scripts
+        - improvements to the window-size management window
+	- when a subwindow-change happened and the new line was suppressed, it would incorrectly emit a markerline (if enabled)
+	- markerline for when multitail changes subwindow can now have its own colors
+	- "idle markerline" can now have its own colors
+	- standard syslog '-- MARK --' can now automatically replaced by the multitail markerline
+
+4.0.0-rc1: - merged stable release 3.8.10 with development release 3.9.16
+
+4.0.0-rc2: - the functionality which determines what is buffered and what not no longer worked. fixed.
+
+4.0.0-rc3: - multitail did not notice file truncations
+           - closing windows did not tell what their contents was
+	   - strftime on Solaris and IRIX doesn't like %2d (the '2')
+	   - some makefiles would still overwrite existing makefiles
+
+4.0.1: - realpath(), fscanf() and dup() returncodes were ignored, fixed a bufferoverrun in set_window_sizes()
+       - on at least FreeBSD all colors were gone, fixed that
+
+4.0.2: - runs again on B&W terminals
+
+4.0.3: - -C on a B&W terminal would crash
+       - statusline was not inverse on B&W
+
+4.0.4: - compiles again on HP-UX
+       - -t/-x commandline parsing fixed
+       - replaced SIGHUP by SIGUSR1: this fixes the problem that multitail doesn't exits when your terminal gets closed. it would then use all cpu
+
+4.0.5: - %2d for strftime does not work on all platforms
+       - when your shell was different from bash processes would not be killed correctly
+       - ported to AIX 5.3 with the standard AIX c-compiler (thanks to BPSolutions)
+
+4.0.6: - multitail still did not stop all child processes (in some situations) when it was stopped. that should now be fixed
+
+4.0.7: - fixed bug in the Makefile: 'make thanks' would sometimes fail
+
+4.1.0: - one can now set configurationfile settings from the commandline with '-o'
+       - -rc and -Rc now clear the window between each run
+       - priority of the regular expressions for filtering can now be changed at run-time
+       - using '/' in the main-menu, one can now search in all windows; the result will be merged in a new popup-window
+       - using shift + '/' ('?') in the main-menu, one can now highlight a search-string in all windows
+       - case sensitivity of searches can now be set in at run-time by pressing 'I' or in the configurationfile (for scrollback search, merge search and highlight search)
+
+4.1.1: - can now convert 'TAI64' timestrings (as emitted by Q-mail) to ascii string
+       - now removes markerlines when merging search-results of multiple windows
+       - fixed a segfault that happens when the last line in a window is a markerline and a redraw of the screen is forced
+       - -iw did not work
+       - added --no-load_global_config to prevent loading of configfile from /etc
+       - scrolling to the right in the scrollback window now keeps the colors
+       - wether to follow the filename or the filedescriptor (the file that we started to follow initially) default parameter can be set in the configfile
+       - default linewrap mode can be set in the configfile
+       - added -P which is like -p but for all following windows
+       - linewrap handling was broken when there were tabs in the input
+       - add --retry-all which is like --retry but for all following files
+       - -cv can now handle multiple conversionschemes at once. e.g.: -cv scheme1,scheme2,scheme3 etc. no spaces around the komma!
+       - one can now predefine a set of filters in the configfile
+       - fixes for statistics popup (number of runs/last rc were not displayed)
+       - --retry did not work
+       - 'B' in the main window will start the scrollback window with all windows merged into one window
+       - empty lines in the scrollback window would give a garbled screen
+       - tabs were not always printed correctly
+       - -P worked only for the first window
+       - ^h in the main menu would not work
+       - added keybindings similar to those of 'less' to the scrollbackwindow
+
+4.1.2: - performance optimalisation of the idle loop
+       - performance optimalisation of the xterm header update routine
+       - normal (not merged) scrollback no longer worked
+       - optimised 'strip string' for the cases were nothing was found to strip
+       - one can configure multitail not to close a window when the process underneath stopped/exited
+       - windows can be restarted
+       - one can now set if empty lines should be suppressed or not (in the configfile)
+
+4.2.0: - merged 4.1.2 with stable release 4.0.7
+       - typo fix in stripstring.c
+
+4.2.1: - on AIX, the program would exit because of an realloc of 0 bytes
+
+4.3.0: - one can now define a set of edit-rules in the configfile
+       - fix to get it to compile (and run) on MacOS X again
+       - splitline can be removed and attributes can be configured (in the configfile)
+
+4.3.1: - a label can be set which will be put in front of each line using '--label "text"'
+       - cnv_ts_format would overrule the the settings for ts_format, that is now fixed
+       - -eC/-ec did not work
+       - compilation fixes voor freebsd 4.x
+       - on GNU LIBC systems, a backtrace is now shown in error situations
+       - attributes for reverse can now be configured in the configfile (used for, e.g. -eC)
+       - optimized code
+       - tabs would garble the display
+       - the abort/exit key can now be configured in the configfile
+       - updated help (-h) output
+       - updated man-page
+
+4.3.2: - ^l now also redraws the terminal
+       - cursor keys did not work anymore
+       - accidently still had -pg (profiling support) in the Makefile switched on
+       - convert (-cv) can now also use an external script/program for the conversions!
+       - multiple occurences for a convert can now be in a line
+
+4.3.3: - can convert a value to KB/MB/GB
+       - added colorscheme for 'p0f'
+       - added beep-functionality: multitail can now beep every line it processes (or every x-th line)
+       - colorschemes can now be determined by an external script
+       - added colorscheme for mpstat (part of sysstat)
+       - 'fixed' (it was not really a bug) a deadlock for colorschemes and conversionschemes where no substring select was done by the regexp
+       - cleaned up and optimised (for speed - loading 67000 colorschemes is now 200x faster) the configfileparser
+       - added page-up/down for colorscheme selection
+       - order of colorschemes and script:-lines in the configfile no longer matters
+
+4.3.4: - terminal emulation can now also be selected via the menus
+       - default conversion scheme for a file can now be selected
+       - conversion schemes can now be selected at runtime (^v) (only for new lines)
+       - adding subwindow-id before each line can now be toggled at runtime (only for new lines)
+       - when selecting a subwindow, the subwindow number is displayed in front of each subwindow-name as well
+       - when adding a timestamp, a subwindownumber or a label before each line, colorschemes would get garbled
+       - code cleanups
+       - performance optimalisation of buffering; expected speed-up is 90%
+       - added colorscheme for portsentry
+       - updated on-line help
+       - lists of subwindows did not show file/command name
+       - fixed memoryleak in merged scrollback
+       - fixes in the cs_re* logic
+       - fixed sysstat colorschemes
+       - merged view (after a (global) search) can now show the window/subwindow number in front of each line (press ^t)
+       - fixes so that on IRIX MultiTail compiles without path-changes to the Makefile
+       - added -[eE]X which only gives the matching substring as a parameter to the command which is invoked for each matching line
+       - fixed a warning about TERM_IGNORE in utils.c (harmless but anoying netherless)
+       - check_mail value of 0 was not accepted altough it should be
+       - Ex (e.g. use the following for all following files) would fail when you would edit the command from within the menu
+       - -[qQ] did not use the default linewrap mode
+       - added wordwrap (-p w)
+
+4.3.5: - 'n' (clear a buffer+window) did not work
+       - added 'N' which clears all buffers and windows
+       - in the scrollback menu, search next ('n') did not work
+       - global search now remembers the last searchstring
+       - added history to inputfields like searchstrings: press ^r or cursor key down when entering a search-string or filename or command
+
+4.3.6: - MultiTail now verifies that you did not accidentely tried to pipe something into multitail while not using -j/-J
+       - do a read of SSIZE_MAX or 65536 (whichever is smaller) instead of just hardcoded 65535 bytes: that way it'll also run on UNIX systems where SSIZE_MAX < 65535
+       - when reading from stdin and the end of the file is reached, multitail would busy-loop causing high cpu load
+       - terminal-mode can now also select the subwindow
+       - disabled terminal-mode for stdin (as that would not work)
+       - added mcsre/mcsre_s/etc. (like cs_re/cs_re_s/etc.) but which merges these attributes to the attributes of a previous matched cs_re/mcsre
+       - statistics screen now also shows the number of colorpairs in use
+       - added colorscheme for Argus (http://qosient.com/argus/) - copied from http://wtf.hijacked.us/wiki/index.php/Multitail
+       - added support (in colorschemes) for alternating colors
+
+4.3.7: - added case insensitive toggle to searchfields
+
+5.0.0: - merge with developmentversion 4.3.7
+       - default linewrap mode in configurationfile was incorrectly parsed
+       - added colorscheme for motion
+
+5.0.1: - fixed a segfault in the 'find'-code
+       - --mergeall would merge all the following files into the previous window(!) which may be unwanted, so added '--mergeall-new' which creates a new window in which all the following files upto --no-mergeall are merged
+       - conversion schemes/color schemes selection would fail if no schemes were defined in the config file.
+       - on certain terminals one need to explicitly set the background color to be usable
+       - version 5.0.0 always remembered the last searchstring, this can now be turned off in the configfile
+
+5.0.2: - removed some debugging code that garbled the screen
+
+5.0.3: - removed bogus error message when aborting 'write script'
+       - added color scheme for the BOINC project
+       - not all commandline settings were written when executing the 'write script' functionality
+
+5.0.4: - changed default changeline_color to white on blue which is better readable then the previous colors
+       - fixes for systems where 'char' is actually unsigned
+       - fix for freebsd: one can now set the characters to use for borders
+
+5.0.5: - HOME/END in scrollback did not redraw the screen
+       - compilation fix for uClibc
+       - page up (in the scrollbackwindow) did not work when there were lines bigger then the scrollbackwindow
+
+5.1.0: - added conversion signal number to signal name
+       - MultiTail used to wake up 4 times a second, it now only wakes up if there is really something to do
+       - fixed a cosmetic bug in the 'add window' menu
+       - made more parameters configurable
+       - error messaging is more uniform
+       - added -kS which, like sed, can select parts of strings to keep. e.g. -kS "^.*(TCP[^ ]*).*$" would keep the string matched by what is between ( and )
+       - fixed 2 memory leaks
+       - replaced 2 strcat()s with strncat()
+       - one can now explicitly wether the 'tail' used is a posix only tail (e.g. inotail) or also supports the old "-[0-9]" format
+       - MultiTail can now act as a syslog-server (e.g. listening on UDP port 514 for messages). this is usefull when you want to monitor syslog capable devices (UNIX servers, Cisco switches, etc.) without the need for a syslog server
+       - made some errors not fatal - e.g. let them give an error popup instead
+       - unfiltered redirection would only emit the first line in certain situations
+       - fixed a segfault (occuring only on AIX) at exit
+       - Solaris problems fixed (malloc of 0 bytes)
+       - one can now redirect to a socket (syslog/udp/514) as well
+       - colors can now be suppressed in the scrollback window to improve scrollingspeed
+       - improved scrolling in the scrollback menu: also scrolling in a line is now possible
+
+5.1.1: - errors in error popups would not fit sometimes
+       - moving to the beginning of the first line when it is longer then the screenwidth would not work in scrollback
+       - searching would not work when you were halfway a line in scrollback
+       - searching in the scrollback window can now open a new window as well
+       - removed 3 memoryleaks
+       - added colorscheme for acpitail
+
+5.1.2: - some compilation/installation fixes for cygwin
+       - when a -E was used also all -e's were copied as well
+
+5.1.3: - fixed small memory leak (global filter was not freed)
+
+5.2.0: - merged 5.0.5 with 5.1.3
+
+5.2.1: - labels would give incorrect linewraps in the scrollbackwindow
+       - the enter key will now add a markerline in all windows
+       - fixed segfault when saving buffer in the scrollback window
+       - added horizontal scroll for non-linewrapped windows (patch by René Berber)
+
+5.2.2: - fixed problem with editrules
+       - fixes for solaris makefiles
+       - write script: won't write --bi with value < 1 anymore
+       - re-enabled 'suspend' (^z)
+       - fixed assertion error happening when doing a search with the '-ts' switch in the scrollback window
+       - configuration-file parameters with 'y' instead of 'yes' were taken for no
+       - added '--follow-all' (see -f for semantics)
+
+5.3.0: - shrunk symboltable when not compiling in _DEBUG-mode
+       - added '--difference-only' (which works at character level)
+       - --retry added to tail when --retry is requested
+       - suppress_empty_lines did not work

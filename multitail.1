@@ -1,0 +1,357 @@
+.\" Copyright Folkert van Heusden, 2007
+.\"
+.\" This file may be copied under the conditions described
+.\" in the GNU GENERAL PUBLIC LICENSE, Version 1, September 1998
+.\" that should have been distributed together with this file.
+.\"
+.TH MULTITAIL 1 2007-02 "MultiTail"
+.SH NAME
+MultiTail \- browse through several files at once
+.SH SYNOPSIS
+.BI "MultiTail [" options "]
+.sp
+options:
+.BI "[\-cs|\-Cs|\-c\-] [\-s] [\-i] inputfile [\-i anotherinputfile] [...]"
+.sp
+.SH DESCRIPTION
+The program
+.B MultiTail
+lets you view one or multiple files like the original tail program. The difference is that it creates multiple windows on your console (with ncurses). It can also monitor wildcards: if another file matching the wildcard has a more recent modification date, it will automatically switch to that file. That way you can, for example, monitor a complete directory of files. Merging of 2 or even more logfiles is possible. It can also use colors while displaying the logfiles (through regular expressions), for faster recognition of what is important and what not. It can also filter lines (again with regular expressions). It has interactive menus for editing given regular expressions and deleting and adding windows. One can also have windows with the output of shell scripts and other software. When viewing the output of external software, MultiTail can mimic the functionality of tools like 'watch' and such. When new mail arrives for the current user, the statuslines will become green. To reset this "mail has arrived"-state, press ' ' (a space). For help at any time, press F1.
+
+.PP
+.SH OPTIONS
+.TP
+.B "\-i" file
+Select a file to monitor. You can have multiple
+.BI "\-i " file
+parameters.
+You only need to add
+.BI "\-i " file
+in front of a filename if the filename starts with a dash ('-').
+.TP
+.B "\-I" file
+Same as
+.BI "\-i " file
+but add the output to the previous window (so the output is merged).
+.TP
+.B "-iw" file interval
+.B "-Iw" file interval
+Like '-i'/'-I' but expects the parameter to be a wildcard and the second(!) an interval.
+Initially MultiTail will start monitoring the first file with the most recent modification
+time. Every interval it will check if any new files were created (or modified) and start tailing
+that one. *Don't forget* to put quotation marks around the filename as otherwhise the shell will
+try to substite them!
+.TP
+.B "\-l" command
+Command to execute in a window. Parameter is the command. Do not forget to use "'s if the external command needs parameter! (e.g. -l "ping host").
+.TP
+.B "\-L" command
+Same as
+.BI "\-l"
+but add the output to the previous window (so the output is merged).
+.TP
+.B "\-j"
+Read from stdin (can be used only once as there is only 1 stdin).
+.TP
+.B "\-J"
+Same as
+.BI "-j"
+but add the output to the previous window (so the output is merged).
+.TP
+.B "\-\-mergeall"
+Merge all of the following files into the same window (see '--no-mergeall').
+.TP
+.B "\-\-no\-mergeall"
+Stop merging all files into one window (see '--mergeall');
+.TP
+.B "\-\-no\-repeat"
+When the same line is repeated, it will be suppressed while printing a "Last message repeated x times" message.
+.TP
+.B "\-\-mark\-interval x"
+Print every 'x' seconds a mark-line when nothing else was printed.
+.TP
+.B "\-q i path"
+Check path for new files with interval 'i', all in new windows. One can enter paths here understood by the shell. E.g. "/tmp/*". Note: do not forget to add quotes around the pathname to prevent the shell from parsing it!
+.TP
+.B "\-Q i path"
+Like -q: but merge them all in one window.
+.TP
+.B "\-\-new\-only"
+For -q/-Q: only create windows for files created after MultiTail was started.
+.TP
+.B "\-\-closeidle x
+Close windows when more then 'x' seconds no new data was processed.
+.TP
+.B "\-a x"
+Write the output also to file 'x' (like 'tee') AFTER it was filtered by MultiTail.
+.TP
+.B "\-A x"
+Write the output also to file 'x' (like 'tee') BEFORE it was filtered by MultiTail.
+.TP
+.B "-g x"
+Send the output also to command 'x' AFTER it was filtered by MultiTail.
+.TP
+.B "-G x"
+Send the output also to command 'x' BEFORE it was filtered by MultiTail.
+.TP
+.B "\-S"
+Prepend merged output with subwindow-number.
+.TP
+.B "\-t" title
+With this switch, "title" is displayed in the statusline instead of the filename or commandline.
+.TP
+.B "\-n" number_of_lines
+Number of lines to tail initially. The default depends on the size of the terminal-window.
+.TP
+.B "\-r" interval
+Restart the command (started with -l/-L) after it has exited. With interval you can set how long to sleep before restarting.
+.TP
+.B "\-R" interval
+Restarts a command like -r only this one shows the difference in output compared to the previous run.
+.TP
+.B "\-rc" / "\-Rc" interval
+Like \-r / \-R but clears the window before each iteration.
+.TP
+.B "\-h"
+The help.
+.TP
+.B "\-f"
+Follow the following filename, not the descriptor.
+.TP
+.B "\--follow-all"
+For all files after this switch: follow the following filename, not the descriptor.
+.TP
+.B "\-fr" filter
+Use the predefined filter(s) from the configfile.
+.TP
+.B "\-e"
+Use the next regular expression on the following file.
+.TP
+.B "\-ex"
+Use regular expression on the following file and execute the command when it matches. The command gets as commandline parameter the whole matching line.
+.TP
+.B "\-eX"
+Like '-ex' but only give the matching substring as parameter. This requires a regular expression with '(' and ')'.
+.TP
+.B "\-ec"
+Use regular expression on the following file and display the matches.
+.TP
+.B "\-eC"
+Use regular expression on the following file but display everything and display the matches inverted.
+.TP
+.B "\-E"
+Use the next regular expression on the following files.
+.TP
+.B "\-v"
+Negate the next regular expression.
+.TP
+.B "\-s x"
+Splits the screen vertically in 'x' columns.
+.TP
+.B "\-sw x"
+At what position to split the screen. e.g. '-sw 20,40,,10' (=4 columns)
+.TP
+.B "\-sn x"
+How many windows per column for vertical split (use with -s or -sw). e.g. '-sn 3,,2'.
+.TP
+.B "\-wh x"
+Sets the height of a window (advisory: if it won't fit, the height is adjusted).
+.TP
+.B "\-cS" scheme
+Show the next given file using the colorscheme selected with 'scheme' (as defined in multitail.conf).
+.TP
+.B "\-CS" scheme
+Show all following files using the colorscheme selected with 'scheme' (as defined in multitail.conf).
+.TP
+.B "\-csn"
+Extra switch for the following switches; do not use reverse (inverted) colors.
+.TP
+.B "\-cs"
+Show the next given file in colors (syslog).
+.TP
+.B "\-c"
+Show the next given file in colors.
+.TP
+.B "\-Cs"
+Show all following files in color (through syslog-scheme).
+.TP
+.B "\-C"
+Show all following files in color.
+.TP
+.B "\-Cf field_index delimiter"
+Show all following files in color depending on field selected with field_index. Fields are delimited by the defined delimiter.
+.TP
+.B "\-cf field_index delimiter"
+Show the next file in color depending on field selected with field_index. Fields are delimited by the defined delimiter.
+.TP
+.B "\-ci color"
+Use a specific color. Usefull when merging multiple outputs.
+.TP
+.B "\-cT terminalmode"
+Interpret terminal codes. Only ANSI supported at this time.
+.TP
+.B "\-c\-"
+Do NOT colorize the following file.
+.TP
+.B "\-C\-"
+Do NOT colorize the following files.
+.TP
+.B "\-ts"
+Add a timestamp to each line (format is configurable in multitail.conf).
+.TP
+.B "\-Z color"
+Specify the color-attributes for the markerline.
+.TP
+.B "\-T"
+A timestamp will be placed in the markerline.
+.TP
+.B "\-d"
+Do NOT update statusline.
+.TP
+.B "\-D"
+Do not display a statusline at all.
+.TP
+.B "\-du"
+Put the statusline above the data window.
+.TP
+.B "\-z"
+Do not display "window closed" windows.
+.TP
+.B "\-u"
+Set screen updateinterval (for slow links).
+.TP
+.B "\-m nlines"
+Set buffersize
+Set
+.BI "nlines"
+to 0 (zero) if you want no limits on the buffering.
+.TP
+.B "\-mb x"
+Set scrollback buffer size (in bytes, use xKB/MB/GB).
+.TP
+.B "\-M nlines"
+Set the buffersize on ALL following files.
+.TP
+.B "\-p x [y]"
+Set linewrap: a = print everything including linewrap. l = just show everything starting at the left until the rightside of the window is reached. r = show everything starting from the right of the line. s = show everything starting with the processname. S = show everything starting after the processname. o = show everything starting at offset 'y'.
+.TP
+.B "\-P x [y]"
+Like -p but for all following windows.
+.TP
+.B "\-ke x"
+Strip parts of the input using regular expression 'x'.
+.TP
+.B "\-kr x y"
+Strip parts of the input starting at offset x and ending (not including!) offset y.
+.TP
+.B "\-kc x y"
+Strip parts of the input: strip column 'y' with delimiter 'x'.
+.TP
+.B "\-ks x"
+Use editscheme 'x' from configfile.
+.TP
+.B "\-w"
+Do not use colors.
+.TP
+.B "\-b" n
+Sets the TAB-width.
+.TP
+.B "\--config" filename
+Load the configuration from given filename.
+.TP
+.B "\-x"
+Set xterm-title: %f will be replaced with the last changed file, %h with the hostname, %l with the load of the system, %m with "New mail!" when the current user has new mail, %u with the current effective user, %t timestamp of last changed file, %% with a %
+.TP
+.B "\-o" configfile-item
+Proces a configurationfile item via the commandline in case you cannot edit the default configfile.
+.TP
+.B "\--cont"
+Reconnect lines with a '\' at the end.
+.TP
+.B "\--mark-interval interval"
+When nothing comes in, print a '---mark---' line every 'interval' seconds.
+.TP
+.B "\--mark-change"
+When multiple files are merged an multitail switches between two windows, print a markerline with the filename.
+.TP
+.B "\--no-mark-change"
+Do NOT print the markerline when the file changes (overrides the configfile).
+.TP
+.B "\--label text"
+Put "text" in front of each line. Usefull when merging multiple files and/or commands.
+.TP
+.B "\--retry
+Keep trying to open the following file if it is inaccessible.
+.TP
+.B "\--retry-all
+Like --retry but for all following files.
+.TP
+.B "\-cv x"
+Use conversion scheme 'x' (see multitail.conf).
+.TP
+.B "\--basename"
+Only display the filename (and not the path) in the statusline.
+.TP
+.B "\-F file"
+Use 'file' as configfile (instead of default configfile).
+.TP
+.B "\--no-load-global-config"
+Do NOT load the global configfile.
+.TP
+.B "\--beep-interval x"
+Let the terminal beep for every x-th line processed. Press 'i' in the main menu to see how many times it beeped.
+.TP
+.B "\--bi x"
+Like '\--beep-interval' but only for current (sub-)window. Statistics on the number of beeps can be found in the statistics for this (sub-)window. Press 't' in the main menu.
+.TP
+.B "\-H"
+Show heartbeat (to keep your sessions alive).
+.TP
+.B "\-V"
+Show the version and exit.
+
+.SH KEYS
+You can press a couple of keys while the program runs.
+To see a list of them, press F1 (or ^h). You can press F1 (or ^h) at any time: it gives you context related information.
+Press 'q' to exit the program.
+
+.SH EXAMPLES
+See http://www.vanheusden.com/multitail/examples.html for more and other examples.
+.TP
+.B "multitail /var/log/apache/access_log logfile \-i \-filestartingwithdatsh"
+This creates three windows. One with the contents of /var/log/apache/access_log, one with the contents of logfile and so on.
+.TP
+.B "multitail -R 2 -l \(dqnetstat -t\(dq"
+This runs netstat every 2 seconds and then shows what has changed since the previous run. That way one can see new connections being made and closed connections fading away.
+.TP
+.B "multitail logfile \-l \(dqping 192.168.1.3\(dq
+This creates two windows. One with the contents of logfile, one with with the output of 'ping 192.168.1.3'.
+.TP
+.B "multitail /var/log/apache/access_log \-I /var/log/apache/error_log"
+This creates
+.BI "one"
+window with the contents of /var/log/apache/access_log
+.BI "merged"
+with the contents of /var/log/apache/error_log.
+.TP
+.B "multitail \-M 0 /var/log/apache/access_log \-I /var/log/apache/error_log"
+Same as previous example. This example will store all logged entries in a buffer so that you can later on browse through them (by pressing '
+.BI "b"
+ ').
+
+.SH BUGS
+As this program grew larger and larger over the time with new functionality sometimes added ad-hoc, some bugs may have been introduced. Please notify folkert@vanheusden.com if you find any.
+.PP
+Well, except for the resizing of your terminal window. The program might
+crash when doing such things. Upgrading the ncurses library to at least
+version 5.3 might help in that case.
+
+.SH "SEE ALSO"
+.BR http://www.vanheusden.com/multitail/
+
+.SH NOTES
+This page describes
+.B MultiTail
+as found in the multitail-4.3.1 package; other versions may differ slightly.
+Mail corrections and additions to folkert@vanheusden.com.
+Report bugs in the program to folkert@vanheusden.com.

@@ -1,0 +1,67 @@
+include version
+
+CONFIG_FILE=$(DESTDIR)/etc/multitail.conf
+
+DEBUG=#-g -D_DEBUG #-pg #-fprofile-arcs
+LDFLAGS=-lpanel -lncurses -lm $(DEBUG)
+CFLAGS=-O2 -D$(shell uname) -DVERSION=\"$(VERSION)\" $(DEBUG) -DCONFIG_FILE=\"$(CONFIG_FILE)\"
+
+OBJS=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o selbox.o stripstring.o color.o misc.o ui.o exec.o diff.o config.o cmdline.o globals.o history.o
+
+all: multitail
+
+multitail: $(OBJS)
+	$(CC) -Wall -W $(OBJS) $(LDFLAGS) -o multitail
+
+install: multitail
+	cp multitail $(DESTDIR)/usr/bin
+	cp multitail.1 $(DESTDIR)/usr/share/man/man1/multitail.1
+	#
+	### COPIED multitail.conf.new, YOU NEED TO REPLACE THE multitail.conf
+	### YOURSELF WITH THE NEW FILE
+	#
+	cp multitail.conf $(DESTDIR)/etc/multitail.conf.new
+	mkdir -p $(DESTDIR)/usr/share/doc/multitail-$(VERSION)
+	cp *.txt INSTALL manual.html $(DESTDIR)/usr/share/doc/multitail-$(VERSION)
+	#
+	# +-=-------------------------------------------------------------=-+
+	# | There's a mailinglist!                                          |
+	# | Send an e-mail to minimalist@vanheusden.com with in the subject |
+	# | 'subscribe multitail' to subscribe.                             |
+	# +-=-------------------------------------------------------------=-+
+	#
+	# you might want to run 'make thanks' now :-)
+	#
+	# http://www.vanheusden.com/wishlist.php
+
+uninstall: clean
+	rm -f $(DESTDIR)/usr/bin/multitail
+	rm -f $(DESTDIR)/usr/share/man/man1/multitail.1
+	rm -rf $(DESTDIR)/usr/share/doc/multitail-$(VERSION)
+
+clean:
+	rm -f $(OBJS) multitail core
+
+macosxbinpackage: multitail
+	# as it is rather tricky to install something in /etc on MacOS X,
+	# we're skipping it here
+	rm -rf usr
+	mkdir -p usr/bin
+	mkdir -p usr/share/man/man1
+	mkdir -p usr/share/doc/multitail-$(VERSION)
+	cp multitail usr/bin
+	cp multitail.1 usr/share/man/man1
+	cp *.txt INSTALL manual.html usr/share/doc/multitail-$(VERSION)
+	tar cvzf multitail-$(VERSION)-macosx.tgz usr
+	rm -rf usr
+
+package: clean
+	# source package
+	rm -rf multitail-$(VERSION)*
+	mkdir multitail-$(VERSION)
+	cp *.c *.h multitail.1 manual.html Makefile makefile.* Changes INSTALL license.txt readme.txt multitail-$(VERSION)
+	tar czf multitail-$(VERSION).tgz multitail-$(VERSION)
+	rm -rf multitail-$(VERSION)
+
+thanks:
+	echo Automatic thank you e-mail for multitail $(VERSION) on a `uname -a` | mail -s "multitail $(VERSION)" folkert@vanheusden.com
