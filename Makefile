@@ -3,6 +3,7 @@ include version
 DESTDIR=/
 CONFIG_FILE=$(DESTDIR)/etc/multitail.conf
 
+CC=gcc
 DEBUG=-g # -D_DEBUG # -pg #  -D_DEBUG  #-pg -W -pedantic # -pg #-fprofile-arcs
 LDFLAGS+=-lpanel -lncurses -lutil -lm $(DEBUG) -rdynamic
 # LDFLAGS+=-lc_p -lpanel_g -lncurses_g -lutil -lm -pg -g -rdynamic
