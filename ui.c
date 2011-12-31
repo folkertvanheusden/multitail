@@ -50,7 +50,7 @@ void error_popup(char *title, int help, char *message, ...)
 
 	win_header(mywin, title);
 	myattr_on(mywin, cdev);
-	mvwprintw(mywin -> win, 3, 2, buffer);
+	mvwprintw(mywin -> win, 3, 2, "%s", buffer);
 	myattr_off(mywin, cdev);
 	escape_print(mywin, 7, 2, "_Press any key to exit this screen_");
 	mydoupdate();

@@ -432,7 +432,7 @@ char * edit_string(NEWWIN *win, int win_y, int win_x, int win_width, int max_wid
 			dummy[min(strlen(dummy), line_width)] = 0x00;
 			for(loop=strlen(dummy); loop<line_width; loop++)
 				mvwprintw(win -> win, win_y, win_x + loop, " ");
-			mvwprintw(win -> win, win_y, win_x, dummy);
+			mvwprintw(win -> win, win_y, win_x, "%s", dummy);
 			myfree(dummy);
 			if (pcase_insensitive)
 				mvwprintw(win -> win, win_y + 1, win_x, "%c", *pcase_insensitive?'X':' ');
