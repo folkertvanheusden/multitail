@@ -2465,7 +2465,9 @@ void regexp_error_popup(int rc, regex_t *pre)
 			popup_buffer[sizeof(popup_buffer) - 1] = 0x00;
 		}
 		else
-			strncat(popup_buffer, error, sizeof(popup_buffer));
+		{
+			strncat(popup_buffer, error, sizeof(popup_buffer)-strlen(popup_buffer)-1);
+		}
 
 		myfree(error);
 	}
