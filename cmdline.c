@@ -182,11 +182,16 @@ void add_redir_to_proc(char mode, char *proc, redirect_t **predir, int *n_redire
 
 void add_redir_to_socket(char filtered, char *prio, char *fac, char *address, redirect_t **predir, int *n_redirect)
 {
-	struct hostent *hp;
 	char *local_address = mystrdup(address, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 	char *colon = strchr(local_address, ':');
 	int prio_nr = -1, fac_nr = -1;
 	int loop;
+    char* node;
+    char* service;
+    struct addrinfo hints;
+    struct addrinfo* result;
+    struct addrinfo* rp;
+    int s, sfd;
 
 	*predir = (redirect_t *)myrealloc(*predir, (*n_redirect) * sizeof(redirect_t), __FILE__, __PRETTY_FUNCTION__, __LINE__);
 
@@ -199,21 +204,44 @@ void add_redir_to_socket(char filtered, char *prio, char *fac, char *address, re
 
 	(*predir)[*n_redirect].redirect = mystrdup(address, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 
-	(*predir)[*n_redirect].fd = socket(AF_INET, SOCK_DGRAM, 0);
-	if ((*predir)[*n_redirect].fd == -1)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Cannot create socket for redirecting via syslog protocol.\n");
-	
-	memset(&(*predir)[*n_redirect].sai, 0x00, sizeof((*predir)[*n_redirect].sai));
-	(*predir)[*n_redirect].sai.sin_family = AF_INET;
 	if (colon)
 	{
 		*colon = 0x00;
-		(*predir)[*n_redirect].sai.sin_port = atoi(colon + 1);
+		node = local_address;
+		service = colon + 1;
 	}
 	else
-		(*predir)[*n_redirect].sai.sin_port = 514;
-	hp = gethostbyname(local_address);
-	memcpy(&(*predir)[*n_redirect].sai.sin_addr.s_addr, hp -> h_addr, hp -> h_length);
+	{
+		node = local_address;
+		service = "syslog";
+	}
+
+	memset(&hints, 0x00, sizeof(struct addrinfo));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_flags = 0;
+	hints.ai_protocol = 0;
+
+	s = getaddrinfo(node, service, &hints, &result);
+	if (s != 0)
+		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Cannot create socket for redirecting via syslog protocol: %s.\n", gai_strerror(s));
+
+	for (rp = result; rp != NULL; rp = rp -> ai_next)
+	{
+		sfd = socket(rp -> ai_family, rp -> ai_socktype, rp -> ai_protocol);
+		if (sfd == -1)
+		    continue;
+		if (connect(sfd, rp -> ai_addr, rp -> ai_addrlen) != -1)
+		    break;
+		close(sfd);
+	}
+
+	freeaddrinfo(result);
+
+	if (rp == NULL)
+		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Cannot create socket for redirecting via syslog protocol.\n");
+
+	(*predir)[*n_redirect].fd = sfd;
 	
 	for(loop=0; loop<8; loop++)
 	{

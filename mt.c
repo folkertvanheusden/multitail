@@ -2295,31 +2295,54 @@ void start_all_processes(char *nsubwindows)
 			{
 				char *dummy = mystrdup(cur -> filename, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 				char *colon = strchr(dummy, ':');
-				struct sockaddr_in sa;
-				socklen_t ssai_len = sizeof(sa);
-				char *host = "0.0.0.0";
-				int port = 514;
+				struct addrinfo hints;
+				struct addrinfo* result;
+				struct addrinfo* rp;
+				int sfd, s;
 
-				cur -> wfd = cur -> fd = socket(AF_INET, SOCK_DGRAM, 0);
-				if (cur -> fd == -1)
-					error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Failed to create socket for receiving syslog data.\n");
+				char *host = NULL;
+				char *service = "syslog";
 
 				if (colon)
 				{
-					port = atoi(colon + 1);
-					if (port <= 0)
-						error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "--[Ll]isten requires a >= 0 portnumber.\n");
+					service = colon + 1;
 					*colon = 0x00;
 					if (colon > dummy)
 						host = dummy;
 				}
 
-				memset(&sa, 0x00, ssai_len);
-				sa.sin_family = AF_INET;
-				sa.sin_port   = htons(port);
-				sa.sin_addr.s_addr = inet_addr(host);
-				if (bind(cur -> fd, (struct sockaddr *)&sa, ssai_len) == -1)
-					error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Failed to bind socket to %s.\n", cur -> filename);
+				memset(&hints, 0x00, sizeof(struct addrinfo));
+				hints.ai_family = AF_UNSPEC;
+				hints.ai_socktype = SOCK_DGRAM;
+				hints.ai_flags = AI_PASSIVE;
+				hints.ai_protocol = 0;
+				hints.ai_canonname = NULL;
+				hints.ai_addr = NULL;
+				hints.ai_next = NULL;
+
+				s = getaddrinfo(host, service, &hints, &result);
+				if (s != 0)
+					error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Failed to create socket for receiving syslog data on %s: %s.\n", cur -> filename, gai_strerror(s));
+
+				for (rp = result; rp != NULL; rp = rp -> ai_next)
+				{
+					sfd = socket(rp -> ai_family, rp -> ai_socktype, rp -> ai_protocol);
+					if (sfd == -1)
+						continue;
+					if (bind(sfd, rp -> ai_addr, rp -> ai_addrlen) == 0)
+						break;
+					close(sfd);
+				}
+
+				freeaddrinfo(result);
+
+				if (rp == NULL)
+					error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Failed to create socket for receiving syslog data on %s.\n", cur -> filename);
+
+				cur -> wfd = cur -> fd = sfd;
+
+				cur -> wfd = cur -> fd = socket(AF_INET, SOCK_DGRAM, 0);
+				if (cur -> fd == -1)
 
 				myfree(dummy);
 
