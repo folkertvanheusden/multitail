@@ -21,19 +21,32 @@
 void error_exit(char *file, const char *function, int line, char *format, ...)
 {
 	va_list ap;
+	int index;
+        void *trace[128];
+        int trace_size = backtrace(trace, 128);
+        char **messages = backtrace_symbols(trace, trace_size);
 
 	(void)endwin();
 
 	fprintf(stderr, version_str, VERSION);
 	fprintf(stderr, "\n\n");
 
-	fprintf(stderr,"A problem occured at line %d in function %s (from file %s):\n\n", line, function, file);
+	fprintf(stderr, "The following error occured:\n");
+	fprintf(stderr, "---------------------------\n");
 	va_start(ap, format);
 	(void)vfprintf(stderr, format, ap);
 	va_end(ap);
-	if (errno) fprintf(stderr, "\nerrno variable (if applicable): %d which means %s\n\n", errno, strerror(errno));
 
-	fprintf(stderr, "\nBinary build at %s %s\n", __DATE__, __TIME__);
+	fprintf(stderr, "\n");
+	fprintf(stderr, "\n");
+	fprintf(stderr, "If this is a bug, please report the following information:\n");
+	fprintf(stderr, "---------------------------------------------------------\n");
+	fprintf(stderr, "This problem occured at line %d in function %s (from file %s):\n", line, function, file);
+	if (errno) fprintf(stderr, "errno variable was then: %d which means \"%s\"\n", errno, strerror(errno));
+	fprintf(stderr, "Binary build at %s %s\n", __DATE__, __TIME__);
+        fprintf(stderr, "Execution path:\n");
+        for(index=0; index<trace_size; ++index)
+                fprintf(stderr, "\t%d %s\n", index, messages[index]);
 
 	dump_mem(SIGHUP);
 

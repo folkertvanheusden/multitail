@@ -385,7 +385,16 @@ void signal_handler(int sig)
 
 void select_display_start_and_end(char *string, char mode, int wrap_offset, int win_width, int *prt_start, int *prt_end, int *disp_end)
 {
-	int nbytes = strlen(string);
+	/* patch by Thomas Gartner */
+	int nbytes = 0; /* = strlen(string); */
+	char *tmpString=string;
+	while(string && *tmpString)
+	{
+		if (*tmpString++==9)
+			nbytes += tab_width;
+		else
+			++nbytes;
+	}
 
 	*prt_start = 0;
 	*prt_end = nbytes;
@@ -455,7 +464,7 @@ int draw_tab(NEWWIN *win)
 	return 0;
 }
 
-	
+
 char find_highlight_matches(regmatch_t *matches, char use_regex, int offset)
 {
 	int match_offset;
@@ -482,65 +491,65 @@ char find_highlight_matches(regmatch_t *matches, char use_regex, int offset)
 
 myattr_t * find_cmatches_index(color_offset_in_line *cmatches, int n_cmatches, mybool_t has_merge_colors, int offset)
 {
-        static myattr_t final_color;
-        int cmatches_index = 0;
-        int fg_composed = -1, bg_composed = -1;
-        int attrs = -1;
-        char first_set = 1;
+	static myattr_t final_color;
+	int cmatches_index = 0;
+	int fg_composed = -1, bg_composed = -1;
+	int attrs = -1;
+	char first_set = 1;
 
-        for(cmatches_index=0; cmatches_index<n_cmatches; cmatches_index++)
-        {
-                if (offset >= cmatches[cmatches_index].start && offset < cmatches[cmatches_index].end)
-                {
-                        if (has_merge_colors == MY_FALSE)
+	for(cmatches_index=0; cmatches_index<n_cmatches; cmatches_index++)
+	{
+		if (offset >= cmatches[cmatches_index].start && offset < cmatches[cmatches_index].end)
+		{
+			if (has_merge_colors == MY_FALSE)
 			{
-                                return &cmatches[cmatches_index].attrs;
+				return &cmatches[cmatches_index].attrs;
 			}
 
-                        if (cmatches[cmatches_index].merge_color == MY_TRUE)
-                        {
-                                /* merge these colors */
-                                if (cmatches[cmatches_index].attrs.colorpair_index != -1)
-                                {
-                                        int fg_fc, bg_fc;
+			if (cmatches[cmatches_index].merge_color == MY_TRUE)
+			{
+				/* merge these colors */
+				if (cmatches[cmatches_index].attrs.colorpair_index != -1)
+				{
+					int fg_fc, bg_fc;
 
-                                        fg_fc = cp.fg_color[cmatches[cmatches_index].attrs.colorpair_index];
-                                        bg_fc = cp.bg_color[cmatches[cmatches_index].attrs.colorpair_index];
+					fg_fc = cp.fg_color[cmatches[cmatches_index].attrs.colorpair_index];
+					bg_fc = cp.bg_color[cmatches[cmatches_index].attrs.colorpair_index];
 
-                                        if (fg_fc != -1 && fg_composed == -1)
-                                                fg_composed = fg_fc;
-                                        if (bg_fc != -1 && bg_composed == -1)
-                                                bg_composed = bg_fc;
-                                }
+					if (fg_fc != -1 && fg_composed == -1)
+						fg_composed = fg_fc;
+					if (bg_fc != -1 && bg_composed == -1)
+						bg_composed = bg_fc;
+				}
 
-                                if (cmatches[cmatches_index].attrs.attrs != -1)
-                                {
-                                        if (attrs == -1)
-                                                attrs = cmatches[cmatches_index].attrs.attrs;
-                                        else
-                                                attrs |= cmatches[cmatches_index].attrs.attrs;
-                                }
-                        }
-                        else if (first_set)
-                        {
-                                first_set = 0;
+				if (cmatches[cmatches_index].attrs.attrs != -1)
+				{
+					if (attrs == -1)
+						attrs = cmatches[cmatches_index].attrs.attrs;
+					else
+						attrs |= cmatches[cmatches_index].attrs.attrs;
+				}
+			}
+			else if (first_set)
+			{
+				first_set = 0;
 
-                                fg_composed = cp.fg_color[cmatches[cmatches_index].attrs.colorpair_index];
-                                bg_composed = cp.bg_color[cmatches[cmatches_index].attrs.colorpair_index];
-                                attrs = cmatches[cmatches_index].attrs.attrs;
-                        }
-                }
-        }
+				fg_composed = cp.fg_color[cmatches[cmatches_index].attrs.colorpair_index];
+				bg_composed = cp.bg_color[cmatches[cmatches_index].attrs.colorpair_index];
+				attrs = cmatches[cmatches_index].attrs.attrs;
+			}
+		}
+	}
 
-        if (fg_composed != -1 || bg_composed != -1 || final_color.attrs != -1)
-        {
-                final_color.attrs = attrs;
-                final_color.colorpair_index = find_or_init_colorpair(fg_composed, bg_composed, 1);
+	if (fg_composed != -1 || bg_composed != -1 || final_color.attrs != -1)
+	{
+		final_color.attrs = attrs;
+		final_color.colorpair_index = find_or_init_colorpair(fg_composed, bg_composed, 1);
 
-                return &final_color;
-        }
+		return &final_color;
+	}
 
-        return NULL;
+	return NULL;
 }
 
 void gen_wordwrap_offsets(char *string, int start_offset, int end_offset, int win_width, int **offsets)
@@ -712,7 +721,7 @@ void color_print(int f_index, NEWWIN *win, proginfo *cur, char *string, regmatch
 {
 	char reverse = 0;
 	myattr_t cdev = { -1, -1 };
-	int prt_start = 0, prt_end, disp_end;
+	int prt_start = 0, prt_end = 0, disp_end = 0;
 	int mx = -1;
 	char use_regex = 0;
 	color_offset_in_line *cmatches = NULL;
@@ -863,7 +872,7 @@ void check_filter_exec(char *cmd, char *matching_string)
 
 /* check if the current line matches with a regular expression
    returns 0 if a regexp failed to execute
-   */
+ */
 
 /* this code can be optimized quit a bit but I wanted to get it to work quickly so I expanded everything (2006/03/28) */
 char check_filter(proginfo *cur, char *string, regmatch_t **pmatch, char **error, int *matching_regex, char do_re, char *display)
@@ -874,7 +883,8 @@ char check_filter(proginfo *cur, char *string, regmatch_t **pmatch, char **error
 	char re_exec_ok = 1;
 
 	*error = NULL;
-	*pmatch = NULL;
+	if (pmatch)
+		*pmatch = NULL;
 	*matching_regex = -1;
 
 	*display = 1;
@@ -2344,7 +2354,7 @@ void start_all_processes(char *nsubwindows)
 				cur -> wfd = cur -> fd = socket(AF_INET, SOCK_DGRAM, 0);
 				if (cur -> fd == -1)
 
-				myfree(dummy);
+					myfree(dummy);
 
 				cur -> pid = -1;
 			}

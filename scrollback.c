@@ -746,6 +746,7 @@ void merged_scrollback_with_search(char *search_for, mybool_t case_insensitive)
 		if ((rc=regcomp(&reg, search_for, REG_EXTENDED | (case_insensitive == MY_TRUE?REG_ICASE:0))))
 		{
 			regexp_error_popup(rc, &reg);
+			free(last_check);
 			return;
 		}
 	}

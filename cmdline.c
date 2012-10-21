@@ -1035,7 +1035,7 @@ void do_commandline(int argc, char *argv[])
 			/* see if file exists */
 			if (check_interval == 0 && is_cmd == 0 && is_stdin == 0 && is_sock == 0 && retry == 0 && stat64(dummy, &buf) == -1)
 			{
-				fprintf(stderr, "Error opening file %s.\n", dummy);
+				fprintf(stderr, "Error opening file %s (%s)\n", dummy, strerror(errno));
 				exit(EXIT_FAILURE);
 			}
 

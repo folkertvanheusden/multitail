@@ -2449,7 +2449,7 @@ void horizontal_scroll(int direction)
 
 void regexp_error_popup(int rc, regex_t *pre)
 {
-	char popup_buffer[4096];
+	char popup_buffer[4096] = { 0 };
 	char *error = convert_regexp_error(rc, pre);
 
 	if (error)
