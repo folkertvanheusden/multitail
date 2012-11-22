@@ -47,7 +47,7 @@ char *global_find = NULL;
 int terminal_main_index = -1;
 int default_color_scheme = -1;
 int max_y, max_x;
-int min_n_bufferlines = 25;
+int min_n_bufferlines = -1;
 int mode_statusline = 1;
 int n_children = 0;
 int n_conversions = 0;

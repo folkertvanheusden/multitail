@@ -191,7 +191,7 @@ void add_redir_to_socket(char filtered, char *prio, char *fac, char *address, re
     struct addrinfo hints;
     struct addrinfo* result;
     struct addrinfo* rp;
-    int s, sfd;
+    int s, sfd = -1;
 
 	*predir = (redirect_t *)myrealloc(*predir, (*n_redirect) * sizeof(redirect_t), __FILE__, __PRETTY_FUNCTION__, __LINE__);
 
@@ -578,7 +578,7 @@ void do_commandline(int argc, char *argv[])
 	int_array_t cur_color_schemes = { NULL, 0, 0 };
 	myattr_t cdef = { -1, -1 };
 	int window_height = -1;
-	int initial_n_lines_tail = -1;
+	int initial_n_lines_tail = min_n_bufferlines;
 	char *win_title = NULL;
 	term_t cur_term_emul = TERM_IGNORE;
 	strip_t *pstrip = NULL;
@@ -792,6 +792,10 @@ void do_commandline(int argc, char *argv[])
 		else if (strcmp(argv[loop], "-n") == 0)
 		{
 			initial_n_lines_tail = get_value_arg("-n", argv[++loop], VAL_ZERO_POSITIVE);
+		}
+		else if (strcmp(argv[loop], "-N") == 0)
+		{
+			initial_n_lines_tail = min_n_bufferlines = get_value_arg("-n", argv[++loop], VAL_ZERO_POSITIVE);
 		}
 		else if (strcmp(argv[loop], "-b") == 0)
 		{
@@ -1067,7 +1071,7 @@ void do_commandline(int argc, char *argv[])
 
 			/* initial number of lines to tail */
 			cur -> initial_n_lines_tail = initial_n_lines_tail;
-			initial_n_lines_tail = -1;
+			initial_n_lines_tail = min_n_bufferlines;
 
 			/* default window height */
 			cur -> win_height = window_height;
