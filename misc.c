@@ -87,7 +87,7 @@ void info(void)
 			struct rusage usage;
 
 			if (getrusage(RUSAGE_SELF, &usage) == -1)
-				error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "getrusage() failed\n");
+				error_exit("getrusage() failed\n");
 
 			mvwprintw(mywin -> win, proc_u_line, 2, "Runtime: %02d:%02d:%02d, avg.proc.usage: %.2f%% ints/s: %.1f",
 					(int)(run_time / 3600), ((int)run_time / 60) % 60, (int)run_time % 60,
@@ -129,9 +129,9 @@ void statistics_popup(int f_index, proginfo *cur)
 	{
 		dtime_t time_running = get_ts() - cur -> statistics.start_ts;
 		time_t start_ts = (time_t)cur -> statistics.start_ts;
-		char *start_ts_str = mystrdup(ctime(&start_ts),  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		char *start_ts_str = mystrdup(ctime(&start_ts));
 		time_t lastevent = (time_t)cur -> statistics.lastevent;
-		char *last_ts_str  = mystrdup(ctime(&lastevent), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		char *last_ts_str  = mystrdup(ctime(&lastevent));
 		char *dummy;
 		char *vmsize_str = NULL;
 		char *fsize_str = NULL;
@@ -218,7 +218,7 @@ void statistics_popup(int f_index, proginfo *cur)
 			{
 				double dummy_d = (double)(time(NULL) - cur -> statistics.lastevent) / avg;
 				time_t next_event = cur -> statistics.lastevent + (ceil(dummy_d) * avg);
-				char *ne_str = mystrdup(ctime(&next_event), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				char *ne_str = mystrdup(ctime(&next_event));
 				char *dummy_str = strchr(ne_str, '\n');
 
 				if (dummy_str) *dummy_str = 0x00;
@@ -320,9 +320,9 @@ void statistics_menu(void)
 
 			while(cur)
 			{
-				plist = (proginfo **)myrealloc(plist, (nwin + 1) * sizeof(proginfo *), __FILE__, __PRETTY_FUNCTION__, __LINE__);
-				issub = (char *)     myrealloc(issub, (nwin + 1) * sizeof(char)      , __FILE__, __PRETTY_FUNCTION__, __LINE__);
-				winnr = (int *)      myrealloc(winnr, (nwin + 1) * sizeof(int)       , __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				plist = (proginfo **)myrealloc(plist, (nwin + 1) * sizeof(proginfo *));
+				issub = (char *)     myrealloc(issub, (nwin + 1) * sizeof(char)      );
+				winnr = (int *)      myrealloc(winnr, (nwin + 1) * sizeof(int)       );
 
 				plist[nwin] = cur;
 				issub[nwin] = (cur != &pi[loop]);

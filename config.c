@@ -44,7 +44,7 @@ long long int kb_str_to_value(char *field, char *str)
 	char *mult;
 	long long int bytes = atoll(str);
 	if (bytes < -1)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "%s: value cannot be < -1\n", field);
+		error_exit("%s: value cannot be < -1\n", field);
 
 	mult = &str[strlen(str) - 2];
 	if (strcasecmp(mult, "kb") == 0)
@@ -104,7 +104,7 @@ void add_cs_re(int linenr, char *incmd, char *par)
 			config_error_exit(linenr, "One cannot let a color script have the same name has a color scheme.");
 
 		/* grow/create list */
-		cschemes[cur_colorscheme_nr].pentries = (color_scheme_entry *)myrealloc(cschemes[cur_colorscheme_nr].pentries, (cschemes[cur_colorscheme_nr].n + 1) * sizeof(color_scheme_entry), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		cschemes[cur_colorscheme_nr].pentries = (color_scheme_entry *)myrealloc(cschemes[cur_colorscheme_nr].pentries, (cschemes[cur_colorscheme_nr].n + 1) * sizeof(color_scheme_entry));
 
 		/* add to list */
 		if (cmd[0] == 0x00)
@@ -154,11 +154,11 @@ void add_colorscheme(int linenr, char *cmd, char *par)
 
 		cur_colorscheme_nr = n_cschemes++;
 
-		cschemes = (color_scheme *)myrealloc(cschemes, n_cschemes * sizeof(color_scheme), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		cschemes = (color_scheme *)myrealloc(cschemes, n_cschemes * sizeof(color_scheme));
 		memset(&cschemes[cur_colorscheme_nr], 0x00, sizeof(color_scheme));
 
-		cschemes[cur_colorscheme_nr].descr = mystrdup(USE_IF_SET(descr, ""), __FILE__, __PRETTY_FUNCTION__, __LINE__);
-		cschemes[cur_colorscheme_nr].name  = mystrdup(par, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		cschemes[cur_colorscheme_nr].descr = mystrdup(USE_IF_SET(descr, ""));
+		cschemes[cur_colorscheme_nr].name  = mystrdup(par);
 	}
 }
 
@@ -171,12 +171,12 @@ void add_colorscript(int linenr, char *cmd, char *par)
 
 	cur_colorscheme_nr = n_cschemes++;
 
-	cschemes = (color_scheme *)myrealloc(cschemes, n_cschemes * sizeof(color_scheme), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	cschemes = (color_scheme *)myrealloc(cschemes, n_cschemes * sizeof(color_scheme));
 	memset(&cschemes[cur_colorscheme_nr], 0x00, sizeof(color_scheme));
 
-	cschemes[cur_colorscheme_nr].name  = mystrdup(par, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-	cschemes[cur_colorscheme_nr].descr = mystrdup(dummy2, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-	cschemes[cur_colorscheme_nr].color_script.script = mystrdup(dummy1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	cschemes[cur_colorscheme_nr].name  = mystrdup(par);
+	cschemes[cur_colorscheme_nr].descr = mystrdup(dummy2);
+	cschemes[cur_colorscheme_nr].color_script.script = mystrdup(dummy1);
 
 	cur_colorscheme_nr = -1;
 }
@@ -185,11 +185,11 @@ void add_editscheme(int linenr, char *cmd, char *par)
 {
 	char *descr = find_next_par(par);
 
-	pes = (editscheme *)myrealloc(pes, sizeof(editscheme) * (n_es + 1), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	pes = (editscheme *)myrealloc(pes, sizeof(editscheme) * (n_es + 1));
 	memset(&pes[n_es], 0x00, sizeof(editscheme));
 
-	pes[n_es].es_name = mystrdup(par, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-	pes[n_es].es_desc = mystrdup(USE_IF_SET(descr, ""), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	pes[n_es].es_name = mystrdup(par);
+	pes[n_es].es_desc = mystrdup(USE_IF_SET(descr, ""));
 	cur_editscheme_nr = n_es++;
 }
 
@@ -223,7 +223,7 @@ void add_editrule(int linenr, char *cmd, char *par)
 	}
 
 	rule_index = pes[cur_editscheme_nr].n_strips;
-	pes[cur_editscheme_nr].strips = (strip_t *)myrealloc(pes[cur_editscheme_nr].strips, (pes[cur_editscheme_nr].n_strips + 1) * sizeof(strip_t), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	pes[cur_editscheme_nr].strips = (strip_t *)myrealloc(pes[cur_editscheme_nr].strips, (pes[cur_editscheme_nr].n_strips + 1) * sizeof(strip_t));
 	memset(&pes[cur_editscheme_nr].strips[pes[cur_editscheme_nr].n_strips], 0x00, sizeof(strip_t));
 	pes[cur_editscheme_nr].n_strips++;
 
@@ -236,12 +236,12 @@ void add_editrule(int linenr, char *cmd, char *par)
 	}
 	else if (type == STRIP_TYPE_REGEXP || type == STRIP_KEEP_SUBSTR)
 	{
-		pes[cur_editscheme_nr].strips[rule_index].regex_str = mystrdup(par1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		pes[cur_editscheme_nr].strips[rule_index].regex_str = mystrdup(par1);
 		compile_re(&pes[cur_editscheme_nr].strips[rule_index].regex, par1);
 	}
 	else if (type == STRIP_TYPE_COLUMN)
 	{
-		pes[cur_editscheme_nr].strips[rule_index].del = mystrdup(par1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		pes[cur_editscheme_nr].strips[rule_index].del = mystrdup(par1);
 		pes[cur_editscheme_nr].strips[rule_index].col_nr = atoi(par2);
 	}
 }
@@ -250,11 +250,11 @@ void add_filterscheme(int linenr, char *cmd, char *par)
 {
 	char *descr = find_next_par(par);
 
-	pfs = (filterscheme *)myrealloc(pfs, sizeof(filterscheme) * (n_fs + 1), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	pfs = (filterscheme *)myrealloc(pfs, sizeof(filterscheme) * (n_fs + 1));
 	memset(&pfs[n_fs], 0x00, sizeof(filterscheme));
 
-	pfs[n_fs].fs_name = mystrdup(par, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-	pfs[n_fs].fs_desc = mystrdup(USE_IF_SET(descr, ""), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	pfs[n_fs].fs_name = mystrdup(par);
+	pfs[n_fs].fs_desc = mystrdup(USE_IF_SET(descr, ""));
 	cur_filterscheme_nr = n_fs++;
 }
 
@@ -284,17 +284,17 @@ void add_filterscheme_rule(int linenr, char *cmd, char *par)
 		if (!dummy)
 			config_error_exit(linenr, "Missing command for rule of type 'e%c' for scheme %s.\n", type[1], pfs[cur_filterscheme_nr].fs_name);
 
-		re_cmd = mystrdup(dummy, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		re_cmd = mystrdup(dummy);
 		use_regex = type[1];
 
 		if (use_regex == 'X' && (strchr(re_str, '(') == NULL || strchr(re_str, ')') == NULL))
 			config_error_exit(linenr, "Filter scheme rule: -eX requires a regular expression which selects a substring using '(' and ')'.\n");
 	}
 
-	pfs[cur_filterscheme_nr].pre = (re *)myrealloc(pfs[cur_filterscheme_nr].pre, (pfs[cur_filterscheme_nr].n_re + 1) * sizeof(re), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	pfs[cur_filterscheme_nr].pre = (re *)myrealloc(pfs[cur_filterscheme_nr].pre, (pfs[cur_filterscheme_nr].n_re + 1) * sizeof(re));
 	memset(&pfs[cur_filterscheme_nr].pre[pfs[cur_filterscheme_nr].n_re], 0x00, sizeof(re));
 	pfs[cur_filterscheme_nr].pre[pfs[cur_filterscheme_nr].n_re].use_regex = use_regex;
-	pfs[cur_filterscheme_nr].pre[pfs[cur_filterscheme_nr].n_re].regex_str = mystrdup(re_str, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	pfs[cur_filterscheme_nr].pre[pfs[cur_filterscheme_nr].n_re].regex_str = mystrdup(re_str);
 	compile_re(&pfs[cur_filterscheme_nr].pre[pfs[cur_filterscheme_nr].n_re].regex, re_str);
 	pfs[cur_filterscheme_nr].pre[pfs[cur_filterscheme_nr].n_re].cmd = re_cmd;
 	pfs[cur_filterscheme_nr].n_re++;
@@ -338,9 +338,9 @@ void add_convert(int linenr, char *cmd, char *par)
 	if (loop == n_conversions)
 	{
 		n_conversions++;
-		conversions = (conversion *)myrealloc(conversions, sizeof(conversion) * n_conversions, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		conversions = (conversion *)myrealloc(conversions, sizeof(conversion) * n_conversions);
 		memset(&conversions[loop], 0x00, sizeof(conversion));
-		conversions[loop].name = mystrdup(conv_name, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		conversions[loop].name = mystrdup(conv_name);
 	}
 
 	if (strcmp(conv_type, "ip4tohost") == 0)
@@ -364,14 +364,14 @@ void add_convert(int linenr, char *cmd, char *par)
 	else
 		config_error_exit(linenr, "Convert %s: '%s' is a not recognized conversion type.\n", conv_name, conv_type);
 
-	conversions[loop].pcb = (conversion_bundle_t *)myrealloc(conversions[loop].pcb, sizeof(conversion_bundle_t) * (conversions[loop].n + 1), __FILE__, __PRETTY_FUNCTION__, __LINE__);
-	conversions[loop].pcs = (script *)myrealloc(conversions[loop].pcs, sizeof(script) * (conversions[loop].n + 1), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	conversions[loop].pcb = (conversion_bundle_t *)myrealloc(conversions[loop].pcb, sizeof(conversion_bundle_t) * (conversions[loop].n + 1));
+	conversions[loop].pcs = (script *)myrealloc(conversions[loop].pcs, sizeof(script) * (conversions[loop].n + 1));
 
 	conversions[loop].pcb[conversions[loop].n].type = type;
 
 
 	memset(&conversions[loop].pcs[conversions[loop].n], 0x00, sizeof(script));
-	conversions[loop].pcs[conversions[loop].n].script = conv_script?mystrdup(conv_script, __FILE__, __PRETTY_FUNCTION__, __LINE__):NULL;
+	conversions[loop].pcs[conversions[loop].n].script = conv_script?mystrdup(conv_script):NULL;
 
 	compile_re(&conversions[loop].pcb[conversions[loop].n].regex, conv_re);
 	conversions[loop].pcb[conversions[loop].n].match_count = 0;
@@ -473,7 +473,7 @@ void scheme(int linenr, char *cmd, char *par)
 void set_defaultcscheme(int linenr, char *cmd, char *par)
 {
 	myfree(defaultcscheme);
-	defaultcscheme = mystrdup(par, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	defaultcscheme = mystrdup(par);
 }
 
 void bind_char(int linenr, char *cmd, char *par)
@@ -485,14 +485,14 @@ void bind_char(int linenr, char *cmd, char *par)
 
 	if (strlen(par) > 2) config_error_exit(linenr, "bind parameter malformed: unknown keyselection.\n");
 
-	keybindings = (keybinding *)myrealloc(keybindings, sizeof(keybinding) * (n_keybindings + 1), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	keybindings = (keybinding *)myrealloc(keybindings, sizeof(keybinding) * (n_keybindings + 1));
 
 	if (par[0] == '^')
 		keybindings[n_keybindings].key = toupper(par[1]) - 'A' + 1;
 	else
 		keybindings[n_keybindings].key = par[0];
 
-	keybindings[n_keybindings].command = mystrdup(proc, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	keybindings[n_keybindings].command = mystrdup(proc);
 	n_keybindings++;
 }
 
@@ -533,7 +533,7 @@ void set_umask(int linenr, char *cmd, char *par)
 void set_shell(int linenr, char *cmd, char *par)
 {
 	myfree(shell);
-	shell = mystrdup(par, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	shell = mystrdup(par);
 }
 
 void set_statusline_above_data(int linenr, char *cmd, char *par)
@@ -600,19 +600,19 @@ void set_bright(int linenr, char *cmd, char *par)
 void set_ts_format(int linenr, char *cmd, char *par)
 {
 	myfree(ts_format);
-	ts_format = mystrdup(par, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	ts_format = mystrdup(par);
 }
 
 void set_cnv_ts_format(int linenr, char *cmd, char *par)
 {
 	myfree(cnv_ts_format);
-	cnv_ts_format = mystrdup(par, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	cnv_ts_format = mystrdup(par);
 }
 
 void set_statusline_ts_format(int linenr, char *cmd, char *par)
 {
 	myfree(statusline_ts_format);
-	statusline_ts_format = mystrdup(par, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	statusline_ts_format = mystrdup(par);
 }
 
 void set_markerline_attrs(int linenr, char *cmd, char *par)
@@ -734,13 +734,13 @@ void set_tab_stop(int linenr, char *cmd, char *par)
 void set_tail(int linenr, char *cmd, char *par)
 {
 	myfree(tail);
-	tail = mystrdup(par, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	tail = mystrdup(par);
 }
 
 void set_titlebar(int linenr, char *cmd, char *par)
 {
 	myfree(set_title);
-	set_title = mystrdup(par, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	set_title = mystrdup(par);
 }
 
 void set_abbreviate_filesize(int linenr, char *cmd, char *par)
@@ -751,7 +751,7 @@ void set_abbreviate_filesize(int linenr, char *cmd, char *par)
 void set_replace_by_markerline(int linenr, char *cmd, char *par)
 {
 	myfree(replace_by_markerline);
-	replace_by_markerline = mystrdup(par, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	replace_by_markerline = mystrdup(par);
 }
 
 void set_popup_refresh_interval(int linenr, char *cmd, char *par)
@@ -817,7 +817,7 @@ void set_exit_key(int linenr, char *cmd, char *par)
 void set_line_ts_format(int linenr, char *cmd, char *par)
 {
 	myfree(line_ts_format);
-	line_ts_format = mystrdup(par, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	line_ts_format = mystrdup(par);
 }
 
 void set_default_min_shrink(int linenr, char *cmd, char *par)
@@ -957,13 +957,13 @@ void set_box_top_side(int linenr, char *cmd, char *par)
 void set_window_number(int linenr, char *cmd, char *par)
 {
 	myfree(window_number);
-	window_number = mystrdup(par, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	window_number = mystrdup(par);
 }
 
 void set_subwindow_number(int linenr, char *cmd, char *par)
 {
 	myfree(subwindow_number);
-	subwindow_number = mystrdup(par, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	subwindow_number = mystrdup(par);
 }
 
 void set_posix_tail(int linenr, char *cmd, char *par)
@@ -974,7 +974,7 @@ void set_posix_tail(int linenr, char *cmd, char *par)
 void set_syslog_ts_format(int linenr, char *cmd, char *par)
 {
 	myfree(syslog_ts_format);
-	syslog_ts_format = mystrdup(par, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	syslog_ts_format = mystrdup(par);
 }
 
 void set_resolv_ip_addresses(int linenr, char *cmd, char *par)
@@ -1174,7 +1174,7 @@ void do_load_config(int dummynr, char *dummy, char *file)
 		if (errno == ENOENT)	/* file does not exist, not an error */
 			return;
 
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "do_load_config: error loading configfile '%s'\n", file);
+		error_exit("do_load_config: error loading configfile '%s'\n", file);
 	}
 
 	for(;;)
@@ -1192,11 +1192,11 @@ void do_load_config(int dummynr, char *dummy, char *file)
 		if (dummy)
 			*dummy = 0x00;
 		else
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "line %d of file '%s' is too long!\n", linenr, file);
+			error_exit("line %d of file '%s' is too long!\n", linenr, file);
 
 		/* LOG("%d: %s\n", linenr, cmdin); */
 		if (config_file_entry(linenr, cmd) == -1)
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Configuration parameter '%s' is unknown (file: %s, line: %d).\n", read_buffer, file, linenr);
+			error_exit("Configuration parameter '%s' is unknown (file: %s, line: %d).\n", read_buffer, file, linenr);
 	}
 	fclose(fh);
 
@@ -1220,7 +1220,7 @@ void load_configfile_wrapper(char *config_file)
 	else
 	{
 		int path_max = find_path_max();
-		char *path = mymalloc(path_max + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		char *path = mymalloc(path_max + 1);
 		char *home = getenv("HOME");
 		struct passwd *pp = getuserinfo();
 

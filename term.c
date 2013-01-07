@@ -143,7 +143,7 @@ void draw_line(NEWWIN *win, linepos_t where)
 
 char * edit_string(NEWWIN *win, int win_y, int win_x, int win_width, int max_width, char numbers_only, char *input_string, int what_help, char first_char, history_t *ph, mybool_t *pcase_insensitive)
 {
-	char *string = (char *)mymalloc(max_width + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	char *string = (char *)mymalloc(max_width + 1);
 	int str_pos = 0, x = 0;
 	int line_width = win_width;
 
@@ -428,7 +428,7 @@ char * edit_string(NEWWIN *win, int win_y, int win_x, int win_width, int max_wid
 		if (str_pos != prev_str_pos || force_redraw)
 		{
 			int loop;
-			char *dummy = mystrdup(&string[str_pos], __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			char *dummy = mystrdup(&string[str_pos]);
 			dummy[min(strlen(dummy), line_width)] = 0x00;
 			for(loop=strlen(dummy); loop<line_width; loop++)
 				mvwprintw(win -> win, win_y, win_x + loop, " ");
@@ -490,10 +490,10 @@ void mydelwin(NEWWIN *win)
 	bottom_panel(win -> pwin);
 
 	if (ERR == del_panel(win -> pwin))
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "del_panel() failed\n");
+		error_exit("del_panel() failed\n");
 
 	if (ERR == delwin(win -> win))
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "delwin() failed\n");
+		error_exit("delwin() failed\n");
 }
 
 void mydoupdate()
@@ -504,15 +504,15 @@ void mydoupdate()
 
 NEWWIN * mynewwin(int nlines, int ncols, int begin_y, int begin_x)
 {
-	NEWWIN *nwin = (NEWWIN *)mymalloc(sizeof(NEWWIN), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	NEWWIN *nwin = (NEWWIN *)mymalloc(sizeof(NEWWIN));
 	/*	nwin -> win = subwin(stdscr, nlines, ncols, begin_y, begin_x); */
 	nwin -> win = newwin(nlines, ncols, begin_y, begin_x);
 	if (!nwin -> win)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Failed to create window with dimensions %dx%d at offset %d,%d (terminal size: %d,%d)\n", ncols, nlines, begin_x, begin_y, COLS, LINES);
+		error_exit("Failed to create window with dimensions %dx%d at offset %d,%d (terminal size: %d,%d)\n", ncols, nlines, begin_x, begin_y, COLS, LINES);
 
 	nwin -> pwin = new_panel(nwin -> win);
 	if (!nwin -> pwin)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Failed to create panel.\n");
+		error_exit("Failed to create panel.\n");
 
 	nwin -> x_off = begin_x;
 	nwin -> y_off = begin_y;
@@ -677,7 +677,7 @@ int find_or_init_colorpair(int fgcolor, int bgcolor, char ignore_errors)
 				return 0;
 			}
 
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Too many (%d) colorpairs defined.\n", cp.n_def);
+			error_exit("Too many (%d) colorpairs defined.\n", cp.n_def);
 		}
 
 		cp.fg_color[cp.n_def] = fgcolor;
@@ -703,7 +703,7 @@ int colorstr_to_nr(char *str)
 	}
 
 	if (use_colors)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "'%s' is not recognized as a color\n", str);
+		error_exit("'%s' is not recognized as a color\n", str);
 
 	return -1;
 }
@@ -732,7 +732,7 @@ int attrstr_to_nr(char *str)
 		else if (strcmp(str, "blink") == 0)
 			attr |= A_BLINK;
 		else
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "'%s' is not recognized as an attribute.\n", str);
+			error_exit("'%s' is not recognized as an attribute.\n", str);
 
 		if (!slash)
 			break;
@@ -809,7 +809,7 @@ char *attr_to_str(int attr)
 	if (attr & A_DIM)
 		attr_to_str_helper(buffer, "dim");
 
-	return mystrdup(buffer, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	return mystrdup(buffer);
 }
 
 void determine_terminal_size(int *max_y, int *max_x)
@@ -878,7 +878,7 @@ int ansi_code_to_color(int value)
 char * emulate_terminal(char *string, color_offset_in_line **cmatches, int *n_cmatches)
 {
 	int len = strlen(string), new_offset = 0, loop;
-	char *new_string = (char *)mymalloc(len + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	char *new_string = (char *)mymalloc(len + 1);
 	int cur_n_cmatches = 0;
 
 	*n_cmatches = 0;
@@ -949,7 +949,7 @@ char * emulate_terminal(char *string, color_offset_in_line **cmatches, int *n_cm
 				{
 					cur_n_cmatches = (cur_n_cmatches + 8) * 2;
 
-					*cmatches = realloc_color_offset_in_line(*cmatches, cur_n_cmatches, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+					*cmatches = realloc_color_offset_in_line(*cmatches, cur_n_cmatches);
 				}
 
 				memset(&(*cmatches)[*n_cmatches], 0x00, sizeof(color_offset_in_line));
@@ -1012,7 +1012,7 @@ void init_colornames(void)
 	dummy = min(256, COLORS);
 	if (use_colors)
 	{
-		color_names = (char **)mymalloc(dummy * sizeof(char *), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		color_names = (char **)mymalloc(dummy * sizeof(char *));
 		memset(color_names, 0x00, dummy * sizeof(char *));
 
 		color_names[COLOR_RED]    = "red";

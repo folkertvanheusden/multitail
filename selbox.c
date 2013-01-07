@@ -32,16 +32,16 @@ int create_subwindow_list(int f_index, char ***swlist)
 
 	do
 	{
-		list = (char **)myrealloc(list, (n + 1) * sizeof(char *), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		list = (char **)myrealloc(list, (n + 1) * sizeof(char *));
 
 		if (show_subwindow_id)
 		{
 			int len = strlen(cur -> filename);
-			list[n] = (char *)mymalloc(len + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			list[n] = (char *)mymalloc(len + 1);
 			memcpy(list[n], cur -> filename, len + 1);
 		}
 		else
-			list[n] = mystrdup(cur -> filename, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			list[n] = mystrdup(cur -> filename);
 
 		n++;
 
@@ -105,9 +105,9 @@ int selection_box(void **list, char *needs_mark, int nlines, selbox_type_t type,
 	int pos = 0, ppos = -1, offs = 0, poffs = -1;
 	int loop = 0, sel = -1;
 	char first = 1;
-	char *dummy = (char *)mymalloc(wcols + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	char *dummy = (char *)mymalloc(wcols + 1);
 	int path_max = find_path_max();
-	char *selstr = (char *)mymalloc(path_max + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__), selfound = 0;
+	char *selstr = (char *)mymalloc(path_max + 1), selfound = 0;
 
 	selstr[0] = 0x00;
 
@@ -377,7 +377,7 @@ char * select_file(char *input, int what_help)
 	index = selection_box((void **)list, isdir, list_n, SEL_FILES, what_help, NULL);
 	if (index != -1)
 	{
-		new_fname = (char *)mymalloc(strbufsize + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		new_fname = (char *)mymalloc(strbufsize + 1);
 
 		snprintf(new_fname, strbufsize, "%s%s", path, list[index]);
 

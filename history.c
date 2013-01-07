@@ -28,7 +28,7 @@ void load_history(history_t *ph)
 	{
 		int array_in_bytes = sizeof(char *) * ph -> history_size;
 
-		ph -> history = (char **)mymalloc(array_in_bytes, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		ph -> history = (char **)mymalloc(array_in_bytes);
 		memset(ph -> history, 0x00, array_in_bytes);
 
 		if (file_exist(ph -> history_file) == 0)
@@ -50,7 +50,7 @@ void load_history(history_t *ph)
 				if (lf)
 					*lf = 0x00;
 
-				(ph -> history)[loop] = mystrdup(buffer, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				(ph -> history)[loop] = mystrdup(buffer);
 			}
 
 			fclose(fh);
@@ -122,7 +122,7 @@ void history_add(history_t *ph, char *string)
 			found = 0;
 		}
 
-		(ph -> history)[found] = mystrdup(string, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		(ph -> history)[found] = mystrdup(string);
 
 		save_history(ph);
 	}
@@ -145,7 +145,7 @@ char * search_history(history_t *ph, char *search_string)
 
 			if (sel_index >= 0)
 			{
-				return mystrdup((ph -> history)[sel_index], __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				return mystrdup((ph -> history)[sel_index]);
 			}
 		}
 		else

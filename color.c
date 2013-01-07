@@ -17,11 +17,11 @@
 #include "globals.h"
 #include "ui.h"
 
-color_offset_in_line *realloc_color_offset_in_line(color_offset_in_line *oldp, int n_entries, char *file, const char *function, int line)
+color_offset_in_line *realloc_color_offset_in_line(color_offset_in_line *oldp, int n_entries)
 {
 	assert(n_entries > 0);
 
-	return (color_offset_in_line *)myrealloc(oldp, n_entries * sizeof(color_offset_in_line), file, function, line);
+	return (color_offset_in_line *)myrealloc(oldp, n_entries * sizeof(color_offset_in_line));
 }
 
 void add_color_scheme(int_array_t *schemes, int cur_scheme)
@@ -121,8 +121,8 @@ void color_script(char *line, script *pscript, int *cur_n_cmatches, color_offset
 {
 	char finished = 0;
 	int line_len = min(SCRIPT_IO_BUFFER_SIZE - 2, strlen(line));
-	char *iobuffer = (char *)mymalloc(SCRIPT_IO_BUFFER_SIZE, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-	char *line_buf = (char *)mymalloc(line_len + 1 + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	char *iobuffer = (char *)mymalloc(SCRIPT_IO_BUFFER_SIZE);
+	char *line_buf = (char *)mymalloc(line_len + 1 + 1);
 
 	exec_script(pscript);
 
@@ -159,7 +159,7 @@ void color_script(char *line, script *pscript, int *cur_n_cmatches, color_offset
 			if (*cur_n_cmatches == *n_cmatches)
 			{
 				*cur_n_cmatches = (*cur_n_cmatches + 8) * 2;
-				*cmatches = realloc_color_offset_in_line(*cmatches, *cur_n_cmatches, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				*cmatches = realloc_color_offset_in_line(*cmatches, *cur_n_cmatches);
 			}
 
 			komma = strchr(workpnt, ',');
@@ -251,7 +251,7 @@ void get_colors_from_colorscheme(char *line, int_array_t *color_schemes, color_o
 					if (flags == CSREFLAG_CMP_VAL_LESS || flags == CSREFLAG_CMP_VAL_BIGGER || flags == CSREFLAG_CMP_VAL_EQUAL)
 					{
 						int val_size = this_end_offset - this_start_offset;
-						char *valstr = (char *)mymalloc(val_size + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+						char *valstr = (char *)mymalloc(val_size + 1);
 						double value = 0.0;
 						char value_match = 0;
 
@@ -275,7 +275,7 @@ void get_colors_from_colorscheme(char *line, int_array_t *color_schemes, color_o
 					if (cur_n_cmatches == *n_cmatches)
 					{
 						cur_n_cmatches = (cur_n_cmatches + 8) * 2;
-						*cmatches = realloc_color_offset_in_line(*cmatches, cur_n_cmatches, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+						*cmatches = realloc_color_offset_in_line(*cmatches, cur_n_cmatches);
 					}
 
 					memset(&(*cmatches)[*n_cmatches], 0x00, sizeof(color_offset_in_line));
@@ -395,8 +395,8 @@ void init_colors(void)
 	cp.size = min(256, COLOR_PAIRS);
 	if (cp.size)
 	{
-		cp.fg_color = (int *)mymalloc(cp.size * sizeof(int), __FILE__, __PRETTY_FUNCTION__, __LINE__);
-		cp.bg_color = (int *)mymalloc(cp.size * sizeof(int), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		cp.fg_color = (int *)mymalloc(cp.size * sizeof(int));
+		cp.bg_color = (int *)mymalloc(cp.size * sizeof(int));
 	}
 
 	(void)find_or_init_colorpair(-1, -1, 1);		/* colorpair 0 is always default, cannot be changed */
@@ -410,5 +410,5 @@ void init_colors(void)
 	/*	(void)find_or_init_colorpair(COLOR_BLACK, -1, 1); */
 
 	if (use_colors && cp.n_def != DEFAULT_COLORPAIRS)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Unexpected number of colors: %d (%d)\n", cp.n_def, DEFAULT_COLORPAIRS);
+		error_exit("Unexpected number of colors: %d (%d)\n", cp.n_def, DEFAULT_COLORPAIRS);
 }

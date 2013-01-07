@@ -13,9 +13,9 @@
 
 void store_for_diff(diff_t *diff, char *string)
 {
-	diff -> bcur = (char **)myrealloc(diff -> bcur, sizeof(char *) * (diff -> ncur + 1), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	diff -> bcur = (char **)myrealloc(diff -> bcur, sizeof(char *) * (diff -> ncur + 1));
 
-	(diff -> bcur)[diff -> ncur] = mystrdup(string, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	(diff -> bcur)[diff -> ncur] = mystrdup(string);
 
 	diff -> ncur++;
 }

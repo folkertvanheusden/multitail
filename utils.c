@@ -37,19 +37,6 @@
 #include "utils.h"
 
 
-#ifdef _DEBUG
-void check_fd(int fd, char *file, const char *function, int line)
-{
-	if (fcntl(fd, F_GETFL) == -1)
-	{
-		if (errno == EBADF)
-			error_exit(file, function, line, "Not a valid filedescriptor.\n");
-	}
-}
-#else
-#define check_fd(x, y, z, a)
-#endif
-
 int find_path_max(void)
 {
 #ifdef PATH_MAX
@@ -58,7 +45,7 @@ int find_path_max(void)
 	int path_max = pathconf("/", _PC_PATH_MAX);
 	if (path_max <= 0)
 	{
-		if (errno) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "pathconf() failed\n");
+		if (errno) error_exit("pathconf() failed\n");
 
 		path_max = 4096;
 	}
@@ -89,7 +76,7 @@ ssize_t WRITE(int fd, char *whereto, size_t len, char *for_whom)
 		if (rc == -1)
 		{
 			if (errno != EINTR && errno != EAGAIN)
-				error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Problem writing to file descriptor while processing %s.\n", for_whom);
+				error_exit("Problem writing to file descriptor while processing %s.\n", for_whom);
 		}
 		else if (rc == 0)
 		{
@@ -121,7 +108,7 @@ void get_load_values(double *v1, double *v2, double *v3)
 		 * calls start to fail, something must be
 		 * really wrong
 		 */
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "sysinfo() failed\n");
+		error_exit("sysinfo() failed\n");
 	}
 
 	*v1 = (double)si.loads[0] / scale;
@@ -132,7 +119,7 @@ void get_load_values(double *v1, double *v2, double *v3)
 	if (getloadavg(loadavg, 3) == -1)
 	{
 		/* see comment on sysinfo() */
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "getloadavg() failed\n");
+		error_exit("getloadavg() failed\n");
 	}
 	*v1 = loadavg[0];
 	*v2 = loadavg[1];
@@ -149,7 +136,7 @@ int get_vmsize(pid_t pid)
 #if defined(linux)
 	FILE *fh;
 	int path_max = find_path_max();
-	char *path = mymalloc(path_max, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	char *path = mymalloc(path_max);
 
 	assert(pid > 1);
 
@@ -158,7 +145,7 @@ int get_vmsize(pid_t pid)
 	fh = fopen(path, "r");
 	if (fh)
 	{
-		char *dummystr = mymalloc(path_max, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		char *dummystr = mymalloc(path_max);
 		char dummychar;
 		int dummy;
 
@@ -200,7 +187,7 @@ void stop_process(pid_t pid)
 	if (mykillpg(pid, SIGTERM) == -1)
 	{
 		if (errno != ESRCH)
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Problem stopping child process with PID %d (SIGTERM).\n", pid);
+			error_exit("Problem stopping child process with PID %d (SIGTERM).\n", pid);
 	}
 
 	usleep(1000);
@@ -215,11 +202,11 @@ void stop_process(pid_t pid)
 		if (mykillpg(pid, SIGKILL) == -1)
 		{
 			if (errno != ESRCH)
-				error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Problem stopping child process with PID %d (SIGKILL).\n", pid);
+				error_exit("Problem stopping child process with PID %d (SIGKILL).\n", pid);
 		}
 	}
 	else if (errno != ESRCH)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Problem stopping child process with PID %d (SIGTERM).\n", pid);
+		error_exit("Problem stopping child process with PID %d (SIGTERM).\n", pid);
 
 	/* wait for the last remainder of the died process to go away,
 	 * otherwhise we'll find zombies on our way
@@ -227,7 +214,7 @@ void stop_process(pid_t pid)
 	if (waitpid(pid, NULL, WNOHANG | WUNTRACED) == -1)
 	{
 		if (errno != ECHILD)
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "waitpid() failed\n");
+			error_exit("waitpid() failed\n");
 	}
 }
 
@@ -270,7 +257,7 @@ int file_info(char *filename, off64_t *file_size, time_field_t tft, time_t *ts, 
 	if (stat64(filename, &buf) == -1)
 	{
 		if (errno != ENOENT)
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Error while obtaining details of file %s.\n", filename);
+			error_exit("Error while obtaining details of file %s.\n", filename);
 
 		return -1;
 	}
@@ -302,7 +289,7 @@ int file_exist(char *filename)
 	int rc = stat(filename, &buf);
 
 	if (rc == -1 && errno != ENOENT)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "stat() on file %s failed.\n", filename);
+		error_exit("stat() on file %s failed.\n", filename);
 
 	return rc;
 }
@@ -319,7 +306,7 @@ char * convert_regexp_error(int error, const regex_t *preg)
 
 	if (error != REG_NOMATCH)
 	{
-		error_out = (char *)mymalloc(max_err_len + len + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		error_out = (char *)mymalloc(max_err_len + len + 1);
 
 		memcpy(error_out, multitail_string, len);
 
@@ -332,7 +319,7 @@ char * convert_regexp_error(int error, const regex_t *preg)
 
 char * amount_to_str(long long int amount)
 {
-	char *out = mymalloc(AMOUNT_STR_LEN, __FILE__, __PRETTY_FUNCTION__, __LINE__);	/* ...XB\0 */
+	char *out = mymalloc(AMOUNT_STR_LEN);	/* ...XB\0 */
 
 	assert(amount >= 0);
 
@@ -352,7 +339,7 @@ struct passwd *getuserinfo(void)
 {
 	struct passwd *pp = getpwuid(geteuid());
 	if (!pp)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Failed to get passwd-structure for effective user id %d.\n", geteuid());
+		error_exit("Failed to get passwd-structure for effective user id %d.\n", geteuid());
 
 	return pp;
 }
@@ -394,8 +381,6 @@ int myopen(char *path, int mode)
 
 int myclose(int fd)
 {
-	check_fd(fd, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-
 	for(;;)
 	{
 		if (close(fd) == -1)
@@ -438,7 +423,7 @@ double get_ts(void)
 	struct timezone tz;
 
 	if (gettimeofday(&ts, &tz) == -1)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "gettimeofday() failed");
+		error_exit("gettimeofday() failed");
 
 	return (((double)ts.tv_sec) + ((double)ts.tv_usec)/1000000.0);
 }
@@ -447,7 +432,7 @@ int match_files(char *search_for, char **path, char ***found, char **isdir)
 {
 	DIR *dir;
 	struct dirent *entry;
-	char *cur_dir = mymalloc(find_path_max() + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	char *cur_dir = mymalloc(find_path_max() + 1);
 	char *fname;
 	char **list = NULL;
 	int nfound = 0;
@@ -457,14 +442,14 @@ int match_files(char *search_for, char **path, char ***found, char **isdir)
 	char *slash = strrchr(search_for, '/');
 	if (slash)
 	{
-		fname = mystrdup(slash + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		fname = mystrdup(slash + 1);
 		*(slash + 1) = 0x00;
-		*path = mystrdup(search_for, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		*path = mystrdup(search_for);
 	}
 	else
 	{
-		*path = mystrdup("./", __FILE__, __PRETTY_FUNCTION__, __LINE__);
-		fname = mystrdup(search_for, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		*path = mystrdup("./");
+		fname = mystrdup(search_for);
 	}
 	fname_size = strlen(fname);
 	path_len = strlen(*path);
@@ -486,16 +471,16 @@ int match_files(char *search_for, char **path, char ***found, char **isdir)
 			struct stat finfo;
 
 			/* get filename */
-			list = (char **)myrealloc(list, (nfound + 1) * sizeof(char *), __FILE__, __PRETTY_FUNCTION__, __LINE__);
-			list[nfound] = mystrdup(entry -> d_name, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			list = (char **)myrealloc(list, (nfound + 1) * sizeof(char *));
+			list[nfound] = mystrdup(entry -> d_name);
 
 			/* check if the file is a directory */
-			*isdir = (char *)myrealloc(*isdir, (nfound + 1) * sizeof(char), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			*isdir = (char *)myrealloc(*isdir, (nfound + 1) * sizeof(char));
 			strncpy(&cur_dir[path_len], entry -> d_name, max(0,find_path_max() - path_len));
 			if (stat(cur_dir, &finfo) == -1)
 			{
 				if (errno != ENOENT)	/* file did not disappear? then something is very wrong */
-					error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Error while invoking stat() %s.\n", cur_dir);
+					error_exit("Error while invoking stat() %s.\n", cur_dir);
 			}
 			(*isdir)[nfound] = S_ISDIR(finfo.st_mode)?1:0;
 
@@ -504,7 +489,7 @@ int match_files(char *search_for, char **path, char ***found, char **isdir)
 	}
 
 	if (closedir(dir) == -1)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "closedir() failed\n");
+		error_exit("closedir() failed\n");
 
 	/*	qsort( (void *)list, (size_t)nfound, sizeof(char *), compare_filenames); */
 	for(s1=0; s1<(nfound - 1); s1++)
@@ -534,16 +519,14 @@ int match_files(char *search_for, char **path, char ***found, char **isdir)
 void setup_for_childproc(int fd, char close_fd_0, char *term)
 {
 	int term_len = strlen(term) + 5;
-	char *dummy = (char *)mymalloc(term_len + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	char *dummy = (char *)mymalloc(term_len + 1);
 
-	check_fd(fd, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-
-	if (close_fd_0) if (-1 == myclose(0)) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "close() failed\n");
-	if (-1 == myclose(1)) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "close() failed\n");
-	if (-1 == myclose(2)) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "close() failed\n");
-	if (close_fd_0) if (-1 == mydup(fd)) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "dup() failed\n");
-	if (-1 == mydup(fd)) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "dup() failed\n");
-	if (-1 == mydup(fd)) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "dup() failed\n");
+	if (close_fd_0) if (-1 == myclose(0)) error_exit("close() failed\n");
+	if (-1 == myclose(1)) error_exit("close() failed\n");
+	if (-1 == myclose(2)) error_exit("close() failed\n");
+	if (close_fd_0) if (-1 == mydup(fd)) error_exit("dup() failed\n");
+	if (-1 == mydup(fd)) error_exit("dup() failed\n");
+	if (-1 == mydup(fd)) error_exit("dup() failed\n");
 
 	/*
 	 * not doing this: it also clears the 'PATH'
@@ -571,7 +554,7 @@ int open_null(void)
 {
 	int fd = myopen("/dev/null", O_RDWR);
 	if (fd == -1)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Failed to open file /dev/null.\n");
+		error_exit("Failed to open file /dev/null.\n");
 
 	return fd;
 }
@@ -640,7 +623,7 @@ char * find_most_recent_file(char *filespec, char *cur_file)
 	/* found a file? then remember the filename */
 	if (selected_file != NULL)
 	{
-		selected_file = mystrdup(selected_file, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		selected_file = mystrdup(selected_file);
 	}
 
 	globfree(&files);
@@ -674,8 +657,6 @@ int mydup(int old_fd)
 {
 	int new_fd = -1;
 
-	check_fd(old_fd, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-
 	for(;;)
 	{
 		new_fd = dup(old_fd);
@@ -685,7 +666,7 @@ int mydup(int old_fd)
 			if (errno == EINTR)
 				continue;
 
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "dup() failed\n");
+			error_exit("dup() failed\n");
 		}
 
 		break;
@@ -715,7 +696,7 @@ void double_ts_to_str(dtime_t ts, char *format_str, char *dest, int dest_size)
 {
 	time_t now = (time_t)ts;
 	struct tm *ptm = localtime(&now);
-	if (!ptm) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "localtime() failed\n");
+	if (!ptm) error_exit("localtime() failed\n");
 
 	assert(ts > 0);
 	assert(dest_size > 0);
@@ -737,18 +718,18 @@ void duplicate_re_array(re *pre_in, int n_rein, re **pre_out, int *n_reout)
 	*n_reout += n_rein;
 	if (*n_reout)
 	{
-		*pre_out = (re *)myrealloc(*pre_out, (*n_reout) * sizeof(re), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		*pre_out = (re *)myrealloc(*pre_out, (*n_reout) * sizeof(re));
 
 		for(loop=0; loop<n_rein; loop++)
 		{
 			memcpy(&(*pre_out)[loop + old_n], &pre_in[loop], sizeof(re));
 
 			memset(&(*pre_out)[loop + old_n].regex, 0x00, sizeof(regex_t));
-			(*pre_out)[loop + old_n].regex_str = mystrdup(pre_in[loop].regex_str, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			(*pre_out)[loop + old_n].regex_str = mystrdup(pre_in[loop].regex_str);
 			compile_re(&(*pre_out)[loop + old_n].regex, (*pre_out)[loop + old_n].regex_str);
 
 			if (pre_in[loop].cmd)
-				(*pre_out)[loop + old_n].cmd = mystrdup(pre_in[loop].cmd, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				(*pre_out)[loop + old_n].cmd = mystrdup(pre_in[loop].cmd);
 		}
 	}
 	else
@@ -764,7 +745,7 @@ void duplicate_es_array(strip_t *pes_in, int n_esin, strip_t **pes_out, int *n_e
 	assert(n_esin >= 0);
 
 	*n_esout += n_esin;
-	*pes_out = (strip_t *)myrealloc(*pes_out, (*n_esout) * sizeof(strip_t), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	*pes_out = (strip_t *)myrealloc(*pes_out, (*n_esout) * sizeof(strip_t));
 
 	for(loop=0; loop<n_esin; loop++)
 	{
@@ -773,13 +754,13 @@ void duplicate_es_array(strip_t *pes_in, int n_esin, strip_t **pes_out, int *n_e
 		memset(&(*pes_out)[loop + old_n].regex, 0x00, sizeof(regex_t));
 		if (pes_in[loop].type != STRIP_TYPE_COLUMN && pes_in[loop].type != STRIP_TYPE_RANGE)
 		{
-			(*pes_out)[loop + old_n].regex_str = mystrdup(pes_in[loop].regex_str, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			(*pes_out)[loop + old_n].regex_str = mystrdup(pes_in[loop].regex_str);
 
 			compile_re(&(*pes_out)[loop + old_n].regex, (*pes_out)[loop + old_n].regex_str);
 		}
 
 		if (pes_in[loop].del)
-			(*pes_out)[loop + old_n].del = mystrdup(pes_in[loop].del, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			(*pes_out)[loop + old_n].del = mystrdup(pes_in[loop].del);
 	}
 }
 
@@ -814,7 +795,7 @@ void compile_re(regex_t *whereto, char *what)
 	/* compile & store regular expression */
 	int rc = regcomp(whereto, what, REG_EXTENDED);
 	if (rc != 0)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Failed to compile regular expression '%s'.\nReason: %s\n", what, convert_regexp_error(rc, whereto));
+		error_exit("Failed to compile regular expression '%s'.\nReason: %s\n", what, convert_regexp_error(rc, whereto));
 }
 
 void grow_mem_if_needed(char **what, int *cur_len, int requested_len)
@@ -834,7 +815,7 @@ void grow_mem_if_needed(char **what, int *cur_len, int requested_len)
 	}
 
 	if (changed)
-		*what = myrealloc(*what, *cur_len, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		*what = myrealloc(*what, *cur_len);
 }
 
 int READ(int fd, char *where_to, int max_len, char *for_whom)
@@ -848,7 +829,7 @@ int READ(int fd, char *where_to, int max_len, char *for_whom)
 			return rc;
 
 		if (errno != EINTR && errno != EAGAIN)
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Error writing to fd for %s.\n", for_whom);
+			error_exit("Error writing to fd for %s.\n", for_whom);
 	}
 }
 
@@ -859,7 +840,7 @@ int get_value_arg(char *par, char *string, valcheck_t check)
 	int multiplier = 1;
 
 	if (!string)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "%s needs a parameter.\n", par);
+		error_exit("%s needs a parameter.\n", par);
 
 	len = strlen(string);
 
@@ -881,31 +862,31 @@ int get_value_arg(char *par, char *string, valcheck_t check)
 				break;
 			}
 			else
-				error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "%s needs a value as parameter.\n", par);
+				error_exit("%s needs a value as parameter.\n", par);
 		}
 	}
 
 	result = strtol(string, NULL, 10);
 
 	if (result > INT_MAX || result == LONG_MIN || result == LONG_MAX)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Value %s for parameter %s is too large.\n", string, par);
+		error_exit("Value %s for parameter %s is too large.\n", string, par);
 
 	result *= multiplier;
 
 	if (check == VAL_ZERO_POSITIVE)
 	{
 		if (result < 0)
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Value for %s must be >= 0.\n", par);
+			error_exit("Value for %s must be >= 0.\n", par);
 	}
 	else if (check == VAL_POSITIVE_NOT_1)
 	{
 		if (result < 0 || result == 1)
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Value for %s must be >= 0 and must not be 1.\n", par);
+			error_exit("Value for %s must be >= 0 and must not be 1.\n", par);
 	}
 	else if (check == VAL_POSITIVE)
 	{
 		if (result <= 0)
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Value for %s must be > 0.\n", par);
+			error_exit("Value for %s must be > 0.\n", par);
 	}
 	else
 	{
@@ -920,7 +901,7 @@ void add_to_iat(int_array_t *piat, int element)
 	if (piat -> n == piat -> size)
 	{
 		piat -> size = USE_IF_SET(piat -> size, 8) * 2;
-		piat -> elements = (int *)myrealloc(piat -> elements, piat -> size * sizeof(int), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		piat -> elements = (int *)myrealloc(piat -> elements, piat -> size * sizeof(int));
 	}
 
 	(piat -> elements)[piat -> n] = element;
@@ -959,7 +940,7 @@ char *gethome(char *user)
 		pw = getpwnam(user);
 	else
 		pw = getpwuid(getuid());
-	return mystrdup(pw->pw_dir, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	return mystrdup(pw->pw_dir);
 }
 
 char *myrealpath(char *in)
@@ -969,7 +950,7 @@ char *myrealpath(char *in)
 	char *pout;
 
 	if (in[0] != '~')
-		return mystrdup(in, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		return mystrdup(in);
 
 	if (in[1] != '/')
 	{
@@ -988,7 +969,7 @@ char *myrealpath(char *in)
 			pin = in + len + 1;
 		}
 
-		user = (char *)mymalloc(len + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		user = (char *)mymalloc(len + 1);
 		memcpy(user, &in[1], len);
 		user[len] = 0x00;
 
@@ -1003,10 +984,10 @@ char *myrealpath(char *in)
 	}
 
 	if (!home)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Cannot expand path %s:\nhome directory not found.\n", in);
+		error_exit("Cannot expand path %s:\nhome directory not found.\n", in);
 
 	home_len = strlen(home);
-	pout = (char *)mymalloc(home_len + strlen(in) + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	pout = (char *)mymalloc(home_len + strlen(in) + 1);
 
 	sprintf(pout, "%s/%s", home, pin);
 

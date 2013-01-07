@@ -82,7 +82,7 @@ int get_pty_and_fork(int *fd_master, int *fd_slave)
 
 	if (openpty(fd_master, fd_slave, NULL, NULL, NULL) == -1)
 	{
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "openpty() failed.\n");
+		error_exit("openpty() failed.\n");
 		return -1;
 	}
 
@@ -105,7 +105,7 @@ int get_pty_and_fork(int *fd_master, int *fd_slave)
 
 	ptm = myopen(multiplexer, O_RDWR | O_NOCTTY);
 	if (ptm < 0) {
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Error opening %s.\n", multiplexer);
+		error_exit("Error opening %s.\n", multiplexer);
 		return -1;
 	}
 	*fd_master = ptm;
@@ -113,20 +113,20 @@ int get_pty_and_fork(int *fd_master, int *fd_slave)
 	pid = fork();
 	if (pid == 0)
 	{
-		if (grantpt(ptm) < 0) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "grantpt() failed.\n");
-		if (unlockpt(ptm) < 0) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "unlockpt() failed.\n");
+		if (grantpt(ptm) < 0) error_exit("grantpt() failed.\n");
+		if (unlockpt(ptm) < 0) error_exit("unlockpt() failed.\n");
 		setsid(); /* lose old controlling terminal (FvH) */
 		pts = ptsname(ptm);
-		if (pts == NULL) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Slave pty side name could not be obtained.\n");
+		if (pts == NULL) error_exit("Slave pty side name could not be obtained.\n");
 
 		/* Open the slave side. */
 		*fd_slave = myopen(pts, O_RDWR | O_NOCTTY);
-		if (*fd_slave < 0) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Problem opening slave-side of pseudo tty (file '%s').\n", pts);
+		if (*fd_slave < 0) error_exit("Problem opening slave-side of pseudo tty (file '%s').\n", pts);
 
 #if !defined(AIX) && !defined(scoos)
 		/* Push the appropriate streams modules, as described in Solaris pts(7). */
-		if (ioctl(*fd_slave, I_PUSH, "ptem") < 0) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "ioctl I_PUSH ptem failed.\n");
-		if (ioctl(*fd_slave, I_PUSH, "ldterm") < 0) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "ioctl I_PUSH ldterm failed.\n");
+		if (ioctl(*fd_slave, I_PUSH, "ptem") < 0) error_exit("ioctl I_PUSH ptem failed.\n");
+		if (ioctl(*fd_slave, I_PUSH, "ldterm") < 0) error_exit("ioctl I_PUSH ldterm failed.\n");
 		(void)ioctl(*fd_slave, I_PUSH, "ttcompat"); /* not on HP-UX? */
 #endif
 	}
@@ -136,10 +136,10 @@ int get_pty_and_fork(int *fd_master, int *fd_slave)
 #elif defined(IRIX) || defined(IRIX64)
 
 	char *line = _getpty(fd_master, O_RDWR | O_NDELAY, 0600, 0);
-	if (line == NULL) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "_getpy() failed.\n");
+	if (line == NULL) error_exit("_getpy() failed.\n");
 
 	*fd_slave = myopen(line, O_RDWR);
-	if (*fd_slave < 0) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Error while openening file %s.\n", line);
+	if (*fd_slave < 0) error_exit("Error while openening file %s.\n", line);
 
 	return fork();
 

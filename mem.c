@@ -18,153 +18,13 @@
 #include "utils.h"
 #include "mem.h"
 
-#ifndef _DEBUG
-#define MEMLOG(x)
-void dump_mem(int sig)
-{
-}
-#else
-void MEMLOG(char *s, ...)
-{
-        va_list ap;
-        FILE *fh = fopen("log.log", "a+");
-        if (!fh)
-                error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "error logging\n");
-
-        va_start(ap, s);
-        vfprintf(fh, s, ap);
-        va_end(ap);
-
-        fclose(fh);
-}
-
-typedef struct
-{
-	void *p;
-	int size;
-
-	char *file;
-	char *function;
-	int line;
-} memlist;
-memlist *pm = NULL;
-int n_pm = 0;
-
-void dump_mem(int sig)
-{
-	int loop;
-
-	signal(SIGHUP, dump_mem);
-
-	if (sig != SIGHUP)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Unexpected signal %d.\n", sig);
-
-	MEMLOG("%d elements of memory used\n", n_pm);
-	for(loop=0; loop<n_pm; loop++)
-	{
-		MEMLOG("%06d] %p %d (%s:%s@%d)\n", loop, pm[loop].p, pm[loop].size, pm[loop].file, pm[loop].function, pm[loop].line);
-	}
-	MEMLOG("--- finished memory dump\n");
-}
-
-int remove_mem_element(void *p)
-{
-	int old_size = 0;
-
-	if (p)
-	{
-		int loop;
-
-		for(loop=0; loop<n_pm; loop++)
-		{
-			if (pm[loop].p == p)
-			{
-				int n_to_move;
-
-				old_size = pm[loop].size;
-
-				n_to_move = (n_pm - loop) - 1;
-				if (n_to_move > 0)
-					memmove(&pm[loop], &pm[loop + 1], n_to_move * sizeof(memlist));
-				else if (n_to_move < 0)
-					error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "n_to_move < 0!\n");
-				n_pm--;
-				loop=-1;
-
-				break;
-			}
-		}
-
-		if (loop != -1)
-		{
-			MEMLOG("remove_mem_element: pointer %p not found\n", p);
-		}
-
-		if (n_pm)
-		{
-			pm = (memlist *)realloc(pm, sizeof(memlist) * n_pm);
-			if (!pm) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Failed to shrink memory list to %d elements.\n", n_pm);
-		}
-		else
-		{
-			free(pm);
-			pm = NULL;
-		}
-	}
-
-	return old_size;
-}
-void add_mem_element(void *p, int size, char *file, const char *function, int line)
-{
-	pm = (memlist *)realloc(pm, sizeof(memlist) * (n_pm + 1));
-	if (!pm) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Failed to grow memory list from %d elements.\n", n_pm);
-
-	pm[n_pm].p = p;
-	pm[n_pm].size = size;
-
-	pm[n_pm].file     = file;
-	pm[n_pm].function = (char *)function;
-	pm[n_pm].line     = line;
-
-	n_pm++;
-}
-#endif
-
 void myfree(void *p)
 {
-#ifdef _DEBUG
-	(void)remove_mem_element(p);
-#endif
 	free(p);
 }
 
-void * myrealloc(void *oldp, int new_size, char *file, const char *function, int line)
+void * myrealloc(void *oldp, int new_size)
 {
-#ifdef _DEBUG
-	int old_size;
-	void *newp;
-
-	if (new_size <= 0)
-		error_exit(file, function, line, "Tried to allocate %d bytes which is wrong.\n", new_size);
-
-	newp = realloc(oldp, new_size);
-	if (!newp)
-		error_exit(file, function, line, "Failed to reallocate a memory block to %d bytes.\n", new_size);
-	old_size = remove_mem_element(oldp);
-	add_mem_element(newp, new_size, file, function, line);
-	signal(SIGHUP, dump_mem);
-
-	if (new_size > old_size)
-		memset(&((char *)newp)[old_size], 0xf1, new_size - old_size);
-
-/*	rand_size = new_size - old_size;
-	if (rand_size > 0)
-	{
-		MEMLOG("randomizing(%s) %d bytes\n", what, rand_size);
-		memset(&((char *)newp)[old_size], rand_val, rand_size);
-	}
-*/
-#else
 	/* ----------------------------------------------------
 	 * add code for repeatingly retry? -> then configurable
 	 * via configurationfile with number of retries and/or
@@ -173,36 +33,25 @@ void * myrealloc(void *oldp, int new_size, char *file, const char *function, int
 	 */
 	void *newp = realloc(oldp, new_size);
 	if (!newp)
-		error_exit(file, function, line, "Failed to reallocate a memory block to %d bytes.\n", new_size);
-#endif
+		error_exit("Failed to reallocate a memory block to %d bytes.\n", new_size);
 
 	return newp;
 }
 
-void * mymalloc(int size, char *file, const char *function, int line)
+void * mymalloc(int size)
 {
-	return myrealloc(NULL, size, file, function, line);
+	return myrealloc(NULL, size);
 }
 
-char * mystrdup(char *in, char *file, const char *function, int line)
+char * mystrdup(char *in)
 {
-#ifdef _DEBUG
-	int len = strlen(in) + 1;
-	char *newp = (char *)mymalloc(len, file, function, line);
-
-	memcpy(newp, in, len);
-
-	return newp;
-#else
 	char *newp = strdup(in);
 	if (!newp)
-		error_exit(file, function, line, "Failed to duplicate a string: out of memory?\n");
+		error_exit("Failed to duplicate a string: out of memory?\n");
 
 	return newp;
-#endif
 }
 
-#ifdef _DEBUG
 void clean_memory(void)
 {
 	int loop;
@@ -405,7 +254,4 @@ void clean_memory(void)
 	myfree(syslog_ts_format);
 
 	myfree(global_find);
-
-	MEMLOG("finished clean_memory\n");
 }
-#endif

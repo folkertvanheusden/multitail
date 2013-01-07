@@ -68,7 +68,7 @@ void LOG(char *s, ...)
 	if (!fh)
 	{
 		endwin();
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "error logging\n");
+		error_exit("error logging\n");
 	}
 
 	va_start(ap, s);
@@ -82,7 +82,7 @@ void LOG(char *s, ...)
 typedef void (*sh_t)(int);
 void set_signal(int sig, sh_t func, char *signame)
 {
-	if (SIG_ERR == signal(sig, func)) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Setting of handler for signal %s failed.\n", signame);
+	if (SIG_ERR == signal(sig, func)) error_exit("Setting of handler for signal %s failed.\n", signame);
 }
 
 void free_subentry(proginfo *entry)
@@ -229,8 +229,8 @@ char delete_entry(int f_index, proginfo *sub)
 		}
 		else		/* not empty, just shrink */
 		{
-			pi = (proginfo *)myrealloc(pi, nfd * sizeof(proginfo), __FILE__, __PRETTY_FUNCTION__, __LINE__);
-			lb = (buffer *)  myrealloc(lb, nfd * sizeof(buffer),   __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			pi = (proginfo *)myrealloc(pi, nfd * sizeof(proginfo));
+			lb = (buffer *)  myrealloc(lb, nfd * sizeof(buffer));
 		}
 	}
 	else		/* delete sub */
@@ -573,7 +573,7 @@ void gen_wordwrap_offsets(char *string, int start_offset, int end_offset, int wi
 
 		if (max_len >= 0)
 		{
-			*offsets = (int *)myrealloc(*offsets, (n_ww + 1) * sizeof(int), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			*offsets = (int *)myrealloc(*offsets, (n_ww + 1) * sizeof(int));
 			(*offsets)[n_ww++] = check_x;
 		}
 		else
@@ -582,7 +582,7 @@ void gen_wordwrap_offsets(char *string, int start_offset, int end_offset, int wi
 		}
 	}
 
-	*offsets = (int *)myrealloc(*offsets, (n_ww + 1) * sizeof(int), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	*offsets = (int *)myrealloc(*offsets, (n_ww + 1) * sizeof(int));
 	(*offsets)[n_ww] = -1;
 }
 
@@ -845,7 +845,7 @@ void check_filter_exec(char *cmd, char *matching_string)
 	int str_index, par_len = strlen(matching_string);
 	int cmd_len = strlen(cmd);
 	char *command = mymalloc(cmd_len + 1/* cmd + space */
-			+ 1 + (par_len * 2) + 1 + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__); /* "string"\0 */
+			+ 1 + (par_len * 2) + 1 + 1); /* "string"\0 */
 	int loop;
 
 	memcpy(command, cmd, cmd_len);
@@ -906,7 +906,7 @@ char check_filter(proginfo *cur, char *string, regmatch_t **pmatch, char **error
 		if (pmatch)
 		{
 			if (*pmatch == NULL)
-				*pmatch = (regmatch_t *)mymalloc(sizeof(regmatch_t) * MAX_N_RE_MATCHES, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				*pmatch = (regmatch_t *)mymalloc(sizeof(regmatch_t) * MAX_N_RE_MATCHES);
 
 			rc = regexec(&(cur -> pre)[loop].regex, string, MAX_N_RE_MATCHES, *pmatch, 0);
 		}
@@ -951,7 +951,7 @@ char check_filter(proginfo *cur, char *string, regmatch_t **pmatch, char **error
 				{
 					regmatch_t *usep = USE_IF_SET(*pmatch, local_matches);
 					int len = usep[1].rm_eo - usep[1].rm_so;
-					char *dummy = (char *)mymalloc(len + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+					char *dummy = (char *)mymalloc(len + 1);
 					memcpy(dummy, &string[usep[1].rm_so], len);
 					dummy[len] = 0x00;
 					check_filter_exec((cur -> pre)[loop].cmd, dummy);
@@ -1001,7 +1001,7 @@ char check_filter(proginfo *cur, char *string, regmatch_t **pmatch, char **error
 				else if (cmd == 'X' && do_re)
 				{
 					int len = *pmatch ? (*pmatch)[1].rm_eo - (*pmatch)[1].rm_so : local_matches[1].rm_eo - local_matches[1].rm_so;
-					char *dummy = (char *)mymalloc(len + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+					char *dummy = (char *)mymalloc(len + 1);
 					memcpy(dummy, &string[local_matches[1].rm_so], len);
 					dummy[len] = 0x00;
 					check_filter_exec((cur -> pre)[loop].cmd, dummy);
@@ -1094,7 +1094,7 @@ void do_buffer(int f_index, proginfo *cur, char *string, char filter_match, dtim
 		else
 		{
 			/* grow array */
-			lb[f_index].be = (buffered_entry *)myrealloc(lb[f_index].be, sizeof(buffered_entry) * (lb[f_index].curpos + 1), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			lb[f_index].be = (buffered_entry *)myrealloc(lb[f_index].be, sizeof(buffered_entry) * (lb[f_index].curpos + 1));
 		}
 
 		cur_line = lb[f_index].curpos++;
@@ -1102,7 +1102,7 @@ void do_buffer(int f_index, proginfo *cur, char *string, char filter_match, dtim
 		/* add the logline itself */
 		if (string)
 		{
-			lb[f_index].be[cur_line].Bline = mystrdup(string, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			lb[f_index].be[cur_line].Bline = mystrdup(string);
 			lb[f_index].curbytes += line_len;
 		}
 		else
@@ -1123,7 +1123,7 @@ void do_redirect(redirect_t *predir, char *buffer, int nbytes, char add_lf)
 	if (predir -> type == REDIRECTTO_SOCKET_FILTERED || predir -> type == REDIRECTTO_SOCKET)
 	{
 		int msg_len = nbytes + 6;
-		char *msg = (char *)mymalloc(msg_len + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);;
+		char *msg = (char *)mymalloc(msg_len + 1);;
 
 		snprintf(msg, msg_len, "<%d>%s\n", predir -> prio_fac, buffer);
 
@@ -1190,7 +1190,7 @@ void delete_all_markerlines(void)
 				continue;
 			}
 
-			cur_lb.be = myrealloc(cur_lb.be, (cur_lb.curpos + 1) * sizeof(buffered_entry), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			cur_lb.be = myrealloc(cur_lb.be, (cur_lb.curpos + 1) * sizeof(buffered_entry));
 			cur_lb.be[cur_lb.curpos].Bline = (lb[index].be)[loop].Bline;
 			cur_lb.be[cur_lb.curpos].pi    = (lb[index].be)[loop].pi;
 			cur_lb.be[cur_lb.curpos].ts    = (lb[index].be)[loop].ts;
@@ -1267,7 +1267,7 @@ int emit_to_buffer_and_term(int f_index, proginfo *cur, char *line)
 		{
 			do_print_and_buffer = 1;
 			if (new_line)
-				cur -> repeat.last_line = mystrdup(new_line, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				cur -> repeat.last_line = mystrdup(new_line);
 			else
 				cur -> repeat.last_line = NULL;
 		}
@@ -1473,7 +1473,7 @@ void create_window_set(int startx, int width, int nwindows, int indexoffset)
 	int n_lines_available = 0;
 	int n_lines_available_per_win = 0;
 	int reserved_lines = mode_statusline >= 0?1:0;
-	int *lines_per_win = (int *)mymalloc(nwindows * sizeof(int), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	int *lines_per_win = (int *)mymalloc(nwindows * sizeof(int));
 
 	set_signal(SIGWINCH, SIG_IGN, "SIGWINCH");
 
@@ -1723,8 +1723,8 @@ void create_windows(void)
 			int cols_per_col = max_x / split;
 			int win_per_col = nfd / split;
 			int x = 0, indexoffset = 0;
-			int *vs = (int *)mymalloc(sizeof(int) * split, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-			int *vn = (int *)mymalloc(sizeof(int) * split, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			int *vs = (int *)mymalloc(sizeof(int) * split);
+			int *vn = (int *)mymalloc(sizeof(int) * split);
 
 			if (vertical_split)
 			{
@@ -1816,7 +1816,7 @@ void create_windows(void)
 			{
 				n_splitlines = split - 1;
 				if (n_splitlines > 0)
-					splitlines = (NEWWIN **)mymalloc(sizeof(NEWWIN *) * n_splitlines, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+					splitlines = (NEWWIN **)mymalloc(sizeof(NEWWIN *) * n_splitlines);
 			}
 
 			for(loop=0; loop<split; loop++)
@@ -1899,10 +1899,10 @@ char close_window(int winnr, proginfo *cur)
 		int initial_n_lines_tail;
 
 		/* close old fds */
-		if (myclose(cur -> fd) == -1) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Closing file descriptor of read-end of pipe failed.\n");
+		if (myclose(cur -> fd) == -1) error_exit("Closing file descriptor of read-end of pipe failed.\n");
 		if (cur -> fd != cur -> wfd)
 		{
-			if (myclose(cur -> wfd) == -1) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Closing file descriptor of write-end of pipe failed.\n");
+			if (myclose(cur -> wfd) == -1) error_exit("Closing file descriptor of write-end of pipe failed.\n");
 		}
 
 		/* do diff */
@@ -1989,7 +1989,7 @@ void do_restart_window(proginfo *cur)
 
 	/* re-start tail */
 	if (start_proc(cur, 1) == -1)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Failed to start process %s.\n", cur -> filename);
+		error_exit("Failed to start process %s.\n", cur -> filename);
 }
 
 char * key_to_keybinding(char what)
@@ -2065,9 +2065,9 @@ void add_pars_per_file(char *re, char *colorscheme, int n_buffer_lines, int buff
 		n_pars_per_file++;
 
 		/* add to list */
-		ppf = (pars_per_file *)myrealloc(ppf, sizeof(pars_per_file) * n_pars_per_file, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		ppf = (pars_per_file *)myrealloc(ppf, sizeof(pars_per_file) * n_pars_per_file);
 		memset(&ppf[loop], 0x00, sizeof(pars_per_file));
-		ppf[loop].re_str = mystrdup(re, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		ppf[loop].re_str = mystrdup(re);
 
 		/* compile & store regular expression */
 		compile_re(&ppf[loop].regex, re);
@@ -2079,15 +2079,15 @@ void add_pars_per_file(char *re, char *colorscheme, int n_buffer_lines, int buff
 	if (colorscheme != NULL)
 	{
 		ppf[loop].n_colorschemes++;
-		ppf[loop].colorschemes = (char **)myrealloc(ppf[loop].colorschemes, sizeof(char *) * ppf[loop].n_colorschemes, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-		ppf[loop].colorschemes[ppf[loop].n_colorschemes - 1] = mystrdup(colorscheme, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		ppf[loop].colorschemes = (char **)myrealloc(ppf[loop].colorschemes, sizeof(char *) * ppf[loop].n_colorschemes);
+		ppf[loop].colorschemes[ppf[loop].n_colorschemes - 1] = mystrdup(colorscheme);
 	}
 
 	if (conversion_scheme != NULL)
 	{
 		ppf[loop].n_conversion_schemes++;
-		ppf[loop].conversion_schemes = (char **)myrealloc(ppf[loop].conversion_schemes, sizeof(char *) * ppf[loop].n_conversion_schemes, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-		ppf[loop].conversion_schemes[ppf[loop].n_conversion_schemes - 1] = mystrdup(conversion_scheme, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		ppf[loop].conversion_schemes = (char **)myrealloc(ppf[loop].conversion_schemes, sizeof(char *) * ppf[loop].n_conversion_schemes);
+		ppf[loop].conversion_schemes[ppf[loop].n_conversion_schemes - 1] = mystrdup(conversion_scheme);
 	}
 
 	if (n_buffer_lines != -1)
@@ -2159,7 +2159,7 @@ void set_default_parameters_if_not_given_do(proginfo *cur, int pi_index)
 {
 	int maxnlines = default_maxnlines, maxbytes = default_maxbytes;
 	int pm = find_path_max();
-	char *real_fname = (char *)mymalloc(pm, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	char *real_fname = (char *)mymalloc(pm);
 
 	do
 	{
@@ -2173,7 +2173,7 @@ void set_default_parameters_if_not_given_do(proginfo *cur, int pi_index)
 		else
 		{
 			if (!realpath(cur -> filename, real_fname))
-				error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Problem obtaining complete (real) path of file %s.\n", cur -> filename);
+				error_exit("Problem obtaining complete (real) path of file %s.\n", cur -> filename);
 		}
 
 		/* check if any default parameters are given in the configfile */
@@ -2207,7 +2207,7 @@ void set_default_parameters_if_not_given_do(proginfo *cur, int pi_index)
 					{
 						int cs_index = find_colorscheme(ppf[ppf_index].colorschemes[c_nr]);
 						if (cs_index == -1)
-							error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Color scheme '%s' is not known.\n", ppf[ppf_index].colorschemes[c_nr]);
+							error_exit("Color scheme '%s' is not known.\n", ppf[ppf_index].colorschemes[c_nr]);
 						add_color_scheme(&cur -> cdef.color_schemes, cs_index);
 					}
 					cur -> cdef.colorize = 'S';
@@ -2291,11 +2291,11 @@ void start_all_processes(char *nsubwindows)
 			{
 				int old_0 = mydup(0);
 
-				if (old_0 == -1) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Cannot dup(0).\n");
+				if (old_0 == -1) error_exit("Cannot dup(0).\n");
 
-				if (myclose(0) == -1) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Error closing fd 0.\n");
+				if (myclose(0) == -1) error_exit("Error closing fd 0.\n");
 
-				if (myopen("/dev/tty", O_RDONLY) != 0) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "New fd != 0\n");
+				if (myopen("/dev/tty", O_RDONLY) != 0) error_exit("New fd != 0\n");
 
 				cur -> fd = old_0;
 				cur -> wfd = -1;
@@ -2303,12 +2303,12 @@ void start_all_processes(char *nsubwindows)
 			}
 			else if (cur -> wt == WT_SOCKET)
 			{
-				char *dummy = mystrdup(cur -> filename, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				char *dummy = mystrdup(cur -> filename);
 				char *colon = strchr(dummy, ':');
 				struct addrinfo hints;
 				struct addrinfo* result;
 				struct addrinfo* rp;
-				int sfd, s;
+				int sfd = -1, s;
 
 				char *host = NULL;
 				char *service = "syslog";
@@ -2332,7 +2332,7 @@ void start_all_processes(char *nsubwindows)
 
 				s = getaddrinfo(host, service, &hints, &result);
 				if (s != 0)
-					error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Failed to create socket for receiving syslog data on %s: %s.\n", cur -> filename, gai_strerror(s));
+					error_exit("Failed to create socket for receiving syslog data on %s: %s.\n", cur -> filename, gai_strerror(s));
 
 				for (rp = result; rp != NULL; rp = rp -> ai_next)
 				{
@@ -2347,7 +2347,7 @@ void start_all_processes(char *nsubwindows)
 				freeaddrinfo(result);
 
 				if (rp == NULL)
-					error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Failed to create socket for receiving syslog data on %s.\n", cur -> filename);
+					error_exit("Failed to create socket for receiving syslog data on %s.\n", cur -> filename);
 
 				cur -> wfd = cur -> fd = sfd;
 
@@ -2365,7 +2365,7 @@ void start_all_processes(char *nsubwindows)
 
 				/* start the tail process for this file/command */
 				if (start_proc(cur, cur -> initial_n_lines_tail) == -1)
-					error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Failed to start process for %s.\n", cur -> filename);
+					error_exit("Failed to start process for %s.\n", cur -> filename);
 			}
 
 			cur = cur -> next;
@@ -2684,9 +2684,9 @@ void check_for_valid_stdin()
 	if (!ttyname(0))
 	{
 		if (errno == ENOTTY || errno == EINVAL)
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Please use -j/-J when you want to pipe something into MultiTail.\n");
+			error_exit("Please use -j/-J when you want to pipe something into MultiTail.\n");
 		else
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "ttyname(0) failed.\n");
+			error_exit("ttyname(0) failed.\n");
 	}
 }
 
@@ -2713,15 +2713,15 @@ int main(int argc, char *argv[])
 	set_signal(SIGHUP,  signal_handler, "SIGHUP" );
 	set_signal(SIGCHLD, signal_handler, "SIGCHLD");
 
-	shell            = mystrdup("/bin/sh", __FILE__, __PRETTY_FUNCTION__, __LINE__);
-	tail             = mystrdup("tail", __FILE__, __PRETTY_FUNCTION__, __LINE__);
-	ts_format        = mystrdup("%b %d %H:%M:%S", __FILE__, __PRETTY_FUNCTION__, __LINE__);
-	window_number    = mystrdup("[%02d]", __FILE__, __PRETTY_FUNCTION__, __LINE__);
-	cnv_ts_format    = mystrdup("%b %d %H:%M:%S %Y", __FILE__, __PRETTY_FUNCTION__, __LINE__);
-	line_ts_format   = mystrdup("%b %d %H:%M:%S %Y ", __FILE__, __PRETTY_FUNCTION__, __LINE__);
-	subwindow_number = mystrdup("[%02d]", __FILE__, __PRETTY_FUNCTION__, __LINE__);
-	statusline_ts_format = mystrdup("%b %d %H:%M:%S %Y", __FILE__, __PRETTY_FUNCTION__, __LINE__);
-	syslog_ts_format = mystrdup("%b %d %H:%M:%S %Y", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	shell            = mystrdup("/bin/sh");
+	tail             = mystrdup("tail");
+	ts_format        = mystrdup("%b %d %H:%M:%S");
+	window_number    = mystrdup("[%02d]");
+	cnv_ts_format    = mystrdup("%b %d %H:%M:%S %Y");
+	line_ts_format   = mystrdup("%b %d %H:%M:%S %Y ");
+	subwindow_number = mystrdup("[%02d]");
+	statusline_ts_format = mystrdup("%b %d %H:%M:%S %Y");
+	syslog_ts_format = mystrdup("%b %d %H:%M:%S %Y");
 
 	mail_spool_file = getenv("MAIL");
 	if (dummy) check_for_mail = atoi(dummy);
@@ -2764,7 +2764,7 @@ int main(int argc, char *argv[])
 		default_color_scheme = find_colorscheme(defaultcscheme);
 
 		if (default_color_scheme == -1)
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Default color scheme '%s' is not defined. Please check the MultiTail configuration file %s.\n", defaultcscheme, config_file);
+			error_exit("Default color scheme '%s' is not defined. Please check the MultiTail configuration file %s.\n", defaultcscheme, config_file);
 	}
 
 	if (markerline_attrs.colorpair_index == -1 && markerline_attrs.attrs == -1)
@@ -2822,14 +2822,14 @@ void sigusr1_restart_tails(void)
 
 				stop_process(cur -> pid);
 
-				if (myclose(cur -> fd) == -1) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Closing read filedescriptor failed.\n");
+				if (myclose(cur -> fd) == -1) error_exit("Closing read filedescriptor failed.\n");
 				if (cur -> fd != cur -> wfd)
 				{
-					if (myclose(cur -> wfd) == -1) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Closing write filedescriptor failed.\n");
+					if (myclose(cur -> wfd) == -1) error_exit("Closing write filedescriptor failed.\n");
 				}
 
 				/* create a pipe, will be to child-process */
-				if (-1 == pipe(pipefd)) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Error while creating pipe.\n");
+				if (-1 == pipe(pipefd)) error_exit("Error while creating pipe.\n");
 
 				cur -> pid = start_tail(cur -> filename, cur -> retry_open, cur -> follow_filename, min_n_bufferlines, pipefd);
 				cur -> fd = pipefd[0];
@@ -2863,7 +2863,7 @@ int check_for_died_processes(void)
 			if (errno == ECHILD)
 				break;
 
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "waitpid failed.\n");
+			error_exit("waitpid failed.\n");
 		}
 
 		/* now check every window for died processes */
@@ -2952,8 +2952,8 @@ void create_new_win(proginfo **cur, int *nr)
 {
 	int loop;
 
-	proginfo *newpi = (proginfo *)myrealloc(pi, (nfd + 1) * sizeof(proginfo), __FILE__, __PRETTY_FUNCTION__, __LINE__);
-	lb = (buffer *)myrealloc(lb, (nfd + 1) * sizeof(buffer), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	proginfo *newpi = (proginfo *)myrealloc(pi, (nfd + 1) * sizeof(proginfo));
+	lb = (buffer *)myrealloc(lb, (nfd + 1) * sizeof(buffer));
 
 	/* 'lb' has pointers to 'pi'-structures. now since we've realloced the pi-
 	 * array, we need to update to pointers to pi in the lb-array
@@ -3032,13 +3032,13 @@ int check_paths(void)
 						while (cur -> next) cur = cur -> next;
 
 						/* allocate new entry */
-						cur -> next = (proginfo *)mymalloc(sizeof(proginfo), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+						cur -> next = (proginfo *)mymalloc(sizeof(proginfo));
 						cur = cur -> next;
 						memset(cur, 0x00, sizeof(proginfo));
 					}
 
 					/* fill in */
-					cur -> filename = mystrdup(files.gl_pathv[fi], __FILE__, __PRETTY_FUNCTION__, __LINE__);
+					cur -> filename = mystrdup(files.gl_pathv[fi]);
 					cur -> line_wrap = default_linewrap;
 					cur -> win_height = -1;
 					cur -> statistics.sccfirst = 1;
@@ -3046,7 +3046,7 @@ int check_paths(void)
 
 					/* start the tail process for this file/command */
 					if (start_proc(cur, max_y / nfd) == -1)
-						error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Failed to start tail process for %s.\n", cur -> filename);
+						error_exit("Failed to start tail process for %s.\n", cur -> filename);
 
 					new_wins = 1;
 				}
@@ -3063,7 +3063,7 @@ void resize_terminal_do(NEWWIN *popup)
 {
 	determine_terminal_size(&max_y, &max_x);
 
-	if (ERR == resizeterm(max_y, max_x)) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "An error occured while resizing terminal(-window).\n");
+	if (ERR == resizeterm(max_y, max_x)) error_exit("An error occured while resizing terminal(-window).\n");
 
 	endwin();
 	refresh(); /* <- as specified by ncurses faq, was: doupdate(); */
@@ -3100,7 +3100,7 @@ int process_global_keys(int what_help, NEWWIN *popup, char cursor_shift)
 	else if (c == exit_key)     /* ^C */
 	{
 		do_exit();
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "This should not be reached.\n");
+		error_exit("This should not be reached.\n");
 	}
 	else if (c == 8 || c == KEY_F(1))       /* HELP (^h / F1) */
 	{
@@ -3252,7 +3252,7 @@ char process_input_data(int win_nr, proginfo *cur, char *data_in, int new_data_o
 	if (*pnt != 0x00)
 	{
 		int line_len = strlen(pnt) + 1;
-		cur -> incomplete_line = mymalloc(line_len, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		cur -> incomplete_line = mymalloc(line_len);
 		memcpy(cur -> incomplete_line, pnt, line_len);
 	}
 
@@ -3263,7 +3263,7 @@ int recv_from_fd(int fd, char **buffer, int new_data_offset, int read_size)
 {
 	struct sockaddr sa;
 	socklen_t ssa_len = sizeof(sa);
-	char *recv_buffer = mymalloc(read_size + 1,  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	char *recv_buffer = mymalloc(read_size + 1);
 	char time_buffer[TIMESTAMP_EXTEND_BUFFER];
 	int time_len;
 	char *host = "";
@@ -3315,7 +3315,7 @@ int recv_from_fd(int fd, char **buffer, int new_data_offset, int read_size)
 
 	added_bytes = strlen(time_buffer) + 1 + strlen(host) + 1 + strlen(facility) + 1 + strlen(severity) + 1 + 1 + nbytes + 1;
 
-	*buffer = myrealloc(*buffer, new_data_offset + added_bytes, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	*buffer = myrealloc(*buffer, new_data_offset + added_bytes);
 
 	nbytes = snprintf(&(*buffer)[new_data_offset], added_bytes, "%s%s%s%s%s%s%s%s %s\n",
 			time_buffer, time_buffer[0]?" ":"",
@@ -3426,7 +3426,7 @@ int wait_for_keypress(int what_help, double max_wait, NEWWIN *popup, char cursor
 		if ((rc = select(last_fd + 1, &rfds, NULL, NULL, tv.tv_sec != 32767 ? &tv : NULL)) == -1)
 		{
 			if (errno != EINTR && errno != EAGAIN)
-				error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "select() returned an error.");
+				error_exit("select() returned an error.");
 		}
 
 		now = get_ts();
@@ -3484,7 +3484,7 @@ int wait_for_keypress(int what_help, double max_wait, NEWWIN *popup, char cursor
 						int read_size = min(SSIZE_MAX, 65536);
 						int nbytes, new_data_offset = cur -> incomplete_line ? strlen(cur -> incomplete_line) : 0;
 
-						buffer = myrealloc(cur -> incomplete_line, new_data_offset + read_size + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+						buffer = myrealloc(cur -> incomplete_line, new_data_offset + read_size + 1);
 						cur -> incomplete_line = NULL;
 
 						if (cur -> wt == WT_SOCKET)

@@ -9,7 +9,6 @@ void compile_re(regex_t *whereto, char *what);
 char * convert_regexp_error(int error, const regex_t *preg);
 void delete_array(char **list, int n);
 void double_ts_to_str(double ts, char *format_str, char *dest, int dest_size);
-void dump_mem(int sig);
 void duplicate_es_array(strip_t *pes_in, int n_esin, strip_t **pes_out, int *n_esout);
 void duplicate_re_array(re *pre_in, int n_rein, re **pre_out, int *n_reout);
 int file_exist(char *filename);

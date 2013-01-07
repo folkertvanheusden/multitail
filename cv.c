@@ -44,9 +44,9 @@ char * epoch_to_str(time_t epoch)
 	if (!ptm)
 		return NULL;
 
-	new_string = mymalloc(4096, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	new_string = mymalloc(4096);
 	if (!strftime(new_string, 4096, cnv_ts_format, ptm))
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "An error occured whilte converting timestamp format '%s'.\n", cnv_ts_format);
+		error_exit("An error occured whilte converting timestamp format '%s'.\n", cnv_ts_format);
 
 	return new_string;
 }
@@ -60,9 +60,9 @@ char *do_convert(char *what, int what_len, int type, script *pscript)
 				int signr = atoi(what);
 
 				if (signr > n_known_sigs || signr < 1)
-					return mystrdup("unknown signal", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+					return mystrdup("unknown signal");
 
-				return mystrdup(sigs[signr], __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				return mystrdup(sigs[signr]);
 			}
 
 		case CONVTYPE_TAI64NTODATE:
@@ -94,29 +94,34 @@ char *do_convert(char *what, int what_len, int type, script *pscript)
 					if (new_str)
 						return new_str;
 					else
-						return mystrdup("cannot convert current 'TAI64N'-date to string", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+						return mystrdup("cannot convert current 'TAI64N'-date to string");
 				}
 				else
 				{
 					/* before 1970/1/1 now what should I do with that? */
 
-					return mystrdup("cannot convert 'TAI64N'-dates before the epoch", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+					return mystrdup("cannot convert 'TAI64N'-dates before the epoch");
 				}
 			}
 
 		case CONVTYPE_IP4TOHOST:
 			{
-				struct hostent *ht;
-				in_addr_t addr = inet_addr(what);
-				if ((int)addr == -1)
-					return mystrdup(what, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				if (resolv_ip_addresses)
+				{
+					struct hostent *ht;
+					in_addr_t addr = inet_addr(what);
+					if ((int)addr == -1)
+						return mystrdup(what);
 
-				if ((ht = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET)) == NULL)
-					return mystrdup(what, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+					if ((ht = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET)) == NULL)
+						return mystrdup(what);
 
-				return mystrdup(ht -> h_name, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+					return mystrdup(ht -> h_name);
+				}
+
+				return mystrdup(what);
 			}
-			break; /* this redundant break-statement is what we call "defensive programming" */
+			break;
 
 		case CONVTYPE_EPOCHTODATE:
 			{
@@ -125,13 +130,13 @@ char *do_convert(char *what, int what_len, int type, script *pscript)
 				if (new_str)
 					return new_str;
 				else
-					return mystrdup("cannot convert current epoch value", __FILE__, __PRETTY_FUNCTION__, __LINE__);
+					return mystrdup("cannot convert current epoch value");
 			}
 			break;
 
 		case CONVTYPE_ERRNO:
 			{
-				return mystrdup(strerror(atoi(what)), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				return mystrdup(strerror(atoi(what)));
 			}
 
 		case CONVTYPE_HEXTODEC:
@@ -141,7 +146,7 @@ char *do_convert(char *what, int what_len, int type, script *pscript)
 
 				snprintf(result_str, sizeof(result_str), "%lld", result);
 
-				return mystrdup(result_str, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				return mystrdup(result_str);
 			}
 
 		case CONVTYPE_DECTOHEX:
@@ -151,14 +156,14 @@ char *do_convert(char *what, int what_len, int type, script *pscript)
 
 				snprintf(result_str, sizeof(result_str), "%llx", result);
 
-				return mystrdup(result_str, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				return mystrdup(result_str);
 			}
 
 		case CONVTYPE_SCRIPT:
 			{
 				int rc;
-				char *send_buffer = mymalloc(what_len + 1 + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-				char *result_str = mymalloc(SCRIPT_IO_BUFFER_SIZE, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				char *send_buffer = mymalloc(what_len + 1 + 1);
+				char *result_str = mymalloc(SCRIPT_IO_BUFFER_SIZE);
 
 				exec_script(pscript);
 
@@ -179,7 +184,7 @@ char *do_convert(char *what, int what_len, int type, script *pscript)
 			return amount_to_str(atoll(what));
 
 		default:
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Internal error: unknown conversion type %d.\n", type);
+			error_exit("Internal error: unknown conversion type %d.\n", type);
 	}
 
 	return "do_convert: INTERNAL ERROR";
@@ -206,7 +211,7 @@ char *convert(int_array_t *pconversions, char *line)
 		cur_conv = &conversions[get_iat_element(pconversions, conv_req)];
 
 		max_n_cv_matches = cur_conv -> n * MAX_N_RE_MATCHES;
-		cv_offsets = (cv_off *)mymalloc(sizeof(cv_off) * max_n_cv_matches, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		cv_offsets = (cv_off *)mymalloc(sizeof(cv_off) * max_n_cv_matches);
 
 		/* find where they match */
 		for(conv_index=0; conv_index<cur_conv -> n && cur_n_cv_matches < max_n_cv_matches; conv_index++)
@@ -243,7 +248,7 @@ char *convert(int_array_t *pconversions, char *line)
 
 					dummylen = match_end - match_start;
 
-					dummy = mymalloc(dummylen + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+					dummy = mymalloc(dummylen + 1);
 					memcpy(dummy, &line[match_start], dummylen);
 					dummy[dummylen] = 0x00;
 
@@ -271,7 +276,7 @@ char *convert(int_array_t *pconversions, char *line)
 			n_copy = cv_offsets[conv_index].start - offset_old;
 			if (n_copy > 0)
 			{
-				new_string = myrealloc(new_string, new_len + n_copy + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				new_string = myrealloc(new_string, new_len + n_copy + 1);
 				memcpy(&new_string[offset_new], &line[offset_old], n_copy);
 				new_string[offset_new + n_copy] = 0x00;
 				new_len += n_copy;
@@ -280,7 +285,7 @@ char *convert(int_array_t *pconversions, char *line)
 			offset_old = cv_offsets[conv_index].end;
 
 			n_copy = strlen(cv_offsets[conv_index].newstr);
-			new_string = myrealloc(new_string, new_len + n_copy + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			new_string = myrealloc(new_string, new_len + n_copy + 1);
 			memcpy(&new_string[offset_new], cv_offsets[conv_index].newstr, n_copy);
 			new_string[offset_new + n_copy] = 0x00;
 			myfree(cv_offsets[conv_index].newstr);
@@ -291,7 +296,7 @@ char *convert(int_array_t *pconversions, char *line)
 		n_copy = old_len - offset_old;
 		if (n_copy)
 		{
-			new_string = myrealloc(new_string, new_len + n_copy + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			new_string = myrealloc(new_string, new_len + n_copy + 1);
 			memcpy(&new_string[offset_new], &line[offset_old], n_copy);
 			new_string[offset_new + n_copy] = 0x00;
 		}
@@ -323,7 +328,7 @@ void add_conversion_scheme(int_array_t *conversions, char *conversion_name)
 {
 	int conversion_nr = find_conversion_scheme(conversion_name);
 	if (conversion_nr == -1)
-		error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "'%s' is not a known conversion scheme.\n", conversion_name);
+		error_exit("'%s' is not a known conversion scheme.\n", conversion_name);
 
 	add_to_iat(conversions, conversion_nr);
 }

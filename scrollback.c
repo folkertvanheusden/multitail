@@ -231,7 +231,7 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 		if ((pbuf -> be)[loop].Bline == NULL)
 			continue;
 
-		cur_lb.be = myrealloc(cur_lb.be, (cur_lb.curpos + 1) * sizeof(buffered_entry), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		cur_lb.be = myrealloc(cur_lb.be, (cur_lb.curpos + 1) * sizeof(buffered_entry));
 		cur_lb.be[cur_lb.curpos].pi    = (pbuf -> be)[loop].pi;
 		if ((pbuf -> be)[loop].pi != NULL && (!IS_MARKERLINE((pbuf -> be)[loop].pi)) && (pbuf -> be)[loop].pi -> cdef.term_emul != TERM_IGNORE)
 		{
@@ -249,7 +249,7 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 	LOG("---\n");
 	if (global_highlight_str)
 	{
-		find = mystrdup(global_highlight_str, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		find = mystrdup(global_highlight_str);
 	}
 
 	mywin1 = create_popup(max_y - 4, max_x - 4);
@@ -719,7 +719,7 @@ void scrollback(void)
 	if (window != -1 && lb[window].bufferwhat != 0)
 	{
 		int header_size = strlen(pi[window].filename) + 4;
-		char *header = (char *)mymalloc(header_size + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		char *header = (char *)mymalloc(header_size + 1);
 		snprintf(header, header_size, "%02d] %s", window, pi[window].filename);
 		scrollback_do(window, &lb[window], NULL, header);
 		myfree(header);
@@ -729,7 +729,7 @@ void scrollback(void)
 void merged_scrollback_with_search(char *search_for, mybool_t case_insensitive)
 {
 	int lc_size = nfd * sizeof(int);
-	int *last_check = (int *)mymalloc(lc_size, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	int *last_check = (int *)mymalloc(lc_size);
 	int *winnr = NULL;
 	buffer buf;
 	regex_t reg;
@@ -811,13 +811,13 @@ void merged_scrollback_with_search(char *search_for, mybool_t case_insensitive)
 		if (!IS_MARKERLINE(lb[chosen_win].be[last_check[chosen_win]].pi))
 		{
 			/*** ADD LINE TO BUFFER ***/
-			buf.be = (buffered_entry *)myrealloc(buf.be, sizeof(buffered_entry) * (buf.curpos + 1), __FILE__, __PRETTY_FUNCTION__, __LINE__);
-			winnr  = (int *)myrealloc(winnr, sizeof(int) * (buf.curpos + 1), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			buf.be = (buffered_entry *)myrealloc(buf.be, sizeof(buffered_entry) * (buf.curpos + 1));
+			winnr  = (int *)myrealloc(winnr, sizeof(int) * (buf.curpos + 1));
 			curline = buf.curpos++;
 			/* add the logline itself */
 			string = lb[chosen_win].be[last_check[chosen_win]].Bline;
 			if (string)
-				buf.be[curline].Bline = mystrdup(string, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				buf.be[curline].Bline = mystrdup(string);
 			else
 				buf.be[curline].Bline = NULL;
 			/* remember pointer to subwindow (required for setting colors etc.) */
@@ -840,13 +840,13 @@ void merged_scrollback_with_search(char *search_for, mybool_t case_insensitive)
 		{
 			char *help = "Searched for: ";
 			int len = strlen(help) + strlen(search_for) + 1;
-			header = mymalloc(len, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			header = mymalloc(len);
 			snprintf(header, len, "%s%s", help, search_for);
 		}
 		else
 		{
 			char *help = "Merge view";
-			header = mymalloc(strlen(help) + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			header = mymalloc(strlen(help) + 1);
 			sprintf(header, "%s", help);
 		}
 
@@ -885,7 +885,7 @@ int scrollback_search_to_new_window(buffer *pbuf, char *org_title, char *find_st
 
 		if (regexec(&regex, (pbuf -> be)[loop].Bline, 0, NULL, 0) == 0)
 		{
-			cur_lb.be = myrealloc(cur_lb.be, (cur_lb.curpos + 1) * sizeof(buffered_entry), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			cur_lb.be = myrealloc(cur_lb.be, (cur_lb.curpos + 1) * sizeof(buffered_entry));
 			cur_lb.be[cur_lb.curpos].Bline = (pbuf -> be)[loop].Bline;
 			cur_lb.be[cur_lb.curpos].pi    = (pbuf -> be)[loop].pi;
 			cur_lb.be[cur_lb.curpos].ts    = (pbuf -> be)[loop].ts;
@@ -893,7 +893,7 @@ int scrollback_search_to_new_window(buffer *pbuf, char *org_title, char *find_st
 		}
 	}
 
-	new_header = (char *)mymalloc(strlen(org_title) + 1 + strlen(find_str) + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	new_header = (char *)mymalloc(strlen(org_title) + 1 + strlen(find_str) + 1);
 	sprintf(new_header, "%s %s", org_title, find_str);
 
 	rc = scrollback_do(-1, &cur_lb, NULL, new_header);

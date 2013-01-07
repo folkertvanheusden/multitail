@@ -359,7 +359,7 @@ int color_management(myattr_t *org, myattr_t *new)
 				cur_bg = sel;
 			else if (cursor_x == 2)
 			{
-				if (sel >= n_attrs) error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Internal error.\n");
+				if (sel >= n_attrs) error_exit("Internal error.\n");
 
 				if (cur_attr & attr_x[sel])
 					cur_attr -= attr_x[sel];
@@ -367,7 +367,7 @@ int color_management(myattr_t *org, myattr_t *new)
 					cur_attr |= attr_x[sel];
 			}
 			else
-				error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "Internal error.\n");
+				error_exit("Internal error.\n");
 		}
 	}
 
@@ -584,7 +584,7 @@ int select_schemes(void *schemes_in, int n_schemes_in, scheme_t tscheme, int_arr
 	}
 
 	/* create array that says for each colorscheme if it is selected or not */
-	selected_schemes = (char *)mymalloc(n_schemes_in, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	selected_schemes = (char *)mymalloc(n_schemes_in);
 	memset(selected_schemes, 0x00, n_schemes_in);
 	for(loop=0; loop<get_iat_size(schemes_out); loop++)
 		selected_schemes[get_iat_element(schemes_out, loop)] = 1;
@@ -992,7 +992,7 @@ int add_window(void)
 			set_next_pointer = cur;
 
 			/* allocate new entry */
-			cur = (proginfo *)mymalloc(sizeof(proginfo), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			cur = (proginfo *)mymalloc(sizeof(proginfo));
 		}
 		memset(cur, 0x00, sizeof(proginfo));
 
@@ -1086,7 +1086,7 @@ int toggle_colors(void)
 			mywin = create_popup(11, 53);
 			win_header(mywin, "Toggle colors");
 
-			dummy = mystrdup(cur -> filename, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			dummy = mystrdup(cur -> filename);
 			dummy[min(strlen(dummy), 40)] = 0x00;
 			mvwprintw(mywin -> win, 3, 1, dummy);
 
@@ -1291,7 +1291,7 @@ int edit_regexp(void)
 			else
 			{
 				cur_re = cur -> n_re++;
-				cur -> pre = (re *)myrealloc(cur -> pre, cur -> n_re * sizeof(re), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				cur -> pre = (re *)myrealloc(cur -> pre, cur -> n_re * sizeof(re));
 				memset(&(cur -> pre)[cur_re], 0x00, sizeof(re));
 			}
 
@@ -1803,7 +1803,7 @@ void write_script(void)
 
 		if (fchmod(fileno(fh), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) == -1)
 		{
-			error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "write_script: error setting mode-bits on output file.\n");
+			error_exit("write_script: error setting mode-bits on output file.\n");
 		}
 
 		fprintf(fh, "\n");
@@ -2031,8 +2031,8 @@ int set_window_widths(void)
 
 				if (!vertical_split) is_new = 1;
 
-				vertical_split = (int *)myrealloc(vertical_split, sizeof(int) * split, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-				n_win_per_col  = (int *)myrealloc(n_win_per_col,  sizeof(int) * split, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+				vertical_split = (int *)myrealloc(vertical_split, sizeof(int) * split);
+				n_win_per_col  = (int *)myrealloc(n_win_per_col,  sizeof(int) * split);
 
 				if (is_new)
 				{
@@ -2089,12 +2089,12 @@ int set_window_widths(void)
 
 				if (!vertical_split)
 				{
-					vertical_split = mymalloc(split * sizeof(int), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+					vertical_split = mymalloc(split * sizeof(int));
 					memset(vertical_split, 0x00, split * sizeof(int));
 				}
 				if (!n_win_per_col)
 				{
-					n_win_per_col = mymalloc(split * sizeof(int), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+					n_win_per_col = mymalloc(split * sizeof(int));
 					memset(n_win_per_col, 0x00, split * sizeof(int));
 				}
 
@@ -2325,7 +2325,7 @@ void add_markerline(int index, proginfo *cur, proginfo *type, char *text)
 
 	str_len = strlen(curfname) + 1 + strlen(buffer) + 1 + strlen(curtext) + 1 + 1;
 
-	ml = (char *)mymalloc(str_len, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	ml = (char *)mymalloc(str_len);
 
 	snprintf(ml, str_len, "%s%s%s%s%s", curtext, curtext[0]?" ":"", curfname, (curtext[0] || curfname[0])?" ":"", buffer);
 
@@ -2503,7 +2503,7 @@ void draw_gui_window_header(proginfo *last_changed_window)
 
 				case 'h':	/* hostname */
 					if (uname(&uinfo) == -1)
-						error_exit(__FILE__, __PRETTY_FUNCTION__, __LINE__, "uname() failed\n");
+						error_exit("uname() failed\n");
 
 					repl_str = uinfo.nodename;
 					break;

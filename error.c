@@ -18,13 +18,15 @@
 #include "utils.h"
 #include "version.h"
 
-void error_exit(char *file, const char *function, int line, char *format, ...)
+void error_exit_(char *file, const char *function, int line, char *format, ...)
 {
 	va_list ap;
+#if defined(__GLIBC__)
 	int index;
         void *trace[128];
         int trace_size = backtrace(trace, 128);
         char **messages = backtrace_symbols(trace, trace_size);
+#endif
 
 	(void)endwin();
 
@@ -44,11 +46,11 @@ void error_exit(char *file, const char *function, int line, char *format, ...)
 	fprintf(stderr, "This problem occured at line %d in function %s (from file %s):\n", line, function, file);
 	if (errno) fprintf(stderr, "errno variable was then: %d which means \"%s\"\n", errno, strerror(errno));
 	fprintf(stderr, "Binary build at %s %s\n", __DATE__, __TIME__);
+#if defined(__GLIBC__)
         fprintf(stderr, "Execution path:\n");
         for(index=0; index<trace_size; ++index)
                 fprintf(stderr, "\t%d %s\n", index, messages[index]);
-
-	dump_mem(SIGHUP);
+#endif
 
 	fflush(NULL);
 

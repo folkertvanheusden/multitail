@@ -101,7 +101,7 @@ int edit_stripper_edit_field(NEWWIN *win, char **del, int *col_nr)
 
 	if (new_del != NULL && new_col_nr != NULL)
 	{
-		*del = mystrdup(new_del, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+		*del = mystrdup(new_del);
 		*col_nr = atoi(new_col_nr);
 		changed = 1;
 	}
@@ -281,7 +281,7 @@ int edit_strippers(void)
 			changed = 1;
 
 			cur_strip = cur -> n_strip++;
-			cur -> pstrip = (strip_t *)myrealloc(cur -> pstrip, cur -> n_strip * sizeof(strip_t), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+			cur -> pstrip = (strip_t *)myrealloc(cur -> pstrip, cur -> n_strip * sizeof(strip_t));
 			memset(&(cur -> pstrip)[cur_strip], 0x00, sizeof(strip_t));
 
 			/* compile */
@@ -507,8 +507,8 @@ char * do_strip(proginfo *cur, char *in)
 	if (len == 0)
 		return NULL;
 
-	strip_what = (char *)mymalloc(len,     __FILE__, __PRETTY_FUNCTION__, __LINE__);
-	new_string = (char *)mymalloc(len + 1, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+	strip_what = (char *)mymalloc(len);
+	new_string = (char *)mymalloc(len + 1);
 
 	memset(strip_what, 0x01, len);
 
