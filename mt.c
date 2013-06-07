@@ -2740,6 +2740,9 @@ int main(int argc, char *argv[])
 
 	init_colornames();
 
+	/* start curses library */
+	init_ncurses();
+
 	/* verify size of terminal window */
 	if (LINES < 23 || COLS < 78)
 		error_popup("Terminal too small", -1, "Your terminal(-window) is %dx%d. That is too small\nfor MultiTail: at least 78x23 is required.\nSome menus will look garbled!", COLS, LINES);
@@ -2774,9 +2777,6 @@ int main(int argc, char *argv[])
 
 	/* initialise mail-stuff */
 	init_check_for_mail();
-
-	/* start curses library */
-	init_ncurses();
 
 	/* it seems that on at least FreeBSD ncurses forgets all defined
 	 * colorpairs after an endwin()
