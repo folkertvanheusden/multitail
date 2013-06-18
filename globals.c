@@ -1,10 +1,12 @@
 #define _LARGEFILE64_SOURCE     /* required for GLIBC to enable stat64 and friends */
-#include <sys/types.h>
 #include <regex.h>
-#include <sys/stat.h>
+#include <string.h>
+#include <time.h>
 #include <unistd.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include "mt.h"
 #include "mem.h"
@@ -160,3 +162,13 @@ char *sigs[] = { NULL, "SIGHUP", "SIGINT", "SIGQUIT", "SIGILL", "SIGTRAP", "SIGA
 int n_known_sigs = 32;
 char *severities[8] = { "emerg", "alert", "crit", "err", "warning", "notice", "info", "debug" };
 char *facilities[24] = { "kern", "user", "mail", "daemon", "auth", "syslog", "lpr", "news", "uucp", "cron", "authpriv", "ftp", "?", "?", "?", "?", "local0", "local1", "local2", "local3", "local4", "local5", "local6", "local7" };
+
+void set_do_refresh(char val)
+{
+	do_refresh = val;
+}
+
+char get_do_refresh()
+{
+	return do_refresh;
+}

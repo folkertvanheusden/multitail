@@ -477,9 +477,9 @@ void heartbeat(void)
 	mydoupdate();
 }
 
-void do_check_for_mail(dtime_t now)
+void do_check_for_mail()
 {
-	if (check_for_mail > 0 && mail_spool_file != NULL && (now - msf_last_check) >= check_for_mail)
+	if (check_for_mail > 0 && mail_spool_file != NULL)
 	{
 		/* get current filesize */
 		if (stat64(mail_spool_file, &msf_info) == -1)
@@ -504,13 +504,12 @@ void do_check_for_mail(dtime_t now)
 
 				redraw_statuslines();
 
-				if (do_refresh != 2) do_refresh = 1;
+				if (get_do_refresh() != 2)
+					set_do_refresh(1);
 			}
 
 			msf_prev_size = msf_info.st_size;
 		}
-
-		msf_last_check = now;
 	}
 }
 

@@ -611,10 +611,14 @@ void gui_window_header(char *string)
 {
 	if (term_type == TERM_XTERM)
 	{
+		fprintf(stderr, "\033]2;%s\007", string);
+
+#if 0	/* this code gives problems */
 		/* \033]0;%s\007 */
 		putp("\033]0;");
 		putp(string);
 		putp("\007");
+#endif
 	}
 }
 
@@ -995,7 +999,7 @@ void init_ncurses(void)
 	noecho();
 	nonl();
 	refresh();
-	nodelay(stdscr, FALSE);
+	nodelay(stdscr, TRUE);
 	meta(stdscr, TRUE);	/* enable 8-bit input */
 	idlok(stdscr, TRUE);	/* may give a little clunky screenredraw */
 	idcok(stdscr, TRUE);	/* may give a little clunky screenredraw */

@@ -2409,7 +2409,7 @@ void init_check_for_mail(void)
 void main_loop(void)
 {
 	/* create windows */
-	do_refresh = 2;
+	set_do_refresh(2);
 
 	for(;;)
 	{
@@ -2419,7 +2419,7 @@ void main_loop(void)
 		{
 			int uc = toupper(c);
 
-			do_refresh = 1;
+			set_do_refresh(1);
 
 			if (mail)
 			{
@@ -2429,7 +2429,7 @@ void main_loop(void)
 
 			if (c == -1)
 			{
-				do_refresh = 2;
+				set_do_refresh(2);
 				continue;
 			}
 			else if (uc == 'Q' || uc == 'X')
@@ -2439,13 +2439,13 @@ void main_loop(void)
 			else if (c == 'Z')	/* clear all marker lines */
 			{
 				delete_all_markerlines();
-				do_refresh = 2;
+				set_do_refresh(2);
 				continue;
 			}
 			else if (uc == 'A')
 			{
 				if (add_window())
-					do_refresh = 2;
+					set_do_refresh(2);
 				continue;
 			}
 			else if (uc == 'H' || c == 8)
@@ -2455,7 +2455,7 @@ void main_loop(void)
 			}
 			else if (c == 'r' || c == 12)
 			{
-				do_refresh = 2;
+				set_do_refresh(2);
 				continue;
 			}
 			else if (c == 'R')
@@ -2481,7 +2481,7 @@ void main_loop(void)
 			else if (uc == 'J')
 			{
 				if (set_window_sizes())
-					do_refresh = 2;
+					set_do_refresh(2);
 				continue;
 			}
 			else if (uc == 'L')
@@ -2493,35 +2493,35 @@ void main_loop(void)
 			if (nfd == 0)
 			{
 				wrong_key();
-				do_refresh = 0;
+				set_do_refresh(0);
 				continue;
 			}
 
 			else if (uc == 'E' || uc == '\\')
 			{
 				if (edit_regexp())
-					do_refresh = 2;
+					set_do_refresh(2);
 			}
 			else if (uc == 'F')
 			{
 				if (edit_strippers())
-					do_refresh = 2;
+					set_do_refresh(2);
 			}
 			else if (uc == 'D')
 			{
 				if (delete_window())
-					do_refresh = 2;
+					set_do_refresh(2);
 				continue;
 			}
 			else if (uc == 'V')
 			{
 				if (toggle_vertical_split())
-					do_refresh = 2;
+					set_do_refresh(2);
 			}
 			else if (c == 'c')
 			{
 				if (toggle_colors())
-					do_refresh = 2;
+					set_do_refresh(2);
 			}
 			else if (c == 'C' && use_colors)
 			{
@@ -2533,23 +2533,23 @@ void main_loop(void)
 			else if (uc == 'S')
 			{
 				if (swap_window())
-					do_refresh = 2;
+					set_do_refresh(2);
 				continue;
 			}
 			else if (c == 'z')
 			{
 				if (hide_window())
-					do_refresh = 2;
+					set_do_refresh(2);
 			}
 			else if (c == 'u')
 			{
 				if (hide_all_but())
-					do_refresh = 2;
+					set_do_refresh(2);
 			}
 			else if (c == 'U')
 			{
 				if (unhide_all_windows())
-					do_refresh = 2;
+					set_do_refresh(2);
 			}
 			else if (uc == 'G')
 			{
@@ -2618,7 +2618,7 @@ void main_loop(void)
 			else if (c == 'y')	/* set linewrap */
 			{
 				set_linewrap();
-				do_refresh = 2;
+				set_do_refresh(2);
 			}
 			else if (c == 'Y')	/* send a signal to a window */
 			{
@@ -2631,7 +2631,7 @@ void main_loop(void)
 			else if (c == '?')	/* highlight in all windows */
 			{
 				highlight_in_all_windows();
-				do_refresh = 2;
+				set_do_refresh(2);
 			}
 			else if (c == 'I')
 			{
@@ -2640,7 +2640,7 @@ void main_loop(void)
 			else if (c == 20)	/* ^t */
 			{
 				toggle_subwindow_nr();
-				do_refresh = 2;
+				set_do_refresh(2);
 			}
 			else if (c == 22)	/* ^v */
 			{
@@ -2657,18 +2657,16 @@ void main_loop(void)
 			else if (c == KEY_LEFT || c == KEY_RIGHT)
 			{
 				horizontal_scroll(c);
-				do_refresh = 2;
+				set_do_refresh(2);
 			}
 			else
 			{
 				if (exec_bind(c))
-				{
-					do_refresh = 1;
-				}
+					set_do_refresh(1);
 				else
 				{
 					wrong_key();
-					do_refresh = 0;
+					set_do_refresh(0);
 				}
 			}
 		}
@@ -2883,11 +2881,12 @@ int check_for_died_processes(void)
 					/* is an entry deleted? (>=0) or restarted? (==-1) */
 					if (refresh_info >= 0)
 					{
-						do_refresh = 2;
+						set_do_refresh(2);
 					}
-					else if (cur -> restart.do_diff && do_refresh == 0)
+					else if (cur -> restart.do_diff && get_do_refresh() == 0)
 					{
-						if (do_refresh != 2) do_refresh = 1;
+						if (get_do_refresh() != 2)
+							set_do_refresh(1);
 					}
 
 					break;
@@ -2984,7 +2983,7 @@ int check_paths(void)
 
 	for(loop=0; loop<n_cdg; loop++)
 	{
-		if ((now - cdg[loop].last_check) >= cdg[loop].check_interval)
+		if (now - cdg[loop].last_check >= cdg[loop].check_interval)
 		{
 			int fi;
 			glob_t files;
@@ -3086,20 +3085,23 @@ void resize_terminal_do(NEWWIN *popup)
 
 int process_global_keys(int what_help, NEWWIN *popup, char cursor_shift)
 {
-	int c;
+	int c = getch();
 
-	c = getch();
+	if (c == KEY_RESIZE)
+		return -1;
 
 	redraw_statuslines();
 
-	if (c == KEY_RESIZE || c == KEY_F(5))
+	if (c == KEY_F(5))
 	{
 		resize_terminal_do(popup);
-		do_refresh = 2;
+
+		set_do_refresh(2);
 	}
 	else if (c == exit_key)     /* ^C */
 	{
 		do_exit();
+
 		error_exit("This should not be reached.\n");
 	}
 	else if (c == 8 || c == KEY_F(1))       /* HELP (^h / F1) */
@@ -3150,12 +3152,8 @@ int process_global_keys(int what_help, NEWWIN *popup, char cursor_shift)
 		else
 			wrong_key();
 	}
-	else
-	{
-		return c;
-	}
 
-	return -1;
+	return c;
 }
 
 char process_input_data(int win_nr, proginfo *cur, char *data_in, int new_data_offset, int n_bytes_added, double now)
@@ -3226,8 +3224,8 @@ char process_input_data(int win_nr, proginfo *cur, char *data_in, int new_data_o
 			}
 			else /* no, just output */
 			{
-				if (do_refresh == 0)
-					do_refresh = 1;	/* after update interval, update screen */
+				if (get_do_refresh() == 0)
+					set_do_refresh(1); /* after update interval, update screen */
 
 				statusline_update_needed |= emit_to_buffer_and_term(win_nr, cur, pnt);
 			}
@@ -3346,22 +3344,14 @@ int wait_for_keypress(int what_help, double max_wait, NEWWIN *popup, char cursor
 		static double lastupdate = 0;
 		double sleep = 32767.0;
 
-		if (heartbeat_interval > 0 && (get_ts() - heartbeat_t) >= heartbeat_interval)
-		{
-			heartbeat();
-			heartbeat_t = get_ts();
-		}
-
 		/* need to check any paths? */
 		if (check_paths())
-			do_refresh = 2;
-
-		/* check for mail */
-		do_check_for_mail(now);
+			set_do_refresh(2);
 
 		sleep = min(sleep, check_for_mail > 0     ? max((msf_last_check + check_for_mail)  - now, 0) : 32767);
 		sleep = min(sleep, heartbeat_interval > 0 ? max((heartbeat_t + heartbeat_interval) - now, 0) : 32767);
 		sleep = min(sleep, max_wait > 0.0         ? max((max_wait_start + max_wait)        - now, 0) : 32767);
+
 		for(loop=0; loop<n_cdg; loop++)
 			sleep = min(sleep, max((cdg[loop].last_check + cdg[loop].check_interval) - now, 0));
 
@@ -3409,14 +3399,14 @@ int wait_for_keypress(int what_help, double max_wait, NEWWIN *popup, char cursor
 		}
 
 		/* update screen? */
-		if (do_refresh)
+		if (get_do_refresh())
 		{
-			if (do_refresh == 2)
+			if (get_do_refresh() == 2)
 				create_windows();
 
-			if ((now - lastupdate) >= update_interval)
+			if (now - lastupdate >= update_interval)
 			{
-				do_refresh = 0;
+				set_do_refresh(0);
 				lastupdate = now;
 				mydoupdate();
 			}
@@ -3431,6 +3421,21 @@ int wait_for_keypress(int what_help, double max_wait, NEWWIN *popup, char cursor
 
 		now = get_ts();
 
+		if (heartbeat_interval > 0 && now - heartbeat_t >= heartbeat_interval)
+		{
+			heartbeat();
+
+			heartbeat_t = now;
+		}
+
+		/* check for mail */
+		if (now - msf_last_check >= check_for_mail)
+		{
+			do_check_for_mail(now);
+
+			msf_last_check = now;
+		}
+
 		total_wakeups++;
 
 		if (terminal_changed)
@@ -3439,7 +3444,7 @@ int wait_for_keypress(int what_help, double max_wait, NEWWIN *popup, char cursor
 			resize_terminal_do(popup);
 		}
 
-		if (max_wait != 0.0 && (get_ts() - max_wait_start) >= max_wait)
+		if (max_wait != 0.0 && now - max_wait_start >= max_wait)
 			break;
 
 		if (got_sigusr1)
@@ -3458,9 +3463,7 @@ int wait_for_keypress(int what_help, double max_wait, NEWWIN *popup, char cursor
 
 				c = process_global_keys(what_help, popup, cursor_shift);
 				if (c != -1)
-				{
 					break;
-				}
 			}
 
 			/* go through all fds */
@@ -3503,21 +3506,24 @@ int wait_for_keypress(int what_help, double max_wait, NEWWIN *popup, char cursor
 							{
 								pi[loop].paused = 1;
 								update_statusline(status, loop, cur);
-								do_refresh = 2;
+								set_do_refresh(2);
 							}
 							else
 							{
-								if (last_changed_window == cur) last_changed_window = NULL;
+								if (last_changed_window == cur)
+									last_changed_window = NULL;
+
 								deleted_entry_in_array = close_window(loop, cur);
 
 								if (deleted_entry_in_array >= 0)
 								{
-									do_refresh = 2;
+									set_do_refresh(2);
 									goto closed_window;
 								}
-								else if (cur -> restart.do_diff && do_refresh == 0)
+								else if (cur -> restart.do_diff && get_do_refresh() == 0)
 								{
-									if (do_refresh != 2) do_refresh = 1;
+									if (get_do_refresh() != 2)
+										set_do_refresh(1);
 								}
 							}
 						}
@@ -3539,26 +3545,30 @@ int wait_for_keypress(int what_help, double max_wait, NEWWIN *popup, char cursor
 					}
 
 					/* close idle, if requested */
-					if (cur -> close_idle > 0 && (time(NULL) - cur -> statistics.lastevent) > cur -> close_idle)
+					if (cur -> close_idle > 0 && now - cur -> statistics.lastevent > cur -> close_idle)
 					{
-						if (last_changed_window == cur) last_changed_window = NULL;
+						if (last_changed_window == cur)
+							last_changed_window = NULL;
+
 						deleted_entry_in_array = close_window(loop, cur);
 						if (deleted_entry_in_array >= 0)
 						{
-							do_refresh = 2;
+							set_do_refresh(2);
+
 							goto closed_window;
 						}
 					}
 
 					if (cur -> mark_interval)
 					{
-						if ((time(NULL) - cur -> statistics.lastevent) >= cur -> mark_interval)
+						if (now - cur -> statistics.lastevent >= cur -> mark_interval)
 						{
 							add_markerline(loop, cur, MARKER_IDLE, NULL);
 
-							if (do_refresh == 0) do_refresh = 1;
+							if (get_do_refresh() == 0)
+								set_do_refresh(1);
 
-							cur -> statistics.lastevent = time(NULL);
+							cur -> statistics.lastevent = now;
 						}
 					}
 

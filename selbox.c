@@ -86,7 +86,7 @@ int find_sb_string(void **list, selbox_type_t type, int nentries, char *compare_
 	{
 		char buffer[4096];
 
-		(void)generate_string(buffer, list, type, sizeof(buffer), index);
+		(void)generate_string(buffer, list, type, sizeof(buffer) - 1, index);
 
 		if (strncmp(buffer, compare_string, len) == 0)
 			return index;

@@ -16,7 +16,6 @@ extern color_scheme *cschemes;
 extern int n_cschemes;
 extern pars_per_file *ppf;
 extern int n_pars_per_file;
-extern char do_refresh;
 extern char mail;
 extern int check_for_mail;
 extern char tab_width;
@@ -143,3 +142,6 @@ extern int syslog_port;
 extern char scrollback_search_new_window;
 extern char *global_find;
 extern mybool_t gnu_tail;
+
+void set_do_refresh(char val);
+char get_do_refresh();
