@@ -33,7 +33,9 @@ int start_tail(char *filename, char retry_open, char follow_filename, int initia
 		int npars = 0;
 		char nlines_buffer[32];
 
+#ifndef __minix
 		setpgid(0,0);
+#endif
 
 		setup_for_childproc(pipefd[1], 0, "dumb");
 
@@ -154,7 +156,9 @@ int start_proc(proginfo *cur, int initial_tail)
 		/* child? */
 		if (cur -> pid == 0)
 		{
-			setpgid(0,0);
+#ifndef __minix
+		setpgid(0,0);
+#endif
 
 			/* reset signal handler for SIGTERM */
 			signal(SIGTERM, SIG_DFL);
@@ -206,7 +210,9 @@ int start_proc(proginfo *cur, int initial_tail)
 			{
 				char *cur_file = NULL, *new_file;
 
+#ifndef __minix
 				setpgid(0,0);
+#endif
 
 				signal(SIGTERM, start_proc_signal_handler);
 
@@ -286,7 +292,9 @@ int execute_program(char *execute, char bg)
 	child = fork();
 	if (child == 0)
 	{
+#ifndef __minix
 		setpgid(0,0);
+#endif
 
 		if (bg)
 			setup_for_childproc(open_null(), 1, "dumb");
@@ -371,7 +379,9 @@ pid_t exec_with_pty(char *command, int *fd)
 
 	if (pid == 0)
 	{
+#ifndef __minix
 		setpgid(0,0);
+#endif
 
 		myclose(fd_master);
 

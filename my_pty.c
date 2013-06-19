@@ -32,7 +32,7 @@
 #if defined(linux) || defined(__CYGWIN__) || defined(__GNU__) || defined(__GLIBC__)
 #include <pty.h>
 #endif
-#ifdef __FreeBSD__
+#if defined(__FreeBSD__) || defined(__minix)
 #include <libutil.h>
 #endif
 #if defined(sun) || defined(__sun)
@@ -78,7 +78,7 @@
 
 int get_pty_and_fork(int *fd_master, int *fd_slave)
 {
-#if defined(__FreeBSD__) || defined(linux) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__APPLE__) || defined(__CYGWIN__) || defined(__GNU__) || defined(__GLIBC__)
+#if defined(__FreeBSD__) || defined(linux) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__APPLE__) || defined(__CYGWIN__) || defined(__GNU__) || defined(__GLIBC__) || defined(__minix)
 
 	if (openpty(fd_master, fd_slave, NULL, NULL, NULL) == -1)
 	{

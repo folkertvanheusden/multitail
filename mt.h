@@ -48,7 +48,7 @@ typedef enum { SCHEME_TYPE_EDIT = 0, SCHEME_TYPE_FILTER } filter_edit_scheme_t;
 #define __USE_BSD	/* manpage says _BSD_SOURCE, stdlib.h says __USE_BSD */
 #endif
 
-#if defined(sun) || defined(__sun) || defined(scoos) || defined(_HPUX_SOURCE) || defined(AIX) || defined(__CYGWIN__)
+#if defined(sun) || defined(__sun) || defined(scoos) || defined(_HPUX_SOURCE) || defined(AIX) || defined(__CYGWIN__) || defined(__minix)
 	#include <ncurses/panel.h>
 	#include <ncurses/ncurses.h>
 #else
@@ -78,7 +78,7 @@ typedef enum { SCHEME_TYPE_EDIT = 0, SCHEME_TYPE_FILTER } filter_edit_scheme_t;
 	#define getmaxyx(w,y,x) y = w->_maxy;  x = w->_maxx
 #endif
 
-#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__APPLE__) || defined(__CYGWIN__)
+#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__APPLE__) || defined(__CYGWIN__) || defined(__minix)
 #define off64_t off_t
 #define stat64 stat
 #define open64 open
