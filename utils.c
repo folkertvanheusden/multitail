@@ -781,7 +781,7 @@ int find_editscheme(char *name)
 {
 	int loop;
 
-	for(loop=0; loop<n_fs; loop++)
+	for(loop=0; loop<n_es; loop++)
 	{
 		if (strcmp(pes[loop].es_name, name) == 0)
 			return loop;
