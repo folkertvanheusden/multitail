@@ -48,13 +48,8 @@ typedef enum { SCHEME_TYPE_EDIT = 0, SCHEME_TYPE_FILTER } filter_edit_scheme_t;
 #define __USE_BSD	/* manpage says _BSD_SOURCE, stdlib.h says __USE_BSD */
 #endif
 
-#if defined(sun) || defined(__sun) || defined(scoos) || defined(_HPUX_SOURCE) || defined(AIX) || defined(__CYGWIN__) || defined(__minix)
-	#include <ncurses/panel.h>
-	#include <ncurses/ncurses.h>
-#else
-	#include <panel.h>
-	#include <ncurses.h>
-#endif
+#include <ncursesw/panel.h>
+#include <ncursesw/ncurses.h>
 
 /* it seems the default HP-UX c-compiler doesn't understand atoll and
  * strtoll while it does understand 'long long'

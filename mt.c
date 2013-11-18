@@ -37,6 +37,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <wctype.h>
 
 #include "mt.h"
 #include "globals.h"
@@ -586,6 +587,18 @@ void gen_wordwrap_offsets(char *string, int start_offset, int end_offset, int wi
 	(*offsets)[n_ww] = -1;
 }
 
+int count_utf_bytes(int c)
+{
+        if ((c & 0xe0) == 0xc0)
+                return 2;
+        else if ((c & 0xf0) == 0xe0)
+                return 3;
+        else if ((c & 0xf8) == 0xf0)
+                return 4;
+
+        return 1;
+}
+
 void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end, int disp_end, color_offset_in_line *cmatches, int n_cmatches, mybool_t has_merge_colors, char start_reverse, regmatch_t *matches, int matching_regex, char use_regex, NEWWIN *win)
 {
 	int offset;
@@ -610,20 +623,28 @@ void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end,
 	}
 
 	/* print text */
-	for(offset=prt_start; offset<prt_end; offset++)
+	for(offset=prt_start; offset<prt_end;)
 	{
 		char re_inv = default_reverse_state;
 		char is_control_or_extended_ascii = 0;
-		unsigned char current_char = (unsigned char)use_string[offset];
 		myattr_t new_cdev = { -1, -1 };
+
+		wchar_t wcur = 0;
+		const char *dummy = &use_string[offset];
+
+		mbsrtowcs(&wcur, &dummy, 1, NULL);
 
 		if (ww != NULL && offset == ww[ww_offset])
 		{
 			wprintw(win -> win, "\n");
 			ww_offset++;
 
-			if (isspace(use_string[offset]))
+			if (iswspace(wcur))
+			{
+				offset++;
+
 				continue;
+			}
 		}
 
 		/* find things to colorize */
@@ -647,11 +668,11 @@ void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end,
 		}
 
 		/* control-characters will be displayed as an inverse '.' */
-		if (current_char < 32 || current_char == 127 || (current_char > 127 && !allow_8bit))
+		if (iswcntrl(wcur))
 		{
 			is_control_or_extended_ascii = 1;
 
-			if (current_char != 13 && current_char != 9)
+			if (!iswspace(wcur))
 				re_inv = 1;
 		}
 
@@ -676,36 +697,37 @@ void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end,
 
 		if (!is_control_or_extended_ascii)
 		{
-			waddch(win -> win, (const chtype)current_char);
+			waddnwstr(win -> win, &wcur, 1);
+
 			disp_offset++;
 		}
 		else
 		{
-			if (current_char > 126)
-			{
-				waddch(win -> win, '.');
-				disp_offset++;
-			}
-			else if (current_char == 9 && tab_width > 0)	/* TAB? */
+			error_exit("> 126 %d", wcur);
+
+			if (wcur == 9 && tab_width > 0)	/* TAB? */
 			{
 				disp_offset += draw_tab(win);
 			}
 			/* 13 (CR) is just silently ignored */
-			else if (current_char != 13)
+			else if (wcur != 13)
 			{
 				if (caret_notation)
 				{
-					wprintw(win -> win, "^%c", 'a' + current_char - 1);
+					wprintw(win -> win, "^%c", 'a' + wcur - 1);
 					disp_offset++;
 				}
 				else
 					waddch(win -> win, '.');
+
 				disp_offset++;
 			}
 		}
 
 		if (disp_offset >= disp_end && disp_end != -1)
 			break;
+
+		offset += count_utf_bytes(&use_string[offset]);
 	}
 
 	if (prt_start == prt_end)       /* scrolled out line */
@@ -1483,7 +1505,9 @@ void create_window_set(int startx, int width, int nwindows, int indexoffset)
 	for(loop=0; loop<nwindows; loop++)
 	{
 		int cur_win_index = loop + indexoffset;
-		if (cur_win_index >= nfd) break;
+
+		if (cur_win_index >= nfd)
+			break;
 
 		if (pi[cur_win_index].hidden == 0)
 		{
@@ -1491,8 +1515,12 @@ void create_window_set(int startx, int width, int nwindows, int indexoffset)
 			n_not_hidden++;
 		}
 	}
+
 	if (n_not_hidden == 0)
+	{
+		free(lines_per_win);
 		return;
+	}
 
 	/* count the number of lines needed by the windows for which
 	 * the height is explicitly set
@@ -1882,7 +1910,7 @@ void do_set_bufferstart(int f_index, char store_what_lines, int maxnlines)
 	lb[f_index].maxnlines = maxnlines;
 }
 
-char close_window(int winnr, proginfo *cur)
+char close_window(int winnr, proginfo *cur, mybool_t stop_proc)
 {
 	if (winnr == terminal_main_index)
 	{
@@ -1891,7 +1919,8 @@ char close_window(int winnr, proginfo *cur)
 	}
 
 	/* make sure it is really gone */
-	stop_process(cur -> pid);
+	if (stop_proc)
+		stop_process(cur -> pid);
 
 	/* restart window? */
 	if (cur -> restart.restart >= 0)
@@ -2874,7 +2903,7 @@ int check_for_died_processes(void)
 				/* did it exit? */
 				if (died_proc == cur -> pid && cur -> wt != WT_STDIN && cur -> wt != WT_SOCKET)
 				{
-					int refresh_info = close_window(f_index, cur);
+					int refresh_info = close_window(f_index, cur, MY_FALSE);
 
 					found = a_window_got_closed = 1;
 
@@ -3513,11 +3542,12 @@ int wait_for_keypress(int what_help, double max_wait, NEWWIN *popup, char cursor
 								if (last_changed_window == cur)
 									last_changed_window = NULL;
 
-								deleted_entry_in_array = close_window(loop, cur);
+								deleted_entry_in_array = close_window(loop, cur, MY_TRUE);
 
 								if (deleted_entry_in_array >= 0)
 								{
 									set_do_refresh(2);
+									free(buffer);
 									goto closed_window;
 								}
 								else if (cur -> restart.do_diff && get_do_refresh() == 0)
@@ -3550,7 +3580,7 @@ int wait_for_keypress(int what_help, double max_wait, NEWWIN *popup, char cursor
 						if (last_changed_window == cur)
 							last_changed_window = NULL;
 
-						deleted_entry_in_array = close_window(loop, cur);
+						deleted_entry_in_array = close_window(loop, cur, MY_TRUE);
 						if (deleted_entry_in_array >= 0)
 						{
 							set_do_refresh(2);
