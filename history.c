@@ -132,7 +132,7 @@ char * search_history(history_t *ph, char *search_string)
 {
 	if (ph -> history_size > 0)
 	{
-		int sel_index, n_entries, free_entry;
+		int n_entries, free_entry;
 
 		load_history(ph);
 
@@ -141,12 +141,10 @@ char * search_history(history_t *ph, char *search_string)
 
 		if (n_entries > 0)
 		{
-			sel_index = selection_box((void **)ph -> history, NULL, n_entries, SEL_HISTORY, HELP_HISTORY, NULL);
+			int sel_index = selection_box((void **)ph -> history, NULL, n_entries, SEL_HISTORY, HELP_HISTORY, NULL);
 
 			if (sel_index >= 0)
-			{
 				return mystrdup((ph -> history)[sel_index]);
-			}
 		}
 		else
 			error_popup("Search history", -1, "The history list is empty.");
