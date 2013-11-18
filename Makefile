@@ -5,7 +5,7 @@ CONFIG_FILE=$(DESTDIR)/etc/multitail.conf
 
 CC=gcc
 DEBUG=-g -D_FORTIFY_SOURCE=2 # -D_DEBUG # -pg #  -D_DEBUG  #-pg -W -pedantic # -pg #-fprofile-arcs
-LDFLAGS+=-lpanel -lncurses -lutil -lm $(DEBUG) -rdynamic
+LDFLAGS+=-lpanelw -lncursesw -lutil -lm $(DEBUG) -rdynamic
 # LDFLAGS+=-lc_p -lpanel_g -lncurses_g -lutil -lm -pg -g -rdynamic
 CFLAGS+=-funsigned-char -D`uname` -O2 -Wall -DVERSION=\"$(VERSION)\" $(DEBUG) -DCONFIG_FILE=\"$(CONFIG_FILE)\"
 
