@@ -193,7 +193,7 @@ void add_redir_to_socket(char filtered, char *prio, char *fac, char *address, re
     struct addrinfo* rp;
     int s, sfd = -1;
 
-	*predir = (redirect_t *)myrealloc(*predir, (*n_redirect) * sizeof(redirect_t));
+	*predir = (redirect_t *)myrealloc(*predir, (*n_redirect + 1) * sizeof(redirect_t));
 
 	assert(filtered == 1 || filtered == 0);
 
