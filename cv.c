@@ -197,7 +197,7 @@ char *convert(int_array_t *pconversions, char *line)
 	int conv_index;
 	int conv_req;
 	int new_len = 0;
-	int max_n_cv_matches = 0, cur_n_cv_matches = 0;
+	int cur_n_cv_matches = 0;
 	char *new_string = NULL;
 	int offset_old = 0, offset_new = 0;
 	int old_len = strlen(line);
@@ -210,11 +210,8 @@ char *convert(int_array_t *pconversions, char *line)
 	{
 		cur_conv = &conversions[get_iat_element(pconversions, conv_req)];
 
-		max_n_cv_matches = cur_conv -> n * MAX_N_RE_MATCHES;
-		cv_offsets = (cv_off *)mymalloc(sizeof(cv_off) * max_n_cv_matches);
-
 		/* find where they match */
-		for(conv_index=0; conv_index<cur_conv -> n && cur_n_cv_matches < max_n_cv_matches; conv_index++)
+		for(conv_index=0; conv_index<cur_conv -> n; conv_index++)
 		{
 			int offset = 0;
 			do
@@ -227,7 +224,7 @@ char *convert(int_array_t *pconversions, char *line)
 				if (regexec(&(cur_conv -> pcb)[conv_index].regex, &line[offset], MAX_N_RE_MATCHES, matches, offset?REG_NOTBOL:0) != 0)
 					break;
 
-				for(cur_match_index=1; cur_match_index<MAX_N_RE_MATCHES && cur_n_cv_matches < max_n_cv_matches; cur_match_index++)
+				for(cur_match_index=1; cur_match_index<MAX_N_RE_MATCHES; cur_match_index++)
 				{
 					char *dummy;
 					int dummylen;
@@ -243,6 +240,7 @@ char *convert(int_array_t *pconversions, char *line)
 
 					(cur_conv -> pcb)[conv_index].match_count++;
 
+					cv_offsets = (cv_off *)myrealloc(cv_offsets, sizeof(cv_off) * (cur_n_cv_matches + 1));
 					cv_offsets[cur_n_cv_matches].start = match_start;
 					cv_offsets[cur_n_cv_matches].end   = match_end;
 
