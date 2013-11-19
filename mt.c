@@ -703,7 +703,7 @@ void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end,
 		}
 		else
 		{
-			error_exit("> 126 %d", wcur);
+			error_exit("> 126 %d: %02x %02x %02x", wcur, use_string[offset+0],  use_string[offset+1], use_string[offset+2]);
 
 			if (wcur == 9 && tab_width > 0)	/* TAB? */
 			{
