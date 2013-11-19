@@ -20,6 +20,7 @@
 
 void error_exit_(char *file, const char *function, int line, char *format, ...)
 {
+	int e = errno;
 	va_list ap;
 #if defined(__GLIBC__)
 	int index;
@@ -44,7 +45,7 @@ void error_exit_(char *file, const char *function, int line, char *format, ...)
 	fprintf(stderr, "If this is a bug, please report the following information:\n");
 	fprintf(stderr, "---------------------------------------------------------\n");
 	fprintf(stderr, "This problem occured at line %d in function %s (from file %s):\n", line, function, file);
-	if (errno) fprintf(stderr, "errno variable was then: %d which means \"%s\"\n", errno, strerror(errno));
+	if (e) fprintf(stderr, "errno variable was then: %d which means \"%s\"\n", e, strerror(e));
 	fprintf(stderr, "Binary build at %s %s\n", __DATE__, __TIME__);
 #if defined(__GLIBC__)
         fprintf(stderr, "Execution path:\n");
