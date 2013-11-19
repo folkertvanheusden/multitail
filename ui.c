@@ -34,7 +34,6 @@ void error_popup(char *title, int help, char *message, ...)
 	va_list ap;
 	NEWWIN *mywin;
 	char buffer[4096];
-	int len;
 	myattr_t cdev;
 
 	cdev.colorpair_index = find_colorpair(COLOR_RED, -1, 1);
@@ -43,8 +42,6 @@ void error_popup(char *title, int help, char *message, ...)
 	va_start(ap, message);
 	vsnprintf(buffer, sizeof(buffer), message, ap);
 	va_end(ap);
-
-	len = strlen(buffer);
 
 	mywin = create_popup(9, max(33, find_char_offset(buffer, '\n')) + 4);
 

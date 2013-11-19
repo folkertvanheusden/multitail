@@ -37,6 +37,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <wchar.h>
 #include <wctype.h>
 
 #include "mt.h"
@@ -448,13 +449,8 @@ int draw_tab(NEWWIN *win)
 {
 	if (tab_width)
 	{
-		int cury, curx, move, loop;
-
-		/* get current coordinate */
-		getyx(win -> win, cury, curx);
-
-		/* calculate new coordinate */
-		move = (((curx / tab_width) + 1) * tab_width) - curx;
+		int curx = getcurx(win -> win), loop;
+		int move = (((curx / tab_width) + 1) * tab_width) - curx;
 
 		for(loop=0; loop<move; loop++)
 			waddch(win -> win, ' ');
@@ -603,7 +599,6 @@ void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end,
 {
 	int offset;
 	myattr_t cdev = { -1, -1 };
-	char reverse = start_reverse;
 	char default_reverse_state = 0;
 	int disp_offset = 0;
 	char highlight_part = toupper(use_regex) == 'C';
@@ -632,7 +627,9 @@ void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end,
 		wchar_t wcur = 0;
 		const char *dummy = &use_string[offset];
 
-		mbsrtowcs(&wcur, &dummy, 1, NULL);
+		/*int rc = */mbsrtowcs(&wcur, &dummy, 1, NULL);
+		/* if (rc != 1)
+			error_exit("> %d: %02x|%02x %02x %02x %02x", rc, *(dummy - 1), *dummy, *(dummy + 1), *(dummy + 2), *(dummy + 3)); */
 
 		if (ww != NULL && offset == ww[ww_offset])
 		{
@@ -677,11 +674,7 @@ void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end,
 		}
 
 		if (re_inv)
-		{
 			new_cdev.attrs = inverse_attrs;
-
-			reverse = 1;
-		}
 
 		/* new color selected? then switch off previous color */
 		if (cdev.colorpair_index != new_cdev.colorpair_index || cdev.attrs != new_cdev.attrs)
@@ -689,8 +682,6 @@ void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end,
 			myattr_off(win, cdev);
 
 			myattr_on(win, new_cdev);
-
-			reverse = new_cdev.attrs != -1 && new_cdev.attrs & A_REVERSE;
 
 			cdev = new_cdev;
 		}
@@ -703,7 +694,7 @@ void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end,
 		}
 		else
 		{
-			error_exit("> 126 %d: %02x %02x %02x", wcur, use_string[offset+0],  use_string[offset+1], use_string[offset+2]);
+			/* error_exit("> 126 %d: %02x %02x %02x", wcur, use_string[offset+0],  use_string[offset+1], use_string[offset+2]); */
 
 			if (wcur == 9 && tab_width > 0)	/* TAB? */
 			{
@@ -727,7 +718,7 @@ void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end,
 		if (disp_offset >= disp_end && disp_end != -1)
 			break;
 
-		offset += count_utf_bytes(&use_string[offset]);
+		offset += count_utf_bytes(use_string[offset]);
 	}
 
 	if (prt_start == prt_end)       /* scrolled out line */
@@ -750,7 +741,7 @@ void color_print(int f_index, NEWWIN *win, proginfo *cur, char *string, regmatch
 	int n_cmatches = 0;
 	mybool_t has_merge_colors = MY_FALSE;
 	char *use_string = NULL;
-	int y, x;
+	int x;
 
 	/* stop if there's no window tou output too */
 	if (!win)
@@ -762,7 +753,7 @@ void color_print(int f_index, NEWWIN *win, proginfo *cur, char *string, regmatch
 	 * to the left itself when emitting text)
 	 */
 	mx = getmaxx(win -> win);
-	getyx(win -> win, y, x);
+	x = getcurx(win -> win);
 	if ((x != 0 && x != mx) || !suppress_empty_lines)
 		wprintw(win -> win, "\n");
 
@@ -1343,7 +1334,7 @@ void update_statusline(NEWWIN *status, int win_nr, proginfo *cur)
 {
 	if (mode_statusline > 0 && status != NULL && cur != NULL)
 	{
-		int dx, dy;
+		int dx;
 		myattr_t attrs = statusline_attrs;
 		int statusline_len = 0;
 		off64_t	fsize = (off64_t)-1;
@@ -1389,7 +1380,7 @@ void update_statusline(NEWWIN *status, int win_nr, proginfo *cur)
 		else if (mail)
 			wprintw(status -> win, " You've got mail!");
 
-		getmaxyx(status -> win, dy, dx);
+		dx = getcurx(status -> win);
 		if (dx >= (statusline_len + 13))
 		{
 			if (cur -> paused)
@@ -1488,7 +1479,6 @@ void create_window_set(int startx, int width, int nwindows, int indexoffset)
 	int loop;
 
 	int term_offset = 0;
-	int last_not_hidden_window = -1;
 	int n_not_hidden = 0;
 	int n_height_not_set = 0;
 	int n_lines_requested = 0, n_with_nlines_request = 0;
@@ -1510,10 +1500,7 @@ void create_window_set(int startx, int width, int nwindows, int indexoffset)
 			break;
 
 		if (pi[cur_win_index].hidden == 0)
-		{
-			last_not_hidden_window = loop;
 			n_not_hidden++;
-		}
 	}
 
 	if (n_not_hidden == 0)
@@ -2723,6 +2710,9 @@ int main(int argc, char *argv[])
 	char *dummy = getenv("MAILCHECK");
 	struct servent *sl = getservbyname("syslog", "tcp");
 
+	/* for mbsrtowcs */
+	setlocale(LC_CTYPE, "");
+
 	if (sl)
 		syslog_port = sl -> s_port;
 
@@ -3292,7 +3282,6 @@ int recv_from_fd(int fd, char **buffer, int new_data_offset, int read_size)
 	socklen_t ssa_len = sizeof(sa);
 	char *recv_buffer = mymalloc(read_size + 1);
 	char time_buffer[TIMESTAMP_EXTEND_BUFFER];
-	int time_len;
 	char *host = "";
 	char *facility = "";
 	char *severity = "";
@@ -3300,7 +3289,6 @@ int recv_from_fd(int fd, char **buffer, int new_data_offset, int read_size)
 	int nbytes;
 
 	get_now_ts(syslog_ts_format, time_buffer, sizeof(time_buffer));
-	time_len = strlen(time_buffer);
 
 	nbytes = recvfrom(fd, recv_buffer, read_size, 0, &sa, &ssa_len);
 	recv_buffer[nbytes] = 0x00;
