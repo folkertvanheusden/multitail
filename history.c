@@ -37,23 +37,25 @@ void load_history(history_t *ph)
 			FILE *fh = fopen(ph -> history_file, "r");
 			if (!fh)
 				error_popup("Load history", -1, "Failed to open history file %s.\n", ph -> history_file);
-
-			for(loop=0; loop<ph -> history_size; loop++)
+			else
 			{
-				char *lf;
-				char buffer[HISTORY_IO_BUFFER];
+				for(loop=0; loop<ph -> history_size; loop++)
+				{
+					char *lf;
+					char buffer[HISTORY_IO_BUFFER];
 
-				if (!fgets(buffer, sizeof(buffer), fh))
-					break;
+					if (!fgets(buffer, sizeof(buffer), fh))
+						break;
 
-				lf = strchr(buffer, '\n');
-				if (lf)
-					*lf = 0x00;
+					lf = strchr(buffer, '\n');
+					if (lf)
+						*lf = 0x00;
 
-				(ph -> history)[loop] = mystrdup(buffer);
+					(ph -> history)[loop] = mystrdup(buffer);
+				}
+
+				fclose(fh);
 			}
-
-			fclose(fh);
 		}
 	}
 }

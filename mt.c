@@ -3310,10 +3310,10 @@ int recv_from_fd(int fd, char **buffer, int new_data_offset, int read_size)
 
 	if (show_severity_facility == MY_TRUE)
 	{
-		if (recv_buffer[0] == '<' &&
-				(recv_buffer[2] == '>' || recv_buffer[3] == '>' || recv_buffer[4] == '>'))
+		char *gt = strchr(recv_buffer, '>');
+
+		if (recv_buffer[0] == '<' && (recv_buffer[2] == '>' || recv_buffer[3] == '>' || recv_buffer[4] == '>') && gt != NULL)
 		{
-			char *gt = strchr(recv_buffer, '>');
 			int value = atoi(recv_buffer + 1);
 			int severity_nr = value & 7;
 			int facility_nr = value / 8;

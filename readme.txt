@@ -1,6 +1,6 @@
 Who?
 ----
-This program was written by folkert@vanheusden.com
+This program was written by mail@vanheusden.com
 Check http://www.vanheusden.com/multitail/ for new(er)
 versions.
 
@@ -10,10 +10,10 @@ Help?
 For help at any time, press F1.
 
 
-Are you using multitail?
------------------------
-Is your company using MultiTail? Leave me an e-mail message: folkert@vanheusden.com and
-get listed at http://www.vanheusden.com/multitail/usedby.html
+How to compile
+--------------
+Make sure you have the ncursesw development libraries installed.
+Note: ncursesW! This is required because of utf8 support.
 
 
 Mailinglist
@@ -38,7 +38,7 @@ A2: or use "ssh-agent": then you only once have to enter your passphrase (so log
 Q & A
 -----
 Q: the program fails then resizing the terminal-window
-A: solution: upgrade ncurses to version 5.3 (or more recent)
+A: solution: upgrade ncursesw to version 5.3 (or more recent)
 
 Q: when I use the -l option on some program, I get nothing in the window
 A: now that is strange! please tell me what program you're trying to interface to MultiTail.
@@ -49,32 +49,6 @@ It ain't workin'!
 -----------------
 Please send me an e-mail telling me all details and all. And if the file is
 not too big, send it please as well.
-
-
-Thanks
-------
-Oliver Braun            <obraun@FreeBSD.org> (FreeBSD port)
-Margarida Sequeira                           (OpenBSD port)
-Rene Engelhard                               (Debian package)
-Fedor Wiedenhof <fedor at oldconomy dot com> (ideas)
-André Majorel                                (the original idea (see: http://www.teaser.fr/~amajorel/wtail/))
-Udo van den Heuvel    <udo@dinges.xs4all.nl> (RPM package for RedHat etc.)
-Adriaan Mol <mollie.nl>                      (helping with the MacOS X port)
-Alberto Varesio                              (helping with AIX port)
-Mads Martin Joergensen                       (SuSE packages)
-Frank Schloeder <schloeder@ph1.uni-koeln.de> ('configure' scripts)
-Uhmmm                                        (Muse)
-
-
-I want to give money
---------------------
-Please donate to your favorite charity-organization.
-
-No, to you!
------------
-Well, if you really insist: https://www.paypal.com/affil/pal=folkert%40vanheusden.com
-Thanks.
-Please do not forget to tell me if you want to be in the thanks-list or not.
 
 
 For help, suggestions or anything else you can write to: folkert@vanheusden.com
