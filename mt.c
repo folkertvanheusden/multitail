@@ -387,16 +387,7 @@ void signal_handler(int sig)
 
 void select_display_start_and_end(char *string, char mode, int wrap_offset, int win_width, int *prt_start, int *prt_end, int *disp_end)
 {
-	/* patch by Thomas Gartner */
-	int nbytes = 0; /* = strlen(string); */
-	char *tmpString=string;
-	while(string && *tmpString)
-	{
-		if (*tmpString++==9)
-			nbytes += tab_width;
-		else
-			++nbytes;
-	}
+	int nbytes = strlen(string);
 
 	*prt_start = 0;
 	*prt_end = nbytes;
