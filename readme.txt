@@ -12,8 +12,9 @@ For help at any time, press F1.
 
 How to compile
 --------------
-Make sure you have the ncursesw development libraries installed.
-Note: ncursesW! This is required because of utf8 support.
+By default multitail requires the ncursesw library (ncursesW!) to compile and run.
+You can choose to use the non-wide char version (ncurses) by setting UTF8_SUPPORT to "no"
+in the makefile. Note that this disables UTF8 support.
 
 
 Mailinglist

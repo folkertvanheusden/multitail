@@ -1,13 +1,18 @@
 include version
 
+UTF8_SUPPORT=yes
 DESTDIR=/
 CONFIG_FILE=$(DESTDIR)/etc/multitail.conf
 
 CC=gcc
 DEBUG=-g -D_FORTIFY_SOURCE=2 # -D_DEBUG # -pg #  -D_DEBUG  #-pg -W -pedantic # -pg #-fprofile-arcs
+ifeq ($(UTF8_SUPPORT),yes)
 LDFLAGS+=-lpanelw -lncursesw -lutil -lm $(DEBUG) -rdynamic
-# LDFLAGS+=-lc_p -lpanel_g -lncurses_g -lutil -lm -pg -g -rdynamic
+CFLAGS+=-funsigned-char -D`uname` -O2 -Wall -DVERSION=\"$(VERSION)\" $(DEBUG) -DCONFIG_FILE=\"$(CONFIG_FILE)\" -DUTF8_SUPPORT
+else
+LDFLAGS+=-lpanel -lncurses -lutil -lm $(DEBUG) -rdynamic
 CFLAGS+=-funsigned-char -D`uname` -O2 -Wall -DVERSION=\"$(VERSION)\" $(DEBUG) -DCONFIG_FILE=\"$(CONFIG_FILE)\"
+endif
 
 OBJS=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o selbox.o stripstring.o color.o misc.o ui.o exec.o diff.o config.o cmdline.o globals.o history.o
 

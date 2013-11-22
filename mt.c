@@ -37,8 +37,10 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#ifdef UTF8_SUPPORT
 #include <wchar.h>
 #include <wctype.h>
+#endif
 
 #include "mt.h"
 #include "globals.h"
@@ -615,19 +617,24 @@ void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end,
 		char is_control_or_extended_ascii = 0;
 		myattr_t new_cdev = { -1, -1 };
 
-		wchar_t wcur = 0;
+#ifdef UTF8_SUPPORT
 		const char *dummy = &use_string[offset];
-
-		/*int rc = */mbsrtowcs(&wcur, &dummy, 1, NULL);
-		/* if (rc != 1)
-			error_exit("> %d: %02x|%02x %02x %02x %02x", rc, *(dummy - 1), *dummy, *(dummy + 1), *(dummy + 2), *(dummy + 3)); */
+		wchar_t wcur = 0;
+		mbsrtowcs(&wcur, &dummy, 1, NULL);
+#else
+		char wcur = use_string[offset];
+#endif
 
 		if (ww != NULL && offset == ww[ww_offset])
 		{
 			wprintw(win -> win, "\n");
 			ww_offset++;
 
+#ifdef UTF8_SUPPORT
 			if (iswspace(wcur))
+#else
+			if (isspace(wcur))
+#endif
 			{
 				offset++;
 
@@ -656,11 +663,19 @@ void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end,
 		}
 
 		/* control-characters will be displayed as an inverse '.' */
+#ifdef UTF8_SUPPORT
 		if (iswcntrl(wcur))
+#else
+		if (iscntrl(wcur))
+#endif
 		{
 			is_control_or_extended_ascii = 1;
 
+#ifdef UTF8_SUPPORT
 			if (!iswspace(wcur))
+#else
+			if (!isspace(wcur))
+#endif
 				re_inv = 1;
 		}
 
@@ -679,7 +694,11 @@ void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end,
 
 		if (!is_control_or_extended_ascii)
 		{
+#ifdef UTF8_SUPPORT
 			waddnwstr(win -> win, &wcur, 1);
+#else
+			wprintw(win -> win, "%c", wcur);
+#endif
 
 			disp_offset++;
 		}
