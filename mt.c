@@ -3015,7 +3015,7 @@ int check_paths(void)
 		if (now - cdg[loop].last_check >= cdg[loop].check_interval)
 		{
 			int fi;
-			glob_t files;
+			glob_t files = { 0 };
 
 			/* get list of files that match */
 			if (glob(cdg[loop].glob_str, GLOB_ERR | GLOB_NOSORT, NULL, &files) != 0)
@@ -3060,12 +3060,12 @@ int check_paths(void)
 						while (cur -> next) cur = cur -> next;
 
 						/* allocate new entry */
-						cur -> next = (proginfo *)mymalloc(sizeof(proginfo));
+						cur -> next = (proginfo *)calloc(1, sizeof(proginfo));
 						cur = cur -> next;
-						memset(cur, 0x00, sizeof(proginfo));
 					}
 
 					/* fill in */
+					cur -> wt = WT_FILE;
 					cur -> filename = mystrdup(files.gl_pathv[fi]);
 					cur -> line_wrap = default_linewrap;
 					cur -> win_height = -1;
@@ -3075,6 +3075,9 @@ int check_paths(void)
 					/* start the tail process for this file/command */
 					if (start_proc(cur, max_y / nfd) == -1)
 						error_exit("Failed to start tail process for %s.\n", cur -> filename);
+
+					if (cur -> pid < 2)
+						error_exit("pid is %d, %d\n", cur -> pid, cur -> wt);
 
 					new_wins = 1;
 				}

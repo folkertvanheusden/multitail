@@ -24,7 +24,7 @@
 
 int start_tail(char *filename, char retry_open, char follow_filename, int initial_tail, int *pipefd)
 {
-	pid_t pid;
+	pid_t pid = -1;
 
 	/* start child process */
 	if ((pid = fork()) == 0)
@@ -147,7 +147,7 @@ int start_proc(proginfo *cur, int initial_tail)
 
 	if (cur -> wt == WT_COMMAND)
 	{
-		int fd_master, fd_slave;
+		int fd_master = 1, fd_slave = 1;
 
 		/* allocate pseudo-tty & fork*/
 		cur -> pid = get_pty_and_fork(&fd_master, &fd_slave);
@@ -195,7 +195,7 @@ int start_proc(proginfo *cur, int initial_tail)
 	}
 	else if (cur -> wt == WT_FILE)
 	{
-		int pipefd[2];
+		int pipefd[2] = { -1 };
 
 		/* create a pipe, will be to child-process */
 		if (-1 == pipe(pipefd)) error_exit("Error creating pipe.\n");
