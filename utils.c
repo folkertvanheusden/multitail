@@ -998,3 +998,21 @@ char *myrealpath(char *in)
 
 	return pout;
 }
+
+void str_add(char **to, const char *what, ...)
+{
+	int len_to = *to ? strlen(*to) : 0;
+	char buffer[4096] = { 0 };
+	int len_what = 0;
+
+        va_list ap;
+
+	/* FIXME: should vasprintf here: does other unixes have it? */
+        va_start(ap, what);
+        len_what = vsnprintf(buffer, sizeof buffer, what, ap);
+        va_end(ap);
+
+	*to = (char *)realloc(*to, len_to + len_what + 1);
+
+	memcpy(&(*to)[len_to], buffer, len_what + 1);
+}

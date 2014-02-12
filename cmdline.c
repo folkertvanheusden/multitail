@@ -24,115 +24,7 @@
 #include "cv.h"
 #include "exec.h"
 #include "globals.h"
-
-
-void usage(void)
-{
-	printf("%s", version_str);
-	printf("\n\nmultitail [-cs|-Cs|-c-] [-i] inputfile [-i anotherinputfile] [...]\n");
-	printf("-i x	the following parameter is a filename (in case it starts with a dash)\n");
-	printf("-I x	like -i only this one merges this logfile into the previous window\n");
-	printf("-l x	parameter is a command to be executed\n");
-	printf("-L x	see -l but add to the previous window\n");
-	printf("-j	read from stdin (can be used (of course) only once)\n");
-	printf("-J      like -j but merge into previous window\n");
-	printf("--listen [interface]:port behave like a syslog server. port is normally 514\n");
-	printf("--Listen [interface]:port like --listen but merge into previous window\n");
-	printf("-r interval    restart the command when it died after `interval' seconds\n");
-	printf("-R interval    same as -r, only with this one only the difference is displayed\n");
-	printf("-Rc/-rc interval  like -r/-R but clean the window before each iteration\n");
-	printf("--cont         reconnect lines with a '\' at the end\n");
-	printf("--mergeall     merge all of the following files into the same window (in the previous window)\n");
-	printf("--mergeall-new merge all of the following files into the same window (in a new window)\n");
-	printf("--no-mergeall  stop merging all files into one window\n");
-	printf("--no-repeat    suppress repeating lines and replace them with a \"last message repeated x times\"\n");
-	printf("--mark-interval x	when nothing comes in, print a '---mark---' line every 'x' seconds\n");
-	printf("--mark-change	when multiple files are merged an multitail switches between two windows, print a markerline with the filename\n");
-	printf("--no-mark-change	do NOT print the markerline when the file changes (overrides the configfile)\n");
-	printf("-n x	initial number of lines to tail\n");
-	printf("-m x	set scrollback buffer size (# lines)\n");
-	printf("-mb x   set scrollback buffer size (in bytes, use xKB/MB/GB)\n");
-	printf("-bw a/f what to buffer: 'a'll or what went through the 'f'ilter\n");
-	printf("-a x	like 'tee': write (filtered) input to file 'x'\n");
-	printf("-A x	see -a: but write the unfiltered(!) input to file 'x'\n");
-	printf("-g x	redirect the input also (filtered) to command/process 'x'\n");
-	printf("-G x	redirect the unfiltered input also  to command/process 'x'\n");
-	printf("--label x	put in front of each line\n");
-	printf("-q i path       check every 'i' seconds for new files in 'path', create a new window for those\n");
-	printf("-Q i path       check every 'i' seconds for new files in 'path', put them all in the same window (using subwindows)\n");
-	printf("--closeidle x   close windows when more then 'x' seconds no new data was processed\n"); 
-	printf("--new-only	(for -q/-Q) only create windows for files created after multitail was started\n");
-	printf("-s x	vertical split screen (in 'x' columns)\n");
-	printf("-sw x,x,...	at what columns to split the screen, use '0' for automatic size\n");
-	printf("-sn x,x,...     number of windows per column\n");
-	printf("-wh x	height of window\n");
-	printf("-S	prepend merged output with subwindow-number\n");
-	printf("-f	follow the following filename, not the descriptor\n");
-	printf("--follow-all	for all files after this switch; follow the filename instead of the descriptor\n");
-	printf("--retry	keep trying to open the following file if it is inaccessible\n");
-	printf("--retry-all like --retry but for all following files\n");
-	printf("-fr scheme  use the predefined filter from the configfile\n");
-	printf("-e[m]	print only when matching with this regexp\n");
-	printf("-ev	print only when NOT matching with this regexp\n");
-	printf("-ec	use regular expression but display the matches inverted on following file\n");
-	printf("-eC	use regexp, display everything but matches inverted on following file\n");
-	printf("-ex	execute command ('-ex regexp command') when matches, matching line is given as commandline parameter\n");
-	printf("-eX     like -ex but only give the matching substring as commandline parameter to the command\n");
-	printf("-E	use regular expression on following files\n");
-	printf("-Ec	use regular expression but display the matches inverted on following files\n");
-	printf("-EC	use regexp, display everything but matches inverted on following files\n");
-	printf("-ke x   strip parts of the input using regular expression 'x'\n");
-	printf("-kr x y strip parts of the input starting at offset x and ending (not including!) offset y\n");
-	printf("-kc x y strip parts of the input: strip column 'y' with delimiter 'x'\n");
-	printf("-ks x   use edit scheme 'x' (defined in configfile)\n");
-	printf("-kS x   only show the substrings matched by the substring-selects (the parts between '(' and ')') in the regular epxression 'x'\n");
-	printf("-v      invert next regular expression (do not use with -ev/em)\n");
-	printf("-cv x	use conversion scheme 'x' (see multitail.conf)\n");
-	printf("-c	colorize current\n");
-	printf("-cS scheme	use colorscheme 'scheme' (as defined in multitail.conf)\n");
-	printf("-csn    extra switch for the following switches; do not use reverse (inverted) colors\n");
-	printf("-Cs	colorize all following files with syslog-scheme\n");
-	printf("-C	colorize all following files\n");
-	printf("-Cf/-cf field delimiter		colorize next/all file(s) depending on the given field number. fields are delimited with the given field-delimiter\n");
-	printf("-ci color  use 'color' (red, green, etc), usefull when merging multiple inputs\n");
-	printf("-c-	do NOT colorize the following file\n");
-	printf("-C-	do NOT colorize the following files\n");
-	printf("-cT term	interpret terminal-codes from file/command (for terminal type 'term')\n");
-	printf("-Z color   set color for markerline\n");
-	printf("-ts	add a timestamp (format configurable in multitail.conf) before each line\n");
-	printf("-T      put a timestamp in markerlines\n");
-	printf("-d	do NOT update the status-line\n");
-	printf("-D	do not display a status-line at all\n");
-	printf("-du     put the statusline above the data window\n");
-	printf("-z	do not \"window closed\" windows\n");
-	printf("-w	do not use colors\n");
-	printf("-u	set update interval (for slow links)\n");
-	printf("-p x [y]	set linewrap (l=left/a=all/r=right/s=syslog,S=syslog w/o procname,o=offset -> 'y',w=wordwrap)\n");
-	printf("-P      like -p but for all following files\n");
-	printf("-b n	set TAB-width\n");
-	printf("--basename	only display the filename (and not the path) in the statusline\n");
-	printf("-x str	switch on the xtermtitlebar stuff\n");
-#ifndef S_SPLINT_S
-	printf("-F file   use 'file' as configfile (instead of " CONFIG_FILE ")\n");
-	printf("--no-load-global-config do not read " CONFIG_FILE "\n");
-#endif
-	printf("-o configfileparameter    do a setting which would normally be set in the configfile\n");
-	printf("-H x	show heartbeat (to keep your sessions alive)\n");
-	printf("-iw file i	check every 'i' seconds if 'file' appeared in the filesystem\n");
-	printf("-t x	display 'x' in the window-title (when MultiTail runs in an xterm)\n");
-	printf("--beep-interval x	beep every x lines processed\n");
-	printf("--bi x	like '--beep-interval' but only for current (sub-)window\n");
-	printf("-V	show version and exit\n");
-	printf("-h	this help\n");
-	printf("\n");
-	printf("You can have multiple regular expressions per file/command. Be warned: if\n");
-	printf("you define multiple and one of them is specified with '-E' (=for every\n");
-	printf("following file), _all_ of the current regular expressions are for all\n");
-	printf("following files!\n");
-	printf("\n");
-
-	printf("%s\n", F1);
-}
+#include "help.h"
 
 void add_redir_to_file(char mode, char *file, redirect_t **predir, int *n_redirect)
 {
@@ -1259,7 +1151,7 @@ void do_commandline(int argc, char *argv[])
 		else
 		{
 			if (strcmp(argv[loop], "-h") != 0)
-				fprintf(stderr, "unknown parameter '%s'\n", argv[loop]);
+				fprintf(stderr, "\nunknown parameter '%s'\n\n", argv[loop]);
 
 			usage();
 

@@ -1,3 +1,5 @@
+#define SWITCHES_COLUMN_WIDTH	16
+
 typedef struct
 {
 	int nr;
@@ -101,3 +103,4 @@ typedef struct
 #define HELP_HISTORY	9800
 
 void show_help(int what_help);
+void usage(void);

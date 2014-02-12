@@ -2720,6 +2720,8 @@ int main(int argc, char *argv[])
 	char *dummy = getenv("MAILCHECK");
 	struct servent *sl = getservbyname("syslog", "tcp");
 
+	determine_terminal_size(&max_y, &max_x);
+
 	/* for mbsrtowcs */
 	setlocale(LC_CTYPE, "");
 
@@ -2752,6 +2754,7 @@ int main(int argc, char *argv[])
 
 	mail_spool_file = getenv("MAIL");
 	if (dummy) check_for_mail = atoi(dummy);
+	determine_terminal_size(&max_y, &max_x);
 
 	/* calc. buffer length (at least a complete terminal screen) */
 	initscr();
