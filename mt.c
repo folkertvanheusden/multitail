@@ -3007,14 +3007,14 @@ void create_new_win(proginfo **cur, int *nr)
 int check_paths(void)
 {
 	int new_wins = 0;
-	int loop;
+	int loop = 0;
 	dtime_t now = get_ts();
 
 	for(loop=0; loop<n_cdg; loop++)
 	{
 		if (now - cdg[loop].last_check >= cdg[loop].check_interval)
 		{
-			int fi;
+			int fi = 0;
 			glob_t files = { 0 };
 
 			/* get list of files that match */
@@ -3024,8 +3024,8 @@ int check_paths(void)
 			/* check each found file */
 			for(fi=0; fi<files.gl_pathc; fi++)
 			{
-				time_t last_mod;
-				mode_t ftype;
+				time_t last_mod = 0;
+				mode_t ftype = 0;
 
 				if (file_info(files.gl_pathv[fi], NULL, cdg[loop].new_only, &last_mod, &ftype) == -1)
 					continue;
@@ -3033,7 +3033,7 @@ int check_paths(void)
 				/* file got changed and/or is new and is a regular file?
 				 * and is created after multitail started?
 				 */
-				if (last_mod >= cdg[loop].last_check &&
+				if ((last_mod >= cdg[loop].last_check || last_mod == 0) &&
 						find_window(files.gl_pathv[fi], NULL, NULL) == -1 &&
 						S_ISREG(ftype) &&
 						((cdg[loop].new_only && last_mod >= mt_started) || !cdg[loop].new_only)

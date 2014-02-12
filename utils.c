@@ -262,7 +262,8 @@ int file_info(char *filename, off64_t *file_size, time_field_t tft, time_t *ts, 
 		return -1;
 	}
 
-	if (file_size) *file_size = buf.st_size;
+	if (file_size)
+		*file_size = buf.st_size;
 
 	if (ts)
 	{
@@ -275,10 +276,12 @@ int file_info(char *filename, off64_t *file_size, time_field_t tft, time_t *ts, 
 		else
 		{
 			assert(tft == 0);
+			*ts = 0;
 		}
 	}
 
-	if (mode) *mode = buf.st_mode;
+	if (mode)
+		*mode = buf.st_mode;
 
 	return 0;
 }
