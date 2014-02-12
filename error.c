@@ -18,7 +18,7 @@
 #include "utils.h"
 #include "version.h"
 
-void error_exit_(char *file, const char *function, int line, char *format, ...)
+void error_exit_(BOOL show_errno, BOOL show_st, char *file, const char *function, int line, char *format, ...)
 {
 	int e = errno;
 	va_list ap;
@@ -34,24 +34,26 @@ void error_exit_(char *file, const char *function, int line, char *format, ...)
 	fprintf(stderr, version_str, VERSION);
 	fprintf(stderr, "\n\n");
 
-	fprintf(stderr, "The following error occured:\n");
-	fprintf(stderr, "---------------------------\n");
+	fprintf(stderr, "The following problem occured:\n");
+	fprintf(stderr, "-----------------------------\n");
 	va_start(ap, format);
 	(void)vfprintf(stderr, format, ap);
 	va_end(ap);
 
-	fprintf(stderr, "\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "If this is a bug, please report the following information:\n");
-	fprintf(stderr, "---------------------------------------------------------\n");
-	fprintf(stderr, "This problem occured at line %d in function %s (from file %s):\n", line, function, file);
-	if (e) fprintf(stderr, "errno variable was then: %d which means \"%s\"\n", e, strerror(e));
-	fprintf(stderr, "Binary build at %s %s\n", __DATE__, __TIME__);
+	if (show_errno || show_st)
+		fprintf(stderr, "If this is a bug, please report the following information:\n");
+
+	if (e && show_errno)
+		fprintf(stderr, "errno variable was then: %d which means \"%s\"\n", e, strerror(e));
+
+	if (show_st)
+	{
 #if defined(__GLIBC__)
-        fprintf(stderr, "Execution path:\n");
-        for(index=0; index<trace_size; ++index)
-                fprintf(stderr, "\t%d %s\n", index, messages[index]);
+		fprintf(stderr, "Execution path:\n");
+		for(index=0; index<trace_size; ++index)
+			fprintf(stderr, "\t%d %s\n", index, messages[index]);
 #endif
+	}
 
 	fflush(NULL);
 
