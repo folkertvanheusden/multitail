@@ -679,7 +679,7 @@ char *help_wipe_window[] = {
 
 char *help_select_colorschemes[] = {
 		"Move the cursor with the cursor keys to the a",
-		"colorscheme. Then press space to select and again",
+		"color scheme. Then press space to select and again",
 		"to unselect. Press enter to submit or ^g to abort.",
 		NULL
 	};
@@ -885,7 +885,7 @@ char *help_edit_color[] = {
 char *help_edit_color_change_name[] = {
 		"One can give this specific red, green and blue",
 		"values a name. Like roses-red or so. This name can",
-		"then be used in a colorscheme.",
+		"then be used in a color scheme.",
 		NULL
 	};
 
@@ -1308,8 +1308,10 @@ void usage(void)
 	format_help("-i x", NULL, "the following parameter is a filename (in case it starts with a dash)");
 	format_help("-I x", NULL, "like -i only this one merges this logfile into the previous window");
 	fprintf(stderr, "\n");
-	format_help("-q x y", NULL, "check every x seconds for new files by search criteria y, create a new window for those");
-	format_help("-Q x y", NULL, "check every x seconds for new files by search criteria y, put them all in the same window (using subwindows)");
+	format_help("-q x z", NULL, "check every x seconds for new files by search criteria z, create a new window for those");
+	format_help("-qs x y z", NULL, "check every x seconds for new files by search criteria z, create a new window for those, use color scheme y");
+	format_help("-Q x z", NULL, "check every x seconds for new files by search criteria z, put them all in the same window (using subwindows)");
+	format_help("-Qs x y z", NULL, "check every x seconds for new files by search criteria z, put them all in the same window (using subwindows), use color scheme y");
 	format_help("-iw file i", NULL, "check every 'i' seconds if 'file' appeared in the filesystem");
 	format_help(NULL, "--new-only", "(for -q/-Q) only create windows for files created after multitail was started, existing files are ignored");
 	fprintf(stderr, "\n");
@@ -1388,7 +1390,7 @@ void usage(void)
 	help_header("colors");
 	format_help("-cv x", NULL, "use conversion scheme 'x' (see multitail.conf)");
 	format_help("-c", NULL, "colorize current");
-	format_help("-cS scheme", NULL, "use colorscheme 'scheme' (as defined in multitail.conf)");
+	format_help("-cS scheme", NULL, "use color scheme 'scheme' (as defined in multitail.conf)");
 	format_help("-csn", NULL, "extra switch for the following switches; do not use reverse (inverted) colors");
 	format_help("-Cs", NULL, "colorize all following files with syslog-scheme");
 	format_help("-C", NULL, "colorize all following files");

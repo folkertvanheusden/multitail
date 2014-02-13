@@ -3075,6 +3075,13 @@ int check_paths(void)
 					cur -> statistics.sccfirst = 1;
 					set_default_parameters_if_not_given_do(cur, win_nr);
 
+					if (cdg[loop].color_scheme)
+					{
+						int cs_index = find_colorscheme(cdg[loop].color_scheme);
+						add_color_scheme(&cur -> cdef.color_schemes, cs_index);
+						cur -> cdef.colorize = 'S';
+					}
+
 					/* start the tail process for this file/command */
 					if (start_proc(cur, max_y / nfd) == -1)
 						error_exit(FALSE, FALSE, "Failed to start tail process for %s.\n", cur -> filename);

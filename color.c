@@ -376,7 +376,7 @@ myattr_t choose_color(char *string, proginfo *cur, color_offset_in_line **cmatch
 	return cdev;
 }
 
-int find_colorscheme(char *name)
+int find_colorscheme(const char *name)
 {
 	int loop;
 

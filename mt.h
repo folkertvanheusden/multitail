@@ -122,6 +122,7 @@ typedef struct
 	int check_interval;
 	dtime_t last_check;
 	time_field_t new_only;
+	const char *color_scheme;
 
 	char in_one_window;
 	int window_nr;	/* if 'in_one_window' is set, merge into the window 'window_nr' */

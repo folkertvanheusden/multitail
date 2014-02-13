@@ -43,7 +43,7 @@ void * mymalloc(int size)
 	return myrealloc(NULL, size);
 }
 
-char * mystrdup(char *in)
+char * mystrdup(const char *in)
 {
 	char *newp = strdup(in);
 	if (!newp)
