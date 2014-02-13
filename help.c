@@ -1158,7 +1158,7 @@ void show_help(int what_help)
 
 void format_help(const char *short_str, const char *long_str, const char *descr)
 {
-	int par_width = SWITCHES_COLUMN_WIDTH, max_wrap_width = par_width / 2, cur_par_width = 0;
+	int par_width = SWITCHES_COLUMN_WIDTH, max_wrap_width = par_width * 2 / 3, cur_par_width = 0;
 	int descr_width = max_x - (par_width + 1);
 	char *line = NULL, *p = (char *)descr;
 	char first = 1;
@@ -1190,7 +1190,7 @@ void format_help(const char *short_str, const char *long_str, const char *descr)
 			p++;
 
 		str_len = strlen(p);
-		if (!str_len)
+		if (str_len == 0)
 			break;
 
 		len_before_ww = min(str_len, cur_descr_width);
