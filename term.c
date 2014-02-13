@@ -820,30 +820,23 @@ void determine_terminal_size(int *max_y, int *max_x)
 {
 	struct winsize size;
 
-	*max_x = *max_y = 0;
+	*max_x = 80;
+	*max_y = 25;
 
-	/* changed from 'STDIN_FILENO' as that is incorrect: we're
-	 * outputting to stdout!
-	 */
 	if (ioctl(1, TIOCGWINSZ, &size) == 0)
 	{
 		*max_y = size.ws_row;
 		*max_x = size.ws_col;
 	}
-
-	if (!*max_x || !*max_y)
+	else
 	{
 		char *dummy = getenv("COLUMNS");
 		if (dummy)
 			*max_x = atoi(dummy);
-		else
-			*max_x = 80;
 
 		dummy = getenv("LINES");
 		if (dummy)
 			*max_x = atoi(dummy);
-		else
-			*max_x = 24;
 	}
 }
 
