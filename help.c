@@ -1267,6 +1267,17 @@ void set_bold(char on)
 	}
 }
 
+void set_underline(char on)
+{
+	if (ansi_terminal())
+	{
+		if (on)
+			fprintf(stderr, "\x1b[4m");
+		else
+			fprintf(stderr, "\x1b[24m");
+	}
+}
+
 void reset_term()
 {
 	if (ansi_terminal())
@@ -1276,9 +1287,13 @@ void reset_term()
 void help_header(const char *str)
 {
 	set_bold(1);
+	fprintf(stderr, " *** ");
 
+	set_underline(1);
 	fprintf(stderr, "%s", str);
+	set_underline(0);
 
+	fprintf(stderr, " ***\n");
 	set_bold(0);
 }
 
@@ -1289,7 +1304,7 @@ void usage(void)
 	fprintf(stderr, "%s", version_str);
 	fprintf(stderr, "\n\nmultitail [-cs|-Cs|-c-] [-i] inputfile [-i anotherinputfile] [...]\n\n");
 
-	help_header(" *** selecting files to follow ***\n");
+	help_header("selecting files to follow");
 	format_help("-i x", NULL, "the following parameter is a filename (in case it starts with a dash)");
 	format_help("-I x", NULL, "like -i only this one merges this logfile into the previous window");
 	fprintf(stderr, "\n");
@@ -1303,7 +1318,7 @@ void usage(void)
 	format_help(NULL, "--retry", "keep trying to open the following file until it is accessible");
 	format_help(NULL, "--retry-all", "like --retry but for all following files");
 	fprintf(stderr, "\n");
-	help_header(" *** selecting command output to follow ***\n");
+	help_header("selecting command output to follow");
 	format_help("-l x", NULL, "parameter is a command to be executed");
 	format_help("-L x", NULL, "see -l but merge the output to a previously created window");
 	format_help("-r interval", NULL, "restart the command when it terminated after `interval' seconds");
@@ -1317,41 +1332,41 @@ void usage(void)
 	format_help(NULL, "--Listen [interface]:port", "like --listen but merge into previous window");
 	fprintf(stderr, "\n");
 
-	help_header(" *** merge parameters ***\n");
+	help_header("merge parameters");
 	format_help(NULL, "--mergeall", "merge all of the following files into the same window (in the previous window)");
 	format_help(NULL, "--mergeall-new", "merge all of the following files into the same window (in a new window)");
 	format_help(NULL, "--no-mergeall", "stop merging all files into one window");
 	format_help(NULL, "--no-repeat", "suppress repeating lines and replace them with a \"last message repeated x times\"");
 	fprintf(stderr, "\n");
 
-	help_header(" *** markers ***\n");
+	help_header("markers");
 	format_help(NULL, "--mark-interval x", "when nothing comes in, print a '---mark---' line every 'x' seconds");
 	format_help(NULL, "--mark-change", "when multiple files are merged an multitail switches between two windows, print a markerline with the filename");
 	format_help(NULL, "--no-mark-change", "do NOT print the markerline when the file changes (overrides the configuration file)");
 	fprintf(stderr, "\n");
 
-	help_header(" *** initial tail / scrollback parameters ***\n");
+	help_header("initial tail / scrollback parameters");
 	format_help("-n x", NULL, "initial number of lines to tail");
 	format_help("-m x", NULL, "set scrollback buffer size (# lines)");
 	format_help("-mb x", NULL, "set scrollback buffer size (in bytes, use xKB/MB/GB)");
 	format_help("-bw a/f", NULL, "what to buffer: 'a'll or what went through the 'f'ilter");
 	fprintf(stderr, "\n");
 
-	help_header(" *** \"tee\" functionality ***\n");
+	help_header("\"tee\" functionality");
 	format_help("-a x", NULL, "like 'tee': write (filtered) input to file 'x'");
 	format_help("-A x", NULL, "see -a: but write the unfiltered(!) input to file 'x'");
 	format_help("-g x", NULL, "redirect the input also (filtered) to command/process 'x'");
 	format_help("-G x", NULL, "redirect the unfiltered input also  to command/process 'x'");
 	fprintf(stderr, "\n");
 
-	help_header(" *** screen layout ***\n");
+	help_header("screen layout");
 	format_help("-s x", NULL, "vertical split screen (in 'x' columns)");
 	format_help("-sw x,x,...", NULL, "at what columns to split the screen, use '0' for automatic size");
 	format_help("-sn x,x,...", NULL, "number of windows per column");
 	format_help("-wh x", NULL, "height of window");
 	fprintf(stderr, "\n");
 
-	help_header(" *** filtering ***\n");
+	help_header("filtering");
 	format_help("-fr scheme", NULL, "use the predefined filter from the configuration file");
 	format_help("-e[m]", NULL, "print only when matching with this regexp");
 	format_help("-ev", NULL, "print only when NOT matching with this regexp");
@@ -1370,7 +1385,7 @@ void usage(void)
 	format_help("-v", NULL, "invert next regular expression (do not use with -ev/em)");
 	fprintf(stderr, "\n");
 
-	help_header(" *** colors ***\n");
+	help_header("colors");
 	format_help("-cv x", NULL, "use conversion scheme 'x' (see multitail.conf)");
 	format_help("-c", NULL, "colorize current");
 	format_help("-cS scheme", NULL, "use colorscheme 'scheme' (as defined in multitail.conf)");
@@ -1386,38 +1401,38 @@ void usage(void)
 	format_help("-w", NULL, "do not use colors");
 	fprintf(stderr, "\n");
 
-	help_header(" *** timestamps ***\n");
+	help_header("timestamps");
 	format_help("-ts", NULL, "add a timestamp (format configurable in multitail.conf) before each line");
 	format_help("-T", NULL, "put a timestamp in markerlines");
 	fprintf(stderr, "\n");
 
-	help_header(" *** status line parameters ***\n");
+	help_header("status line parameters");
 	format_help("-d", NULL, "do NOT update the status-line");
 	format_help("-D", NULL, "do not display a status-line at all");
 	format_help("-du", NULL, "put the statusline above the data window");
 	fprintf(stderr, "\n");
 
-	help_header(" *** status line parameters ***\n");
+	help_header("status line parameters");
 	format_help("-z", NULL, "do not show \"window closed\" pop-ups");
 	format_help("-x str", NULL, "show \"str\" in the xterm title bar");
 	format_help("-t x", NULL, "display 'x' in the window-title (when MultiTail runs in an xterm)");
 	format_help("-u", NULL, "set update interval (for slow links)");
 	fprintf(stderr, "\n");
 
-	help_header(" *** input text handling ***\n");
+	help_header("input text handling");
 	format_help("-p x [y]", NULL, "set linewrap (l=left/a=all/r=right/s=syslog,S=syslog w/o procname,o=offset -> 'y',w=wordwrap)");
 	format_help("-P", NULL, "like -p but for all following files");
 	format_help("-b n", NULL, "set TAB-width");
 	format_help(NULL, "--cont", "reconnect lines with a '\' at the end");
 	fprintf(stderr, "\n");
 
-	help_header(" *** line prefixes ***\n");
+	help_header("line prefixes");
 	format_help(NULL, "--basename", "only display the filename (and not the path) in the statusline");
 	format_help(NULL, "--label x", "put in front of each line");
 	format_help("-S prepend", NULL, "show subwindow number in merged output");
 	fprintf(stderr, "\n");
 
-	help_header(" *** configuration file ***\n");
+	help_header("configuration file");
 #ifndef S_SPLINT_S
 	format_help("-F file", NULL, "use 'file' as configuration file (instead of " CONFIG_FILE ")");
 	format_help(NULL, "--no-load-global-config", "do not read " CONFIG_FILE "");
@@ -1425,14 +1440,14 @@ void usage(void)
 	format_help("-o config_file_parameter", NULL, "do a setting which would normally be set in the configuration file");
 	fprintf(stderr, "\n");
 
-	help_header(" *** monitoring ***\n");
+	help_header("monitoring");
 	format_help("-H x", NULL, "show heartbeat (to keep your sessions alive)");
 	format_help(NULL, "--beep-interval x", "beep every x lines processed");
 	format_help(NULL, "--bi x", "like '--beep-interval' but only for current (sub-)window");
 	format_help(NULL, "--closeidle x", "close windows when more then 'x' seconds no new data was processed"); 
 	fprintf(stderr, "\n");
 
-	help_header(" *** miscellaneous ***\n");
+	help_header("miscellaneous");
 	format_help("-V", NULL, "show version and exit");
 	format_help("-h", NULL, "this help");
 	fprintf(stderr, "\n");
