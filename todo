@@ -1,2 +1,4 @@
 - macos: libintl
 - main: nl/ directory mkdir
+
+- -q/-Q: default colorscheme
