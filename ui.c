@@ -356,7 +356,7 @@ int color_management(myattr_t *org, myattr_t *new)
 				cur_bg = sel;
 			else if (cursor_x == 2)
 			{
-				if (sel >= n_attrs) error_exit("Internal error.\n");
+				if (sel >= n_attrs) error_exit(FALSE, FALSE, "Internal error.\n");
 
 				if (cur_attr & attr_x[sel])
 					cur_attr -= attr_x[sel];
@@ -364,7 +364,7 @@ int color_management(myattr_t *org, myattr_t *new)
 					cur_attr |= attr_x[sel];
 			}
 			else
-				error_exit("Internal error.\n");
+				error_exit(FALSE, FALSE, "Internal error.\n");
 		}
 	}
 
@@ -1800,7 +1800,7 @@ void write_script(void)
 
 		if (fchmod(fileno(fh), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) == -1)
 		{
-			error_exit("write_script: error setting mode-bits on output file.\n");
+			error_exit(TRUE, FALSE, "write_script: error setting mode-bits on output file.\n");
 		}
 
 		fprintf(fh, "\n");
@@ -2500,7 +2500,7 @@ void draw_gui_window_header(proginfo *last_changed_window)
 
 				case 'h':	/* hostname */
 					if (uname(&uinfo) == -1)
-						error_exit("uname() failed\n");
+						error_exit(TRUE, FALSE, "uname() failed\n");
 
 					repl_str = uinfo.nodename;
 					break;

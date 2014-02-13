@@ -46,7 +46,7 @@ char * epoch_to_str(time_t epoch)
 
 	new_string = mymalloc(4096);
 	if (!strftime(new_string, 4096, cnv_ts_format, ptm))
-		error_exit("An error occured whilte converting timestamp format '%s'.\n", cnv_ts_format);
+		error_exit(FALSE, FALSE, "An error occured whilte converting timestamp format '%s'.\n", cnv_ts_format);
 
 	return new_string;
 }
@@ -184,7 +184,7 @@ char *do_convert(char *what, int what_len, int type, script *pscript)
 			return amount_to_str(atoll(what));
 
 		default:
-			error_exit("Internal error: unknown conversion type %d.\n", type);
+			error_exit(FALSE, FALSE, "Internal error: unknown conversion type %d.\n", type);
 	}
 
 	return "do_convert: INTERNAL ERROR";
@@ -326,7 +326,7 @@ void add_conversion_scheme(int_array_t *conversions, char *conversion_name)
 {
 	int conversion_nr = find_conversion_scheme(conversion_name);
 	if (conversion_nr == -1)
-		error_exit("'%s' is not a known conversion scheme.\n", conversion_name);
+		error_exit(FALSE, FALSE, "'%s' is not a known conversion scheme.\n", conversion_name);
 
 	add_to_iat(conversions, conversion_nr);
 }

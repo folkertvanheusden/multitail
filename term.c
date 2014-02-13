@@ -490,10 +490,10 @@ void mydelwin(NEWWIN *win)
 	bottom_panel(win -> pwin);
 
 	if (ERR == del_panel(win -> pwin))
-		error_exit("del_panel() failed\n");
+		error_exit(FALSE, FALSE, "del_panel() failed\n");
 
 	if (ERR == delwin(win -> win))
-		error_exit("delwin() failed\n");
+		error_exit(FALSE, FALSE, "delwin() failed\n");
 }
 
 void mydoupdate()
@@ -508,11 +508,11 @@ NEWWIN * mynewwin(int nlines, int ncols, int begin_y, int begin_x)
 	/*	nwin -> win = subwin(stdscr, nlines, ncols, begin_y, begin_x); */
 	nwin -> win = newwin(nlines, ncols, begin_y, begin_x);
 	if (!nwin -> win)
-		error_exit("Failed to create window with dimensions %dx%d at offset %d,%d (terminal size: %d,%d)\n", ncols, nlines, begin_x, begin_y, COLS, LINES);
+		error_exit(FALSE, FALSE, "Failed to create window with dimensions %dx%d at offset %d,%d (terminal size: %d,%d)\n", ncols, nlines, begin_x, begin_y, COLS, LINES);
 
 	nwin -> pwin = new_panel(nwin -> win);
 	if (!nwin -> pwin)
-		error_exit("Failed to create panel.\n");
+		error_exit(FALSE, FALSE, "Failed to create panel.\n");
 
 	nwin -> x_off = begin_x;
 	nwin -> y_off = begin_y;
@@ -681,7 +681,7 @@ int find_or_init_colorpair(int fgcolor, int bgcolor, char ignore_errors)
 				return 0;
 			}
 
-			error_exit("Too many (%d) colorpairs defined.\n", cp.n_def);
+			error_exit(FALSE, FALSE, "Too many (%d) colorpairs defined.\n", cp.n_def);
 		}
 
 		cp.fg_color[cp.n_def] = fgcolor;
@@ -707,7 +707,7 @@ int colorstr_to_nr(char *str)
 	}
 
 	if (use_colors)
-		error_exit("'%s' is not recognized as a color\n", str);
+		error_exit(FALSE, FALSE, "'%s' is not recognized as a color\n", str);
 
 	return -1;
 }
@@ -736,7 +736,7 @@ int attrstr_to_nr(char *str)
 		else if (strcmp(str, "blink") == 0)
 			attr |= A_BLINK;
 		else
-			error_exit("'%s' is not recognized as an attribute.\n", str);
+			error_exit(FALSE, FALSE, "'%s' is not recognized as an attribute.\n", str);
 
 		if (!slash)
 			break;

@@ -44,7 +44,7 @@ long long int kb_str_to_value(char *field, char *str)
 	char *mult;
 	long long int bytes = atoll(str);
 	if (bytes < -1)
-		error_exit("%s: value cannot be < -1\n", field);
+		error_exit(FALSE, FALSE, "%s: value cannot be < -1\n", field);
 
 	mult = &str[strlen(str) - 2];
 	if (strcasecmp(mult, "kb") == 0)
@@ -1174,7 +1174,7 @@ void do_load_config(int dummynr, char *dummy, char *file)
 		if (errno == ENOENT)	/* file does not exist, not an error */
 			return;
 
-		error_exit("do_load_config: error loading configfile '%s'\n", file);
+		error_exit(TRUE, FALSE, "do_load_config: error loading configfile '%s'\n", file);
 	}
 
 	for(;;)
@@ -1192,11 +1192,11 @@ void do_load_config(int dummynr, char *dummy, char *file)
 		if (dummy)
 			*dummy = 0x00;
 		else
-			error_exit("line %d of file '%s' is too long!\n", linenr, file);
+			error_exit(FALSE, FALSE, "line %d of file '%s' is too long!\n", linenr, file);
 
 		/* LOG("%d: %s\n", linenr, cmdin); */
 		if (config_file_entry(linenr, cmd) == -1)
-			error_exit("Configuration parameter '%s' is unknown (file: %s, line: %d).\n", read_buffer, file, linenr);
+			error_exit(FALSE, FALSE, "Configuration parameter '%s' is unknown (file: %s, line: %d).\n", read_buffer, file, linenr);
 	}
 	fclose(fh);
 

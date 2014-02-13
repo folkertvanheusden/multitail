@@ -410,5 +410,5 @@ void init_colors(void)
 	/*	(void)find_or_init_colorpair(COLOR_BLACK, -1, 1); */
 
 	if (use_colors && cp.n_def != DEFAULT_COLORPAIRS)
-		error_exit("Unexpected number of colors: %d (%d)\n", cp.n_def, DEFAULT_COLORPAIRS);
+		error_exit(FALSE, FALSE, "Unexpected number of colors: %d (%d)\n", cp.n_def, DEFAULT_COLORPAIRS);
 }

@@ -72,7 +72,7 @@ void LOG(char *s, ...)
 	if (!fh)
 	{
 		endwin();
-		error_exit("error logging\n");
+		error_exit(TRUE, TRUE, "error logging\n");
 	}
 
 	va_start(ap, s);
@@ -86,7 +86,7 @@ void LOG(char *s, ...)
 typedef void (*sh_t)(int);
 void set_signal(int sig, sh_t func, char *signame)
 {
-	if (SIG_ERR == signal(sig, func)) error_exit("Setting of handler for signal %s failed.\n", signame);
+	if (SIG_ERR == signal(sig, func)) error_exit(TRUE, FALSE, "Setting of handler for signal %s failed.\n", signame);
 }
 
 void free_subentry(proginfo *entry)
@@ -1925,10 +1925,10 @@ char close_window(int winnr, proginfo *cur, mybool_t stop_proc)
 		int initial_n_lines_tail;
 
 		/* close old fds */
-		if (myclose(cur -> fd) == -1) error_exit("Closing file descriptor of read-end of pipe failed.\n");
+		if (myclose(cur -> fd) == -1) error_exit(TRUE, FALSE, "Closing file descriptor of read-end of pipe failed.\n");
 		if (cur -> fd != cur -> wfd)
 		{
-			if (myclose(cur -> wfd) == -1) error_exit("Closing file descriptor of write-end of pipe failed.\n");
+			if (myclose(cur -> wfd) == -1) error_exit(TRUE, FALSE, "Closing file descriptor of write-end of pipe failed.\n");
 		}
 
 		/* do diff */
@@ -2015,7 +2015,7 @@ void do_restart_window(proginfo *cur)
 
 	/* re-start tail */
 	if (start_proc(cur, 1) == -1)
-		error_exit("Failed to start process %s.\n", cur -> filename);
+		error_exit(FALSE, FALSE, "Failed to start process %s.\n", cur -> filename);
 }
 
 char * key_to_keybinding(char what)
@@ -2199,7 +2199,7 @@ void set_default_parameters_if_not_given_do(proginfo *cur, int pi_index)
 		else
 		{
 			if (!realpath(cur -> filename, real_fname))
-				error_exit("Problem obtaining complete (real) path of file %s.\n", cur -> filename);
+				error_exit(TRUE, FALSE, "Problem obtaining complete (real) path of file %s.\n", cur -> filename);
 		}
 
 		/* check if any default parameters are given in the configfile */
@@ -2233,7 +2233,7 @@ void set_default_parameters_if_not_given_do(proginfo *cur, int pi_index)
 					{
 						int cs_index = find_colorscheme(ppf[ppf_index].colorschemes[c_nr]);
 						if (cs_index == -1)
-							error_exit("Color scheme '%s' is not known.\n", ppf[ppf_index].colorschemes[c_nr]);
+							error_exit(FALSE, FALSE, "Color scheme '%s' is not known.\n", ppf[ppf_index].colorschemes[c_nr]);
 						add_color_scheme(&cur -> cdef.color_schemes, cs_index);
 					}
 					cur -> cdef.colorize = 'S';
@@ -2317,11 +2317,11 @@ void start_all_processes(char *nsubwindows)
 			{
 				int old_0 = mydup(0);
 
-				if (old_0 == -1) error_exit("Cannot dup(0).\n");
+				if (old_0 == -1) error_exit(TRUE, FALSE, "Cannot dup(0).\n");
 
-				if (myclose(0) == -1) error_exit("Error closing fd 0.\n");
+				if (myclose(0) == -1) error_exit(TRUE, FALSE, "Error closing fd 0.\n");
 
-				if (myopen("/dev/tty", O_RDONLY) != 0) error_exit("New fd != 0\n");
+				if (myopen("/dev/tty", O_RDONLY) != 0) error_exit(TRUE, FALSE, "New fd != 0\n");
 
 				cur -> fd = old_0;
 				cur -> wfd = -1;
@@ -2358,7 +2358,7 @@ void start_all_processes(char *nsubwindows)
 
 				s = getaddrinfo(host, service, &hints, &result);
 				if (s != 0)
-					error_exit("Failed to create socket for receiving syslog data on %s: %s.\n", cur -> filename, gai_strerror(s));
+					error_exit(TRUE, FALSE, "Failed to create socket for receiving syslog data on %s: %s.\n", cur -> filename, gai_strerror(s));
 
 				for (rp = result; rp != NULL; rp = rp -> ai_next)
 				{
@@ -2373,7 +2373,7 @@ void start_all_processes(char *nsubwindows)
 				freeaddrinfo(result);
 
 				if (rp == NULL)
-					error_exit("Failed to create socket for receiving syslog data on %s.\n", cur -> filename);
+					error_exit(FALSE, FALSE, "Failed to create socket for receiving syslog data on %s.\n", cur -> filename);
 
 				cur -> wfd = cur -> fd = sfd;
 
@@ -2391,7 +2391,7 @@ void start_all_processes(char *nsubwindows)
 
 				/* start the tail process for this file/command */
 				if (start_proc(cur, cur -> initial_n_lines_tail) == -1)
-					error_exit("Failed to start process for %s.\n", cur -> filename);
+					error_exit(FALSE, FALSE, "Failed to start process for %s.\n", cur -> filename);
 			}
 
 			cur = cur -> next;
@@ -2708,9 +2708,9 @@ void check_for_valid_stdin()
 	if (!ttyname(0))
 	{
 		if (errno == ENOTTY || errno == EINVAL)
-			error_exit("Please use -j/-J when you want to pipe something into MultiTail.\n");
+			error_exit(TRUE, FALSE, "Please use -j/-J when you want to pipe something into MultiTail.\n");
 		else
-			error_exit("ttyname(0) failed.\n");
+			error_exit(TRUE, FALSE, "ttyname(0) failed.\n");
 	}
 }
 
@@ -2797,7 +2797,7 @@ int main(int argc, char *argv[])
 		default_color_scheme = find_colorscheme(defaultcscheme);
 
 		if (default_color_scheme == -1)
-			error_exit("Default color scheme '%s' is not defined. Please check the MultiTail configuration file %s.\n", defaultcscheme, config_file);
+			error_exit(FALSE, FALSE, "Default color scheme '%s' is not defined. Please check the MultiTail configuration file %s.\n", defaultcscheme, config_file);
 	}
 
 	if (markerline_attrs.colorpair_index == -1 && markerline_attrs.attrs == -1)
@@ -2852,14 +2852,14 @@ void sigusr1_restart_tails(void)
 
 				stop_process(cur -> pid);
 
-				if (myclose(cur -> fd) == -1) error_exit("Closing read filedescriptor failed.\n");
+				if (myclose(cur -> fd) == -1) error_exit(TRUE, FALSE, "Closing read filedescriptor failed.\n");
 				if (cur -> fd != cur -> wfd)
 				{
-					if (myclose(cur -> wfd) == -1) error_exit("Closing write filedescriptor failed.\n");
+					if (myclose(cur -> wfd) == -1) error_exit(TRUE, FALSE, "Closing write filedescriptor failed.\n");
 				}
 
 				/* create a pipe, will be to child-process */
-				if (-1 == pipe(pipefd)) error_exit("Error while creating pipe.\n");
+				if (-1 == pipe(pipefd)) error_exit(TRUE, FALSE, "Error while creating pipe.\n");
 
 				cur -> pid = start_tail(cur -> filename, cur -> retry_open, cur -> follow_filename, min_n_bufferlines, pipefd);
 				cur -> fd = pipefd[0];
@@ -2893,7 +2893,7 @@ int check_for_died_processes(void)
 			if (errno == ECHILD)
 				break;
 
-			error_exit("waitpid failed.\n");
+			error_exit(TRUE, FALSE, "waitpid failed.\n");
 		}
 
 		/* now check every window for died processes */
@@ -3077,10 +3077,10 @@ int check_paths(void)
 
 					/* start the tail process for this file/command */
 					if (start_proc(cur, max_y / nfd) == -1)
-						error_exit("Failed to start tail process for %s.\n", cur -> filename);
+						error_exit(FALSE, FALSE, "Failed to start tail process for %s.\n", cur -> filename);
 
 					if (cur -> pid < 2)
-						error_exit("pid is %d, %d\n", cur -> pid, cur -> wt);
+						error_exit(FALSE, FALSE, "pid is %d, %d\n", cur -> pid, cur -> wt);
 
 					new_wins = 1;
 				}
@@ -3097,7 +3097,7 @@ void resize_terminal_do(NEWWIN *popup)
 {
 	determine_terminal_size(&max_y, &max_x);
 
-	if (ERR == resizeterm(max_y, max_x)) error_exit("An error occured while resizing terminal(-window).\n");
+	if (ERR == resizeterm(max_y, max_x)) error_exit(FALSE, FALSE, "An error occured while resizing terminal(-window).\n");
 
 	endwin();
 	refresh(); /* <- as specified by ncurses faq, was: doupdate(); */
@@ -3137,7 +3137,7 @@ int process_global_keys(int what_help, NEWWIN *popup, char cursor_shift)
 	{
 		do_exit();
 
-		error_exit("This should not be reached.\n");
+		error_exit(FALSE, FALSE, "This should not be reached.\n");
 	}
 	else if (c == 8 || c == KEY_F(1))       /* HELP (^h / F1) */
 	{
@@ -3449,7 +3449,7 @@ int wait_for_keypress(int what_help, double max_wait, NEWWIN *popup, char cursor
 		if ((rc = select(last_fd + 1, &rfds, NULL, NULL, tv.tv_sec != 32767 ? &tv : NULL)) == -1)
 		{
 			if (errno != EINTR && errno != EAGAIN)
-				error_exit("select() returned an error.");
+				error_exit(TRUE, TRUE, "select() returned an error.");
 		}
 
 		now = get_ts();

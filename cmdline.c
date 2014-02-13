@@ -42,7 +42,7 @@ void add_redir_to_file(char mode, char *file, redirect_t **predir, int *n_redire
 
 	(*predir)[cur_index].fd = open((*predir)[cur_index].redirect, O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR);
 	if ((*predir)[cur_index].fd == -1)
-		error_exit("%s: cannot open file %s for write access.\n", file, (*predir)[cur_index].redirect);
+		error_exit(TRUE, FALSE, "%s: cannot open file %s for write access.\n", file, (*predir)[cur_index].redirect);
 }
 
 void add_redir_to_proc(char mode, char *proc, redirect_t **predir, int *n_redirect)
@@ -53,7 +53,7 @@ void add_redir_to_proc(char mode, char *proc, redirect_t **predir, int *n_redire
 
 	*predir = (redirect_t *)myrealloc(*predir, (*n_redirect + 1) * sizeof(redirect_t));
 
-	if ((*predir)[*n_redirect].type != REDIRECTTO_NONE) error_exit("One can only set one redirection-type per (sub-)window.\n");
+	if ((*predir)[*n_redirect].type != REDIRECTTO_NONE) error_exit(FALSE, FALSE, "One can only set one redirection-type per (sub-)window.\n");
 
 	if (mode == 'g')
 		(*predir)[*n_redirect].type = REDIRECTTO_PIPE_FILTERED;
@@ -116,7 +116,7 @@ void add_redir_to_socket(char filtered, char *prio, char *fac, char *address, re
 
 	s = getaddrinfo(node, service, &hints, &result);
 	if (s != 0)
-		error_exit("Cannot create socket for redirecting via syslog protocol: %s.\n", gai_strerror(s));
+		error_exit(TRUE, FALSE, "Cannot create socket for redirecting via syslog protocol: %s.\n", gai_strerror(s));
 
 	for (rp = result; rp != NULL; rp = rp -> ai_next)
 	{
@@ -131,7 +131,7 @@ void add_redir_to_socket(char filtered, char *prio, char *fac, char *address, re
 	freeaddrinfo(result);
 
 	if (rp == NULL)
-		error_exit("Cannot create socket for redirecting via syslog protocol.\n");
+		error_exit(FALSE, FALSE, "Cannot create socket for redirecting via syslog protocol.\n");
 
 	(*predir)[*n_redirect].fd = sfd;
 	
@@ -144,7 +144,7 @@ void add_redir_to_socket(char filtered, char *prio, char *fac, char *address, re
 		}
 	}
 	if (prio_nr == -1)
-		error_exit("Priority '%s' is not recognized.\n", prio);
+		error_exit(FALSE, FALSE, "Priority '%s' is not recognized.\n", prio);
 	
 	for(loop=0; loop<24; loop++)
 	{
@@ -155,7 +155,7 @@ void add_redir_to_socket(char filtered, char *prio, char *fac, char *address, re
 		}
 	}
 	if (fac_nr == -1)
-		error_exit("Facility '%s' is not known.\n", fac);
+		error_exit(FALSE, FALSE, "Facility '%s' is not known.\n", fac);
 
 	(*predir)[*n_redirect].prio_fac = (fac_nr * 8) + prio_nr;
 
@@ -167,7 +167,7 @@ void add_redir_to_socket(char filtered, char *prio, char *fac, char *address, re
 void argv_set_window_widths(char *widths)
 {
 	if (split != 0)
-		error_exit("-s and -sw are mutual exclusive.\n");
+		error_exit(FALSE, FALSE, "-s and -sw are mutual exclusive.\n");
 
 	split = 0;
 	for(;;)
@@ -189,14 +189,14 @@ void argv_set_window_widths(char *widths)
 			if (cur_width == 0)
 				cur_width = -1;
 			else
-				error_exit("The width of a column must be 4 or greater (or '0' for automatic size).\n");
+				error_exit(FALSE, FALSE, "The width of a column must be 4 or greater (or '0' for automatic size).\n");
 		}
 
 		vertical_split[split - 1] = cur_width;
 	}
 
 	if (split == 1)
-		error_exit("You have to give the width for each window or set it to 0 (=auto width).\n");
+		error_exit(FALSE, FALSE, "You have to give the width for each window or set it to 0 (=auto width).\n");
 }
 
 void argv_set_n_windows_per_column(char *pars)
@@ -204,7 +204,7 @@ void argv_set_n_windows_per_column(char *pars)
 	int index = 0;
 
 	if (split == 0)
-		error_exit("First use -s or -sw to define the number of columns.\n");
+		error_exit(FALSE, FALSE, "First use -s or -sw to define the number of columns.\n");
 
 	for(;;)
 	{
@@ -221,7 +221,7 @@ void argv_set_n_windows_per_column(char *pars)
 		pars = NULL;
 
 		if (cur_n < 0)
-			error_exit("The number of windows must be either 0 (=auto) or >= 1.\n");
+			error_exit(FALSE, FALSE, "The number of windows must be either 0 (=auto) or >= 1.\n");
 
 		n_win_per_col[index - 1] = cur_n;
 	}
@@ -254,7 +254,7 @@ int argv_add_re(char *mode, char *pars[], char invert_regex, re **pre_cur, int *
 	else if (toupper(mode[2]) == 'X')
 		regex_mode = mode[2];	/* x = execute */
 	else
-		error_exit("%s is an unknown switch.\n", mode);
+		error_exit(FALSE, FALSE, "%s is an unknown switch.\n", mode);
 
 	/* get expression */
 	expr = pars[n_pars_used++];
@@ -265,7 +265,7 @@ int argv_add_re(char *mode, char *pars[], char invert_regex, re **pre_cur, int *
 		cmd = pars[n_pars_used++];
 
 		if (regex_mode == 'X' && (strchr(expr, '(') == NULL || strchr(expr, ')') == NULL))
-			error_exit("Filterscheme rule: -eX requires a regular expression which selects a substring using '(' and ')'.\n");
+			error_exit(FALSE, FALSE, "Filterscheme rule: -eX requires a regular expression which selects a substring using '(' and ')'.\n");
 	}
 
 	/* compile & set expression */
@@ -289,7 +289,7 @@ int argv_add_re(char *mode, char *pars[], char invert_regex, re **pre_cur, int *
 	/* wether to invert the reg exp or not */
 	if ((regex_mode == 'v' || regex_mode == 'm') && invert_regex)
 	{
-		error_exit("-e[m] / -ev cannot be used together with -v\n");
+		error_exit(FALSE, FALSE, "-e[m] / -ev cannot be used together with -v\n");
 	}
 	(*pre)[*n_re].invert_regex = invert_regex;
 
@@ -329,7 +329,7 @@ int argv_color_settings(char *mode, char *pars[], char *allcolor, char *curcolor
 		if (pars[n_pars_used] != NULL && (strcasecmp(pars[n_pars_used], "ANSI") == 0 || strcasecmp(pars[n_pars_used], "vt100") == 0))
 			*cur_term_emul = TERM_ANSI;
 		else
-			error_exit("Terminal emulation '%s' is not known.\n", pars[n_pars_used]);
+			error_exit(FALSE, FALSE, "Terminal emulation '%s' is not known.\n", pars[n_pars_used]);
 
 		n_pars_used++;
 	}
@@ -338,14 +338,14 @@ int argv_color_settings(char *mode, char *pars[], char *allcolor, char *curcolor
 		int cur_scheme_index;
 		char *cur_cscheme = pars[n_pars_used++];
 		if (!cur_cscheme)
-			error_exit("%s requires a color scheme name.\n", mode);
+			error_exit(FALSE, FALSE, "%s requires a color scheme name.\n", mode);
 
 		if ((cur_scheme_index = find_colorscheme(cur_cscheme)) == -1)
 		{
 			if (use_colors)
-				error_exit("Color scheme %s not found! Please check your configuration file.\n", cur_cscheme);
+				error_exit(FALSE, FALSE, "Color scheme %s not found! Please check your configuration file.\n", cur_cscheme);
 			else
-				error_exit("Color schemes are not supported on monochrome terminals.\n");
+				error_exit(FALSE, FALSE, "Color schemes are not supported on monochrome terminals.\n");
 		}
 
 		add_color_scheme(cur_color_schemes, cur_scheme_index);
@@ -365,7 +365,7 @@ int argv_color_settings(char *mode, char *pars[], char *allcolor, char *curcolor
 	}
 	else
 	{
-		error_exit("Invalid -c mode: '%c'.\n", cur_mode);
+		error_exit(FALSE, FALSE, "Invalid -c mode: '%c'.\n", cur_mode);
 	}
 
 	if (doall)
@@ -408,7 +408,7 @@ int argv_add_stripper(char *mode, char *pars[], strip_t **pstrip, int *n_strip)
 		(*pstrip)[*n_strip].end = get_value_arg(mode, pars[n_pars_used++], VAL_ZERO_POSITIVE);
 		(*pstrip)[*n_strip].del = NULL;
 		if ((*pstrip)[*n_strip].end <= (*pstrip)[*n_strip].start)
-			error_exit("'-kr start end': end must be higher then start.\n");
+			error_exit(FALSE, FALSE, "'-kr start end': end must be higher then start.\n");
 		(*n_strip)++;
 	}
 	else if (mode[2] == 'c')
@@ -424,11 +424,11 @@ int argv_add_stripper(char *mode, char *pars[], strip_t **pstrip, int *n_strip)
 		char *scheme = pars[n_pars_used++];
 		int editscheme_index = find_editscheme(scheme);
 		if (editscheme_index == -1)
-			error_exit("-ks %s: scheme not found.\n", scheme);
+			error_exit(FALSE, FALSE, "-ks %s: scheme not found.\n", scheme);
 		duplicate_es_array(pes[editscheme_index].strips, pes[editscheme_index].n_strips, pstrip, n_strip);
 	}
 	else
-		error_exit("'%s' is not recognized.\n", mode);
+		error_exit(FALSE, FALSE, "'%s' is not recognized.\n", mode);
 
 	return n_pars_used;
 }
@@ -538,10 +538,10 @@ void do_commandline(int argc, char *argv[])
 				if (what[0] == 'a' || what[0] == 'f')
 					bufferwhat = what[0];
 				else
-					error_exit("-bw expects either 'a' or 'f' as parameter (got: '%c').\n", what[0]);
+					error_exit(FALSE, FALSE, "-bw expects either 'a' or 'f' as parameter (got: '%c').\n", what[0]);
 			}
 			else
-				error_exit("-bw expects a parameter ('a' or 'f').\n");
+				error_exit(FALSE, FALSE, "-bw expects a parameter ('a' or 'f').\n");
 		}
 		else if (strcmp(argv[loop], "--no-repeat") == 0)
 		{
@@ -587,10 +587,10 @@ void do_commandline(int argc, char *argv[])
 			if (argv[loop])
 			{
 				heartbeat_interval = atof(argv[loop]);
-				if (heartbeat_interval < 0.0) error_exit("The value for -H must be >= 0.\n");
+				if (heartbeat_interval < 0.0) error_exit(FALSE, FALSE, "The value for -H must be >= 0.\n");
 			}
 			else
-				error_exit("-H requires a parameter.\n");
+				error_exit(FALSE, FALSE, "-H requires a parameter.\n");
 		}
 		else if (strcasecmp(argv[loop], "-a") == 0)
 		{
@@ -611,7 +611,7 @@ void do_commandline(int argc, char *argv[])
 
 			// -U[af][as] <facil> <prio> host[:port]
 			if (argv[loop][2] != 'a' && argv[loop][2] != 'f')
-				error_exit("-Ux where x needs to be either 'a' or 'f'");
+				error_exit(FALSE, FALSE, "-Ux where x needs to be either 'a' or 'f'");
 
 			filtered = argv[loop][2] == 'f';
 			prio = argv[++loop];
@@ -624,7 +624,7 @@ void do_commandline(int argc, char *argv[])
 		{
 			config_file = argv[++loop];
 			if (file_exist(config_file) == -1)
-				error_exit("Configuration file %s does not exist.\n", config_file);
+				error_exit(FALSE, FALSE, "Configuration file %s does not exist.\n", config_file);
 
 			(void)do_load_config(-1, NULL, config_file);
 		}
@@ -644,14 +644,14 @@ void do_commandline(int argc, char *argv[])
 		{
 			++loop;
 			if (!argv[loop])
-				error_exit("-t requires a parameter.\n");
+				error_exit(FALSE, FALSE, "-t requires a parameter.\n");
 			win_title = mystrdup(argv[loop]);
 		}
 		else if (strcmp(argv[loop], "-x") == 0)
 		{
 			++loop;
 			if (!argv[loop])
-				error_exit("-x requires a parameter.\n");
+				error_exit(FALSE, FALSE, "-x requires a parameter.\n");
 			set_title = mystrdup(argv[loop]);
 		}
 		else if (argv[loop][0] == '-' && toupper(argv[loop][1]) == 'P')
@@ -667,10 +667,10 @@ void do_commandline(int argc, char *argv[])
 				if (cur_line_wrap == 'o')
 					cur_line_wrap_offset = get_value_arg("-p", argv[++loop], VAL_ZERO_POSITIVE);
 				else if (cur_line_wrap != 'a' && cur_line_wrap != 'l' && cur_line_wrap != 'r' && toupper(cur_line_wrap) != 'S' && cur_line_wrap != 'w')
-					error_exit("Invalid mode for -p\n");
+					error_exit(FALSE, FALSE, "Invalid mode for -p\n");
 			}
 			else
-				error_exit("-p requires a parameter.\n");
+				error_exit(FALSE, FALSE, "-p requires a parameter.\n");
 		}
 		else if (strcmp(argv[loop], "--retry") == 0)
 		{
@@ -735,7 +735,7 @@ void do_commandline(int argc, char *argv[])
 
 				filter = find_filterscheme(par);
 				if (filter == -1)
-					error_exit("'%s' is not a known filter scheme.\n", par);
+					error_exit(FALSE, FALSE, "'%s' is not a known filter scheme.\n", par);
 
 				duplicate_re_array(pfs[filter].pre, pfs[filter].n_re, &pre, &n_re);
 
@@ -833,7 +833,7 @@ void do_commandline(int argc, char *argv[])
 			}
 			else if (strcasecmp(argv[loop], "-j") == 0)
 			{
-				if (used_stdin == MY_TRUE) error_exit("One can use %s only once.\n", argv[loop]);
+				if (used_stdin == MY_TRUE) error_exit(FALSE, FALSE, "One can use %s only once.\n", argv[loop]);
 				is_stdin = used_stdin = 1;
 			}
 			else if (strcasecmp(argv[loop], "-iw") == 0)
@@ -851,7 +851,7 @@ void do_commandline(int argc, char *argv[])
 					}
 				}
 				else
-					error_exit("-iw requires 2 parameters.\n");
+					error_exit(FALSE, FALSE, "-iw requires 2 parameters.\n");
 			}
 			else if (strcasecmp(argv[loop], "--listen") == 0)
 			{
@@ -938,7 +938,7 @@ void do_commandline(int argc, char *argv[])
 			/* init. struct. for this file */
 			if (is_stdin == 0)
 			{
-				if (!dummy) error_exit("No filename given.\n");
+				if (!dummy) error_exit(FALSE, FALSE, "No filename given.\n");
 				cur -> filename = mystrdup(dummy);
 			}
 			else
@@ -1110,10 +1110,10 @@ void do_commandline(int argc, char *argv[])
 				else if (strcasecmp(type, "ctime") == 0)
 					new_only = TT_CTIME;
 				else
-					error_exit("--new-only requires either atime, mtime or ctime as parameter, not '%s'.\n", type);
+					error_exit(FALSE, FALSE, "--new-only requires either atime, mtime or ctime as parameter, not '%s'.\n", type);
 			}
 			else
-				error_exit("--new-only requires a parameter.\n");
+				error_exit(FALSE, FALSE, "--new-only requires a parameter.\n");
 		}
 		else if (strcasecmp(argv[loop], "-q") == 0)
 		{
@@ -1136,7 +1136,7 @@ void do_commandline(int argc, char *argv[])
 			loop++;
 
 			if (!argv[loop])
-				error_exit("-o requires a parameter.\n");
+				error_exit(FALSE, FALSE, "-o requires a parameter.\n");
 			else
 				config_file_entry(-1, argv[loop]);
 		}

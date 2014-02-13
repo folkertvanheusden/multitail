@@ -17,6 +17,7 @@
 #include "mt.h"
 #include "utils.h"
 #include "version.h"
+#include "error.h"
 
 void error_exit_(BOOL show_errno, BOOL show_st, char *file, const char *function, int line, char *format, ...)
 {
@@ -44,7 +45,7 @@ void error_exit_(BOOL show_errno, BOOL show_st, char *file, const char *function
 		fprintf(stderr, "If this is a bug, please report the following information:\n");
 
 	if (e && show_errno)
-		fprintf(stderr, "errno variable was then: %d which means \"%s\"\n", e, strerror(e));
+		fprintf(stderr, "The last system call returned: %d which means \"%s\"\n", e, strerror(e));
 
 	if (show_st)
 	{

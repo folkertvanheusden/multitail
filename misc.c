@@ -87,7 +87,7 @@ void info(void)
 			struct rusage usage;
 
 			if (getrusage(RUSAGE_SELF, &usage) == -1)
-				error_exit("getrusage() failed\n");
+				error_exit(TRUE, FALSE, "getrusage() failed\n");
 
 			mvwprintw(mywin -> win, proc_u_line, 2, "Runtime: %02d:%02d:%02d, avg.proc.usage: %.2f%% ints/s: %.1f",
 					(int)(run_time / 3600), ((int)run_time / 60) % 60, (int)run_time % 60,

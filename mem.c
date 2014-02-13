@@ -33,7 +33,7 @@ void * myrealloc(void *oldp, int new_size)
 	 */
 	void *newp = realloc(oldp, new_size);
 	if (!newp)
-		error_exit("Failed to reallocate a memory block to %d bytes.\n", new_size);
+		error_exit(TRUE, TRUE, "Failed to reallocate a memory block to %d bytes.\n", new_size);
 
 	return newp;
 }
@@ -47,7 +47,7 @@ char * mystrdup(char *in)
 {
 	char *newp = strdup(in);
 	if (!newp)
-		error_exit("Failed to duplicate a string: out of memory?\n");
+		error_exit(TRUE, TRUE, "Failed to duplicate a string: out of memory?\n");
 
 	return newp;
 }

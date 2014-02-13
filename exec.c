@@ -123,10 +123,10 @@ int start_tail(char *filename, char retry_open, char follow_filename, int initia
 		pars[npars] = NULL;
 
 		/* run tail! */
-		if (-1 == execvp(pars[0], pars)) error_exit("Error while starting process %s.\n", pars[0]);
+		if (-1 == execvp(pars[0], pars)) error_exit(TRUE, FALSE, "Error while starting process %s.\n", pars[0]);
 
 		/* if execlp returns, an error occured */
-		error_exit("An error occured while starting process %s!\n", pars[0]);
+		error_exit(FALSE, FALSE, "An error occured while starting process %s!\n", pars[0]);
 	}
 
 	return pid;
@@ -151,7 +151,7 @@ int start_proc(proginfo *cur, int initial_tail)
 
 		/* allocate pseudo-tty & fork*/
 		cur -> pid = get_pty_and_fork(&fd_master, &fd_slave);
-		if (-1 == cur -> pid) error_exit("An error occured while invoking get_pty_and_fork.\n");
+		if (-1 == cur -> pid) error_exit(TRUE, FALSE, "An error occured while invoking get_pty_and_fork.\n");
 
 		/* child? */
 		if (cur -> pid == 0)
@@ -171,10 +171,10 @@ int start_proc(proginfo *cur, int initial_tail)
 			setup_for_childproc(fd_slave, 1, term_t_to_string(cur -> cdef.term_emul));
 
 			/* start process */
-			if (-1 == execlp(shell, shell, "-c", cur -> filename, (void *)NULL)) error_exit("Error while starting \"%s -c '%s'\".\n", shell, cur -> filename);
+			if (-1 == execlp(shell, shell, "-c", cur -> filename, (void *)NULL)) error_exit(TRUE, FALSE, "Error while starting \"%s -c '%s'\".\n", shell, cur -> filename);
 
 			/* if execlp returns, an error occured */
-			error_exit("Error while starting process %s!\n", shell);
+			error_exit(FALSE, FALSE, "Error while starting process %s!\n", shell);
 		}
 
 #if defined(sun) || defined(__sun) || defined(AIX) || defined(_HPUX_SOURCE) || defined(OSF1) || defined(scoos)
@@ -183,7 +183,7 @@ int start_proc(proginfo *cur, int initial_tail)
 		 *
 		 */
 #else
-		if (myclose(fd_slave) == -1) error_exit("An error occured while closing the slave fd (pseudo tty, fd %d)\n", fd_slave);
+		if (myclose(fd_slave) == -1) error_exit(TRUE, FALSE, "An error occured while closing the slave fd (pseudo tty, fd %d)\n", fd_slave);
 #endif
 
 		/* remember master-fd (we'll read from that one) */
@@ -198,7 +198,7 @@ int start_proc(proginfo *cur, int initial_tail)
 		int pipefd[2] = { -1 };
 
 		/* create a pipe, will be to child-process */
-		if (-1 == pipe(pipefd)) error_exit("Error creating pipe.\n");
+		if (-1 == pipe(pipefd)) error_exit(TRUE, FALSE, "Error creating pipe.\n");
 
 		if (cur -> check_interval)
 		{
@@ -300,14 +300,14 @@ int execute_program(char *execute, char bg)
 			setup_for_childproc(open_null(), 1, "dumb");
 
 		/* start process */
-		if (-1 == execlp(shell, shell, "-c", execute, (void *)NULL)) error_exit("Error while starting \"%s -c '%s'\".\n", execute);
+		if (-1 == execlp(shell, shell, "-c", execute, (void *)NULL)) error_exit(TRUE, FALSE, "Error while starting \"%s -c '%s'\".\n", execute);
 
 		/* if execlp returns, an error occured */
-		error_exit("Error while starting process!\n");
+		error_exit(FALSE, FALSE, "Error while starting process!\n");
 	}
 	else if (child == -1)
 	{
-		error_exit("Failed to fork child process.\n");
+		error_exit(TRUE, FALSE, "Failed to fork child process.\n");
 	}
 
 	if (bg)
@@ -321,7 +321,7 @@ int execute_program(char *execute, char bg)
 	{
 		/* wait for the childprocess to exit */
 		if (waitpid(child, &status, 0) == -1)
-			error_exit("Error while waiting for process to exit.\n");
+			error_exit(TRUE, FALSE, "Error while waiting for process to exit.\n");
 
 		/* restore (n)curses */
 		mydoupdate();
@@ -341,31 +341,31 @@ pid_t exec_with_pipe(char *command, int pipe_to_proc[], int pipe_from_proc[])
 	pid_t pid = -1;
 
 	if (pipe(pipe_to_proc) == -1)
-		error_exit("Error creating pipe.\n");
+		error_exit(TRUE, FALSE, "Error creating pipe.\n");
 
 	if (pipe(pipe_from_proc) == -1)
-		error_exit("Error creating pipe.\n");
+		error_exit(TRUE, FALSE, "Error creating pipe.\n");
 
 	if ((pid = fork()) == -1)
-		error_exit("fork() failed.\n");
+		error_exit(TRUE, FALSE, "fork() failed.\n");
 
 	if (pid == 0)
 	{
 		myclose(0);
-		if (mydup(pipe_to_proc[0]) == -1)   error_exit("dup() failed.\n");
+		if (mydup(pipe_to_proc[0]) == -1)   error_exit(TRUE, FALSE, "dup() failed.\n");
 		myclose(pipe_to_proc[1]); /* will not write to itself, only parent writes to it */
 		myclose(1);
 		myclose(2);
-		if (mydup(pipe_from_proc[1]) == -1) error_exit("dup() failed.\n");
-		if (mydup(pipe_from_proc[1]) == -1) error_exit("dup() failed.\n");
+		if (mydup(pipe_from_proc[1]) == -1) error_exit(TRUE, FALSE, "dup() failed.\n");
+		if (mydup(pipe_from_proc[1]) == -1) error_exit(TRUE, FALSE, "dup() failed.\n");
 		myclose(pipe_from_proc[0]);
 
 		/* start process */
 /*		if (-1 == execlp(shell, shell, "-c", command, (void *)NULL)) error_exit("execlp of %s failed\n", command); */
-		if (-1 == execlp(command, command, (void *)NULL)) error_exit("Error while starting '%s'.\n", command);
+		if (-1 == execlp(command, command, (void *)NULL)) error_exit(TRUE, FALSE, "Error while starting '%s'.\n", command);
 
 		/* if execlp returns, an error occured */
-		error_exit("Error while starting process '%s'.\n", command);
+		error_exit(FALSE, FALSE, "Error while starting process '%s'.\n", command);
 	}
 
 	return pid;
@@ -375,7 +375,7 @@ pid_t exec_with_pty(char *command, int *fd)
 {
 	int fd_master = -1, fd_slave = -1;
 	pid_t pid = get_pty_and_fork(&fd_master, &fd_slave);
-	if (-1 == pid) error_exit("An error occured while invoking get_pty_and_fork.\n");
+	if (-1 == pid) error_exit(TRUE, FALSE, "An error occured while invoking get_pty_and_fork.\n");
 
 	if (pid == 0)
 	{
@@ -389,7 +389,7 @@ pid_t exec_with_pty(char *command, int *fd)
 		setup_for_childproc(fd_slave, 1, "dumb");
 
 		/* start process */
-		if (-1 == execlp(command, command, (void *)NULL)) error_exit("Error while starting '%s'.\n", command);
+		if (-1 == execlp(command, command, (void *)NULL)) error_exit(TRUE, FALSE, "Error while starting '%s'.\n", command);
 	}
 
 	*fd = fd_master;
@@ -397,7 +397,7 @@ pid_t exec_with_pty(char *command, int *fd)
 #if defined(sun) || defined(__sun) || defined(AIX) || defined(_HPUX_SOURCE) || defined(OSF1) || defined(scoos)
 	/* see start_proc */
 #else
-	if (myclose(fd_slave) == -1) error_exit("Error closing slave-fd (pseudo tty, fd %d)\n", fd_slave);
+	if (myclose(fd_slave) == -1) error_exit(TRUE, FALSE, "Error closing slave-fd (pseudo tty, fd %d)\n", fd_slave);
 #endif
 
 	return pid;
