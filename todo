@@ -1,5 +1,2 @@
 - macos: libintl
 - main: nl/ directory mkdir
-
-- error_exit: parameter which enables/disables errno print, also for traceback
-- -q / -Q do not work
