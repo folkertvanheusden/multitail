@@ -15,6 +15,7 @@
 #include "config.h"
 #include "utils.h"
 #include "term.h"
+#include "ui.h"
 
 char *xclip = "/usr/bin/xclip";
 
@@ -56,39 +57,46 @@ void send_to_xclip(char *what)
 
 void send_to_clipboard(buffer *pb)
 {
-	char *data = NULL;
-	int len_out = 0;
-	int loop = 0;
-	NEWWIN *mywin = create_popup(9, 40);
-
-	win_header(mywin, "Copy buffer to X clipboard");
-	mydoupdate();
-
-	for(loop=0; loop<pb -> curpos; loop++)
+	if (file_exist(xclip) == -1)
+		error_popup("Copy to clipboard", -1, "xclip program not found");
+	else if (getenv("DISPLAY") == NULL)
+		error_popup("Copy to clipboard", -1, "DISPLAY environment variable not set");
+	else
 	{
-		int len = 0;
+		char *data = NULL;
+		int len_out = 0;
+		int loop = 0;
+		NEWWIN *mywin = create_popup(9, 40);
 
-		if ((pb -> be)[loop].Bline == NULL)
-			continue;
+		win_header(mywin, "Copy buffer to X clipboard");
+		mydoupdate();
 
-		len = strlen((pb -> be)[loop].Bline);
+		for(loop=0; loop<pb -> curpos; loop++)
+		{
+			int len = 0;
 
-		data = (char *)realloc(data, len_out + len + 1);
+			if ((pb -> be)[loop].Bline == NULL)
+				continue;
 
-		memcpy(&data[len_out], (pb -> be)[loop].Bline, len + 1);
+			len = strlen((pb -> be)[loop].Bline);
 
-		len_out += len;
+			data = (char *)realloc(data, len_out + len + 1);
+
+			memcpy(&data[len_out], (pb -> be)[loop].Bline, len + 1);
+
+			len_out += len;
+		}
+
+		send_to_xclip(data);
+
+		free(data);
+
+		mvwprintw(mywin -> win, 3, 2, "Finished!");
+		mvwprintw(mywin -> win, 4, 2, "Press any key to continue...");
+		mydoupdate();
+
+		(void)wait_for_keypress(-1, 0, mywin, 0);
+
+		delete_popup(mywin);
 	}
-
-	send_to_xclip(data);
-
-	free(data);
-
-	mvwprintw(mywin -> win, 3, 2, "Finished!");
-	mvwprintw(mywin -> win, 4, 2, "Press any key to continue...");
-	mydoupdate();
-
-	(void)wait_for_keypress(-1, 0, mywin, 0);
-
-	delete_popup(mywin);
 }

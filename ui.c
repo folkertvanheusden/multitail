@@ -43,7 +43,7 @@ void error_popup(char *title, int help, char *message, ...)
 	vsnprintf(buffer, sizeof(buffer), message, ap);
 	va_end(ap);
 
-	mywin = create_popup(9, max(33, find_char_offset(buffer, '\n')) + 4);
+	mywin = create_popup(9, max(40, find_char_offset(buffer, '\n')) + 4);
 
 	win_header(mywin, title);
 	myattr_on(mywin, cdev);
