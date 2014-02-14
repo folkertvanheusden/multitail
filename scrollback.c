@@ -333,7 +333,7 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 		c = wait_for_keypress(HELP_SCROLLBACK_HELP, 0, NULL, 1);
 		uc = toupper(c);
 
-		if (c == 'q' || uc == 'X' || c == abort_key || c == KEY_CLOSE || c == KEY_EXIT)
+		if (c == 'q' || c == abort_key || c == KEY_CLOSE || c == KEY_EXIT)
 		{
 			break;
 		}
