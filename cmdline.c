@@ -1118,10 +1118,15 @@ void do_commandline(int argc, char *argv[])
 		}
 		else if (strcasecmp(argv[loop], "-q") == 0 || strcasecmp(argv[loop], "-qs") == 0)
 		{
-			int merge = argv[loop][1] == 'Q';
-			int check_interval = get_value_arg("-q/-Q", argv[++loop], VAL_ZERO_POSITIVE);
-			const char *default_color_scheme = argv[loop][2] == 's' ? argv[++loop] : NULL;
-			const char *check_glob = argv[++loop];
+			int cmd_index = loop;
+			int merge = argv[cmd_index][1] == 'Q';
+			int check_interval = get_value_arg("-q[s]/-Q[s]", argv[++loop], VAL_ZERO_POSITIVE);
+			const char *default_color_scheme = NULL, *check_glob = NULL;
+
+			if (argv[cmd_index][2] == 's')
+				default_color_scheme = argv[++loop];
+
+			check_glob = argv[++loop];
 
 			if (default_color_scheme && find_colorscheme(default_color_scheme) == -1)
 				error_exit(FALSE, FALSE, "Color scheme '%s' is not known.\n", default_color_scheme);
