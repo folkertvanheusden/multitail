@@ -1,6 +1,8 @@
 Type:
 make install
 That's it!
+Make sure you have the ncursesw development libraries installed.
+Please note: ncursesW. Also see readme.txt.
 
 *                                 *
  +-------------------------------+
