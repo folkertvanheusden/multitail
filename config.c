@@ -837,6 +837,9 @@ void set_wordwrapmaxlength(int linenr, char *cmd, char *par)
 
 void set_xclip(int linenr, char *cmd, char *par)
 {
+	if (file_exist(par) == -1)
+		error_exit(TRUE, FALSE, "xclip binary '%s' does not exist");
+
 	xclip = strdup(par);
 }
 

@@ -14,6 +14,7 @@
 #include "error.h"
 #include "config.h"
 #include "utils.h"
+#include "term.h"
 
 char *xclip = "/usr/bin/xclip";
 
@@ -58,6 +59,10 @@ void send_to_clipboard(buffer *pb)
 	char *data = NULL;
 	int len_out = 0;
 	int loop = 0;
+	NEWWIN *mywin = create_popup(5, 40);
+
+	win_header(mywin, "Copy buffer to X clipboard");
+	mydoupdate();
 
 	for(loop=0; loop<pb -> curpos; loop++)
 	{
@@ -78,4 +83,6 @@ void send_to_clipboard(buffer *pb)
 	send_to_xclip(data);
 
 	free(data);
+
+	delete_popup(mywin);
 }
