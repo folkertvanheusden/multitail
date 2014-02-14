@@ -1108,7 +1108,7 @@ config_file_keyword cf_entries[] = {
 	{ "usefilterscheme", use_filterscheme },
 	{ "warn_closed", set_warn_closed },
 	{ "window_number", set_window_number },
-	{ "wordwrapmaxlength", set_wordwrapmaxlength }
+	{ "wordwrapmaxlength", set_wordwrapmaxlength },
 	{ "xclip", set_xclip }
 };
 

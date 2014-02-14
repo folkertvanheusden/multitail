@@ -14,7 +14,7 @@ LDFLAGS+=-lpanel -lncurses -lutil -lm $(DEBUG) -rdynamic
 CFLAGS+=-funsigned-char -D`uname` -O2 -Wall -DVERSION=\"$(VERSION)\" $(DEBUG) -DCONFIG_FILE=\"$(CONFIG_FILE)\"
 endif
 
-OBJS=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o selbox.o stripstring.o color.o misc.o ui.o exec.o diff.o config.o cmdline.o globals.o history.o
+OBJS=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o selbox.o stripstring.o color.o misc.o ui.o exec.o diff.o config.o cmdline.o globals.o history.o xclip.o
 
 all: multitail
 

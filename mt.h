@@ -1,3 +1,14 @@
+#ifndef __MT_H__
+#define __MT_H__
+
+#define _LARGEFILE64_SOURCE	/* required for GLIBC to enable stat64 and friends */
+#include <regex.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+
 #define WAIT_FOR_FILE_DELAY	(250)	/* sleep when waiting for a file to become available */
 #define MAX_N_RE_MATCHES	(80)	/* max. number of regex matches: used for coloring matches */
 #define MIN_N_BUFFERLINES	(100)	/* number of lines to buffer at minimum */
@@ -499,3 +510,5 @@ void delete_be_in_buffer(buffer *pb);
 void do_restart_window(proginfo *cur);
 
 void LOG(char *str, ...);
+
+#endif
