@@ -3,6 +3,7 @@
 #include <regex.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -1235,6 +1236,9 @@ void format_help(const char *short_str, const char *long_str, const char *descr)
 char ansi_terminal(void)
 {
 	const char *term = getenv("TERM");
+
+	if (!isatty(1) || !isatty(2))
+		return 0;
 
 	if (!term)
 		return 0;
