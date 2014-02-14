@@ -22,12 +22,12 @@
 #include "exec.h"
 #include "globals.h"
 #include "config.h"
+#include "xclip.h"
 
 /* "local global" */
 int cur_colorscheme_nr = -1;
 int cur_filterscheme_nr = -1;
 int cur_editscheme_nr = -1;
-
 
 mybool_t config_yes_no(char *what)
 {
@@ -830,9 +830,14 @@ void set_scrollback_show_winnrs(int linenr, char *cmd, char *par)
 	default_sb_showwinnr = config_yes_no(par);
 }
 
-void  set_wordwrapmaxlength(int linenr, char *cmd, char *par)
+void set_wordwrapmaxlength(int linenr, char *cmd, char *par)
 {
 	wordwrapmaxlength = get_value_arg("wordwrapmaxlength", par, VAL_POSITIVE);
+}
+
+void set_xclip(int linenr, char *cmd, char *par)
+{
+	xclip = strdup(par);
 }
 
 void set_searchhistory_file(int linenr, char *cmd, char *par)
@@ -1104,6 +1109,7 @@ config_file_keyword cf_entries[] = {
 	{ "warn_closed", set_warn_closed },
 	{ "window_number", set_window_number },
 	{ "wordwrapmaxlength", set_wordwrapmaxlength }
+	{ "xclip", set_xclip }
 };
 
 int find_config_entry_in_dispatch_table(char *cmd_name)

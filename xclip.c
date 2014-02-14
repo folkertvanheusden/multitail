@@ -13,6 +13,8 @@
 #include "config.h"
 #include "utils.h"
 
+char *xclip = "/usr/bin/xclip";
+
 void send_to_xclip(const char *what)
 {
 	int fds[2] = { 0 };
