@@ -49,3 +49,7 @@ void send_to_xclip(const char *what)
 	close(fds[1]);
 	close(fds[0]);
 }
+
+void send_to_clipboard(buffer *pb)
+{
+}

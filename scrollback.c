@@ -19,6 +19,7 @@
 #include "ui.h"
 #include "misc.h"
 #include "globals.h"
+#include "xclip.h"
 
 int scrollback_search_to_new_window(buffer *pbuf, char *org_title, char *find_str, mybool_t case_insensitive);
 
@@ -346,7 +347,10 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 			show_winnr = 1 - show_winnr;
 			redraw = 2;
 		}
-// FIXME  'c' -> xclip
+		else if (c == 'x')
+		{
+			send_to_clipboard(pbuf);
+		}
 		else if (c == 'Y')
 		{
 			no_linewrap = !no_linewrap;
@@ -357,9 +361,7 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 		{
 			statistics_menu();
 		}
-		else if ((c == KEY_LEFT ||
-					c == KEY_BACKSPACE)
-				&& no_linewrap)
+		else if ((c == KEY_LEFT || c == KEY_BACKSPACE) && no_linewrap)
 		{
 			if (line_offset > 0)
 				line_offset--;
