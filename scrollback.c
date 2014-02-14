@@ -346,6 +346,7 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 			show_winnr = 1 - show_winnr;
 			redraw = 2;
 		}
+// FIXME  'c' -> xclip
 		else if (c == 'Y')
 		{
 			no_linewrap = !no_linewrap;
