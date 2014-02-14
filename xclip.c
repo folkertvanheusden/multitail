@@ -59,7 +59,7 @@ void send_to_clipboard(buffer *pb)
 	char *data = NULL;
 	int len_out = 0;
 	int loop = 0;
-	NEWWIN *mywin = create_popup(5, 40);
+	NEWWIN *mywin = create_popup(8, 40);
 
 	win_header(mywin, "Copy buffer to X clipboard");
 	mydoupdate();
@@ -86,6 +86,7 @@ void send_to_clipboard(buffer *pb)
 
 	mvwprintw(mywin -> win, 2, 2, "Finished!");
 	mvwprintw(mywin -> win, 3, 2, "Press any key to continue...");
+	mydoupdate();
 
 	(void)wait_for_keypress(-1, 0, mywin, 0);
 
