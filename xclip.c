@@ -31,8 +31,6 @@ void send_to_xclip(char *what)
 
 	if (pid == 0)
 	{
-		char *no_arguments[] = { NULL };
-
 		close(0);
 		if (dup(fds[0]) == -1)
 			error_exit(TRUE, TRUE, "dup() failed\n");
@@ -43,7 +41,7 @@ void send_to_xclip(char *what)
 		close(2);
 		open("/dev/null", O_RDWR);
 
-		if (execve(xclip, no_arguments, no_arguments) == -1)
+		if (execl(xclip, xclip, NULL) == -1)
 			error_exit(TRUE, FALSE, "execve of %s failed\n", xclip);
 
 		exit(1);
