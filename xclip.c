@@ -4,6 +4,7 @@
  */
 #define _LARGEFILE64_SOURCE
 #include <fcntl.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -33,18 +34,26 @@ void send_to_xclip(char *what)
 
 	if (pid == 0)
 	{
-		close(0);
+		int loop;
+
+		for(loop=0; loop<1024; loop++)
+		{
+			if (fds[0] != loop)
+				close(loop);
+		}
+
+		signal(SIGHUP, SIG_DFL);
+
 		if (dup(fds[0]) == -1)
 			error_exit(TRUE, TRUE, "dup() failed\n");
 
-		close(1);
-		open("/dev/null", O_RDWR);
-
-		close(2);
-		open("/dev/null", O_RDWR);
+		setsid();
+#ifndef __minix
+                setpgid(0, 0);
+#endif
 
 		if (execl(xclip, xclip, NULL) == -1)
-			error_exit(TRUE, FALSE, "execve of %s failed\n", xclip);
+			error_exit(TRUE, FALSE, "execl of %s failed\n", xclip);
 
 		exit(1);
 	}
