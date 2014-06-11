@@ -2014,6 +2014,7 @@ void do_restart_window(proginfo *cur)
 	myclose(cur -> wfd);
 
 	/* re-start tail */
+	cur -> restart.first = 1;
 	if (start_proc(cur, 1) == -1)
 		error_exit(FALSE, FALSE, "Failed to start process %s.\n", cur -> filename);
 }
