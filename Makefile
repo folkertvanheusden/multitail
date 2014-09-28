@@ -1,17 +1,18 @@
 include version
 
 UTF8_SUPPORT=yes
-DESTDIR=/
+DESTDIR=
+PREFIX=/usr
 CONFIG_FILE=$(DESTDIR)/etc/multitail.conf
 
-CC=gcc
-DEBUG=-g -D_FORTIFY_SOURCE=2 # -D_DEBUG # -pg #  -D_DEBUG  #-pg -W -pedantic # -pg #-fprofile-arcs
+CC?=gcc
+DEBUG=-g -O2 -Wall # -D_DEBUG # -pg #  -D_DEBUG  #-pg -W -pedantic # -pg #-fprofile-arcs
 ifeq ($(UTF8_SUPPORT),yes)
-LDFLAGS+=-lpanelw -lncursesw -lutil -lm $(DEBUG) -rdynamic
-CFLAGS+=-funsigned-char -D`uname` -O2 -Wall -DVERSION=\"$(VERSION)\" $(DEBUG) -DCONFIG_FILE=\"$(CONFIG_FILE)\" -DUTF8_SUPPORT
+LDFLAGS+=-lpanelw -lncursesw -lutil -lm
+CFLAGS+=-funsigned-char -D`uname` -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\" -DUTF8_SUPPORT -D_FORTIFY_SOURCE=2
 else
-LDFLAGS+=-lpanel -lncurses -lutil -lm $(DEBUG) -rdynamic
-CFLAGS+=-funsigned-char -D`uname` -O2 -Wall -DVERSION=\"$(VERSION)\" $(DEBUG) -DCONFIG_FILE=\"$(CONFIG_FILE)\"
+LDFLAGS+=-lpanel -lncurses -lutil -lm
+CFLAGS+=-funsigned-char -D`uname` -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\" -D_FORTIFY_SOURCE=2
 endif
 
 OBJS=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o selbox.o stripstring.o color.o misc.o ui.o exec.o diff.o config.o cmdline.o globals.o history.o xclip.o
@@ -19,25 +20,27 @@ OBJS=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o selbox.
 all: multitail
 
 multitail: $(OBJS)
-	$(CC) -Wall -W $(OBJS) $(LDFLAGS) -o multitail
+	$(CC) $(OBJS) $(LDFLAGS) -o multitail
 
 multitail_ccmalloc: $(OBJS)
 	ccmalloc --no-wrapper $(CC) -Wall -W $(OBJS) $(LDFLAGS) -o ccmultitail
 
 install: multitail
-	cp multitail $(DESTDIR)/usr/bin
-	cp multitail.1 $(DESTDIR)/usr/share/man/man1/multitail.1
-	mkdir -p $(DESTDIR)/usr/share/doc/multitail-$(VERSION)
-	cp *.txt INSTALL manual*.html $(DESTDIR)/usr/share/doc/multitail-$(VERSION)
+	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	cp multitail $(DESTDIR)$(PREFIX)/bin
+	mkdir -p $(DESTDIR)$(PREFIX)/share/man/man1
+	cp multitail.1 $(DESTDIR)$(PREFIX)/share/man/man1/multitail.1
+	mkdir -p $(DESTDIR)$(PREFIX)/share/doc/multitail-$(VERSION)
+	cp *.txt INSTALL manual*.html $(DESTDIR)$(PREFIX)/share/doc/multitail-$(VERSION)
 	#
 	### COPIED multitail.conf.new, YOU NEED TO REPLACE THE multitail.conf
 	### YOURSELF WITH THE NEW FILE
 	#
-	cp multitail.conf $(CONFIG_FILE).new
 	mkdir -p $(DESTDIR)/etc/multitail/
-	cp convert-* colors-* $(DESTDIR)/etc/multitail/
-	rm -f $(DESTDIR)/usr/share/man/man1/multitail.1.gz
-	gzip -9 $(DESTDIR)/usr/share/man/man1/multitail.1
+	cp multitail.conf $(CONFIG_FILE).new
+	cp conversion-scripts/* $(DESTDIR)/etc/multitail/
+#rm -f $(DESTDIR)$(PREFIX)/share/man/man1/multitail.1.gz
+#gzip -9 $(DESTDIR)$(PREFIX)/share/man/man1/multitail.1
 	#
 	# There's a mailinglist!
 	# Send an e-mail to minimalist@vanheusden.com with in the subject
@@ -50,10 +53,10 @@ install: multitail
 	# update the examples page.
 
 uninstall: clean
-	rm -f $(DESTDIR)/usr/bin/multitail
-	rm -f $(DESTDIR)/usr/share/man/man1/multitail.1.gz
-	rm -f $(CONFIG_FILE)
-	rm -rf $(DESTDIR)/usr/share/doc/multitail-$(VERSION)
+	rm -f $(DESTDIR)$(PREFIX)/bin/multitail
+	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/multitail.1.gz
+#	rm -f $(CONFIG_FILE)
+	rm -rf $(DESTDIR)$(PREFIX)/share/doc/multitail-$(VERSION)
 
 clean:
 	rm -f $(OBJS) multitail core gmon.out *.da ccmultitail
