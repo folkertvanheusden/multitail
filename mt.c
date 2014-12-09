@@ -447,11 +447,9 @@ int draw_tab(NEWWIN *win)
 
 		for(loop=0; loop<move; loop++)
 			waddch(win -> win, ' ');
-
-		return move;
 	}
 
-	return 0;
+	return 1;
 }
 
 

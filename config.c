@@ -729,6 +729,8 @@ void set_check_mail(int linenr, char *cmd, char *par)
 void set_tab_stop(int linenr, char *cmd, char *par)
 {
 	tab_width = atoi(par);
+	if (tab_width == 0)
+		config_error_exit(linenr, "tab_stop: value cannot be 0.\n");
 }
 
 void set_tail(int linenr, char *cmd, char *par)
