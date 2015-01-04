@@ -349,6 +349,16 @@ char * getusername(void)
 
 	if (username[0] == '?')
 	{
+		char *logname = getenv("LOGNAME");
+		if (logname)
+		{
+			strncpy(username, logname, 128);
+			logname[127] = 0x00;
+		}
+	}
+
+	if (username[0] == '?')
+	{
 		struct passwd *pw = getuserinfo();
 
 		if (pw)
