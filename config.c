@@ -1235,10 +1235,11 @@ void load_configfile_wrapper(char *config_file)
 
 		if (home)
 			snprintf(path, path_max, "%s/.multitailrc", home);
-		else
+		else if (pp)
 			snprintf(path, path_max, "%s/.multitailrc", pp -> pw_dir);
 
-		do_load_config(-1, NULL, path);
+		if (pp || home)
+			do_load_config(-1, NULL, path);
 
 		myfree(path);
 	}

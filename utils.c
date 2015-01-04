@@ -340,21 +340,22 @@ char * amount_to_str(long long int amount)
 
 struct passwd *getuserinfo(void)
 {
-	struct passwd *pp = getpwuid(geteuid());
-	if (!pp)
-		error_exit(TRUE, FALSE, "Failed to get passwd-structure for effective user id %d.\n", geteuid());
-
-	return pp;
+	return getpwuid(geteuid());
 }
 
 char * getusername(void)
 {
-	static char username[128] = { 0 };
+	static char username[128] = "???";
 
-	if (!username[0])
+	if (username[0] == '?')
 	{
-		strncpy(username, getuserinfo() -> pw_name, sizeof(username));
-		username[sizeof(username) - 1] = 0x00;
+		struct passwd *pw = getuserinfo();
+
+		if (pw)
+		{
+			strncpy(username, getuserinfo() -> pw_name, sizeof(username));
+			username[sizeof(username) - 1] = 0x00;
+		}
 	}
 
 	return username;
