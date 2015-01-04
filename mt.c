@@ -1390,13 +1390,13 @@ void update_statusline(NEWWIN *status, int win_nr, proginfo *cur)
 		else if (mail)
 			wprintw(status -> win, " You've got mail!");
 
-		dx = getcurx(status -> win);
-		if (dx >= (statusline_len + 13))
+/*		dx = getcurx(status -> win);
+		if (dx >= (statusline_len + 13)) */
 		{
 			if (cur -> paused)
 			{
 				color_on(status, find_colorpair(COLOR_YELLOW, -1, 0));
-				mvwprintw(status -> win, 0, dx - 10, "  Paused  ");
+				mvwprintw(status -> win, 0, win_width - 10, "  Paused  ");
 				color_off(status, find_colorpair(COLOR_YELLOW, -1, 0));
 			}
 			else if (cur -> wt == WT_COMMAND)
@@ -1405,9 +1405,9 @@ void update_statusline(NEWWIN *status, int win_nr, proginfo *cur)
 
 				total_info_len = statusline_len + 12;
 
-				if (vmsize != -1 && dx >= (statusline_len + 30))
+				if (vmsize != -1 && win_width >= (statusline_len + 30))
 				{
-					int str_x = dx - strlen(timestamp) - 30;
+					int str_x = win_width - strlen(timestamp) - 30;
 					char *vmsize_str = amount_to_str(vmsize);
 					mvwprintw(status -> win, 0, str_x, "%6s (VMsize) %5d (PID) - %s", vmsize_str, cur -> pid, timestamp);
 					myfree(vmsize_str);
@@ -1418,19 +1418,19 @@ void update_statusline(NEWWIN *status, int win_nr, proginfo *cur)
 				{
 					if (cur -> last_exit_rc != 0)
 					{
-						mvwprintw(status -> win, 0, dx - strlen(timestamp) - 26, "Last rc: %d, %5d (PID) - %s", WEXITSTATUS(cur -> last_exit_rc), cur -> pid, timestamp);
+						mvwprintw(status -> win, 0, win_width - strlen(timestamp) - 26, "Last rc: %d, %5d (PID) - %s", WEXITSTATUS(cur -> last_exit_rc), cur -> pid, timestamp);
 					}
 					else
-						mvwprintw(status -> win, 0, dx - strlen(timestamp) - 12, "%5d (PID) - %s", cur -> pid, timestamp);
+						mvwprintw(status -> win, 0, win_width - strlen(timestamp) - 12, "%5d (PID) - %s", cur -> pid, timestamp);
 				}
 			}
 			else if (fsize == -1)
 			{
 				if (cur -> wt == WT_STDIN || cur -> wt == WT_SOCKET)
-					mvwprintw(status -> win, 0, dx - strlen(timestamp), "%s", timestamp);
+					mvwprintw(status -> win, 0, win_width - strlen(timestamp), "%s", timestamp);
 				else
 				{
-					mvwprintw(status -> win, 0, dx - strlen(timestamp) - 6, "??? - %s", timestamp);
+					mvwprintw(status -> win, 0, win_width - strlen(timestamp) - 6, "??? - %s", timestamp);
 					total_info_len = statusline_len + 6;
 				}
 			}
@@ -1446,7 +1446,7 @@ void update_statusline(NEWWIN *status, int win_nr, proginfo *cur)
 				{
 					char *filesize = amount_to_str(fsize);
 					cur_len = 3 + strlen(filesize);
-					mvwprintw(status -> win, 0, dx - (strlen(timestamp) + cur_len), "%s - %s", filesize, timestamp);
+					mvwprintw(status -> win, 0, win_width - (strlen(timestamp) + cur_len), "%s - %s", filesize, timestamp);
 					myfree(filesize);
 				}
 				else
@@ -1457,9 +1457,9 @@ void update_statusline(NEWWIN *status, int win_nr, proginfo *cur)
 					/* this trick is because on MacOS X 'off_t' is specified as a 64 bit integer */
 #endif
 					if (sizeof(off64_t) == 8)
-						mvwprintw(status -> win, 0, dx - (strlen(timestamp) + cur_len), "%10lld - %s", fsize, timestamp);
+						mvwprintw(status -> win, 0, win_width - (strlen(timestamp) + cur_len), "%10lld - %s", fsize, timestamp);
 					else
-						mvwprintw(status -> win, 0, dx - (strlen(timestamp) + cur_len), "%10ld - %s", fsize, timestamp);
+						mvwprintw(status -> win, 0, win_width - (strlen(timestamp) + cur_len), "%10ld - %s", fsize, timestamp);
 				}
 
 				total_info_len = statusline_len + cur_len;
@@ -1469,11 +1469,11 @@ void update_statusline(NEWWIN *status, int win_nr, proginfo *cur)
 		if (show_f1)
 		{
 			if (use_colors) color_on(status, find_colorpair(COLOR_YELLOW, -1, 0));
-			if (dx >= (total_info_len + 32))
+			if (win_width >= (total_info_len + 32))
 				mvwprintw(status -> win, 0, help_str_offset, " *Press F1/<CTRL>+<h> for help* ");
-			else if (dx >= (total_info_len + 21))
+			else if (win_width >= (total_info_len + 21))
 				mvwprintw(status -> win, 0, help_str_offset, " F1/<CTRL>+<h>: help ");
-			else if (dx >= (total_info_len + 13))
+			else if (win_width >= (total_info_len + 13))
 				mvwprintw(status -> win, 0, help_str_offset, " F1/^h: help ");
 			if (use_colors) color_off(status, find_colorpair(COLOR_YELLOW, -1, 0));
 		}
