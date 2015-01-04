@@ -1390,8 +1390,7 @@ void update_statusline(NEWWIN *status, int win_nr, proginfo *cur)
 		else if (mail)
 			wprintw(status -> win, " You've got mail!");
 
-/*		dx = getcurx(status -> win);
-		if (dx >= (statusline_len + 13)) */
+		if (win_width >= (statusline_len + 13))
 		{
 			if (cur -> paused)
 			{
