@@ -3367,6 +3367,40 @@ int recv_from_fd(int fd, char **buffer, int new_data_offset, int read_size)
 	return nbytes;
 }
 
+void get_markerline_sleep(double *const s, char *have_any)
+{
+	int loop = 0;
+	dtime_t now = get_ts();
+
+	*have_any = 0;
+
+	for(loop=0; loop<nfd; loop++)
+	{
+		proginfo *cur = &pi[loop];
+
+		do
+		{
+			if (cur -> mark_interval)
+			{
+				double t_until_next = cur -> statistics.lastevent + cur -> mark_interval - now;
+
+				*have_any = 1;
+
+				if (t_until_next <= 0)
+				{
+					*s = 0;
+					return;
+				}
+
+				*s = min(*s, t_until_next);
+			}
+
+			cur = cur -> next;
+		}
+		while(cur);
+	}
+}
+
 int wait_for_keypress(int what_help, double max_wait, NEWWIN *popup, char cursor_shift)
 {
 	int c = -1;
@@ -3383,6 +3417,7 @@ int wait_for_keypress(int what_help, double max_wait, NEWWIN *popup, char cursor
 		char prev_mail_status = mail;
 		static double lastupdate = 0;
 		double sleep = 32767.0;
+		char any_markers = 0;
 
 		/* need to check any paths? */
 		if (check_paths())
@@ -3391,6 +3426,8 @@ int wait_for_keypress(int what_help, double max_wait, NEWWIN *popup, char cursor
 		sleep = min(sleep, check_for_mail > 0     ? max((msf_last_check + check_for_mail)  - now, 0) : 32767);
 		sleep = min(sleep, heartbeat_interval > 0 ? max((heartbeat_t + heartbeat_interval) - now, 0) : 32767);
 		sleep = min(sleep, max_wait > 0.0         ? max((max_wait_start + max_wait)        - now, 0) : 32767);
+
+		get_markerline_sleep(&sleep, &any_markers);
 
 		for(loop=0; loop<n_cdg; loop++)
 			sleep = min(sleep, max((cdg[loop].last_check + cdg[loop].check_interval) - now, 0));
@@ -3492,6 +3529,36 @@ int wait_for_keypress(int what_help, double max_wait, NEWWIN *popup, char cursor
 			got_sigusr1 = 0;
 
 			sigusr1_restart_tails();
+		}
+
+		if (any_markers)
+		{
+			for(loop=0; loop<nfd; loop++)
+			{
+				proginfo *cur = &pi[loop];
+
+				if (cur -> paused || cur -> closed)
+					continue;
+
+				do
+				{
+					if (cur -> mark_interval && now - cur -> statistics.lastevent >= cur -> mark_interval)
+					{
+						if (cur -> statistics.lastevent)
+						{
+							add_markerline(loop, cur, MARKER_IDLE, NULL);
+
+							if (get_do_refresh() == 0)
+								set_do_refresh(1);
+						}
+
+						cur -> statistics.lastevent = now;
+					}
+
+					cur = cur -> next;
+				}
+				while(cur);
+			}
 		}
 
 		if (rc > 0)
@@ -3597,19 +3664,6 @@ int wait_for_keypress(int what_help, double max_wait, NEWWIN *popup, char cursor
 							set_do_refresh(2);
 
 							goto closed_window;
-						}
-					}
-
-					if (cur -> mark_interval)
-					{
-						if (now - cur -> statistics.lastevent >= cur -> mark_interval)
-						{
-							add_markerline(loop, cur, MARKER_IDLE, NULL);
-
-							if (get_do_refresh() == 0)
-								set_do_refresh(1);
-
-							cur -> statistics.lastevent = now;
 						}
 					}
 

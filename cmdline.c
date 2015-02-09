@@ -927,6 +927,7 @@ void do_commandline(int argc, char *argv[])
 				cur = &pi[nfd];
 				nfd++;
 			}
+
 			memset(cur, 0x00, sizeof(proginfo));
 
 			/* see if file exists */
