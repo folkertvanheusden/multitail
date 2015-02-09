@@ -197,6 +197,11 @@ char * edit_string(NEWWIN *win, int win_y, int win_x, int win_width, int max_wid
 			break;
 		}
 
+		/* key modifier */
+		if (c == 127 && map_delete_as_backspace == MY_TRUE) {
+			c = KEY_BACKSPACE;
+		}
+
 		switch(c)
 		{
 		case 1:			/* ^A */

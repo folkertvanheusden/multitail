@@ -142,6 +142,7 @@ extern int syslog_port;
 extern char scrollback_search_new_window;
 extern char *global_find;
 extern mybool_t gnu_tail;
+extern mybool_t map_delete_as_backspace;
 
 void set_do_refresh(char val);
 char get_do_refresh();

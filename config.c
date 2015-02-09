@@ -729,6 +729,8 @@ void set_check_mail(int linenr, char *cmd, char *par)
 void set_tab_stop(int linenr, char *cmd, char *par)
 {
 	tab_width = atoi(par);
+	if (tab_width == 0)
+		config_error_exit(linenr, "tab_stop: value cannot be 0.\n");
 }
 
 void set_tail(int linenr, char *cmd, char *par)
@@ -841,6 +843,11 @@ void set_xclip(int linenr, char *cmd, char *par)
 		error_exit(TRUE, FALSE, "xclip binary '%s' does not exist");
 
 	xclip = strdup(par);
+}
+
+void set_map_delete_as_backspace(int linenr, char *cmd, char *par)
+{
+	map_delete_as_backspace = config_yes_no(par);	
 }
 
 void set_searchhistory_file(int linenr, char *cmd, char *par)
@@ -1066,6 +1073,7 @@ config_file_keyword cf_entries[] = {
 	{ "include", do_load_config },
 	{ "inverse", set_inverse_attrs },
 	{ "line_ts_format", set_line_ts_format },
+	{ "map_delete_as_backspace", set_map_delete_as_backspace },
 	{ "markerline_char", set_markerline_char },
 	{ "markerline_color", set_markerline_attrs },
 	{ "markerline_timestamp", set_markerline_timestamp },

@@ -151,6 +151,7 @@ mybool_t posix_tail = 0;
 mybool_t resolv_ip_addresses = 1;
 mybool_t show_severity_facility = 1;
 mybool_t gnu_tail = 0;
+mybool_t map_delete_as_backspace = MY_FALSE;
 
 regex_t global_highlight_re;
 char *global_highlight_str = NULL;

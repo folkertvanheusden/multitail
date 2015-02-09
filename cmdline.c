@@ -692,7 +692,7 @@ void do_commandline(int argc, char *argv[])
 		}
 		else if (strcmp(argv[loop], "-b") == 0)
 		{
-			tab_width = get_value_arg("-b", argv[++loop], VAL_ZERO_POSITIVE);
+			tab_width = get_value_arg("-b", argv[++loop], VAL_POSITIVE);
 		}
 		else if (strcmp(argv[loop], "-u") == 0)
 		{
