@@ -223,7 +223,8 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 	char show_winnr = default_sb_showwinnr;
 	mybool_t case_insensitive = re_case_insensitive;
 	buffer cur_lb;
-	int loop;
+	int loop = 0;
+	char fullscreen = 0;
 
 	memset(&cur_lb, 0x00, sizeof(cur_lb));
 
@@ -254,7 +255,6 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 	}
 
 	mywin1 = create_popup(max_y - 4, max_x - 4);
-
 	mywin2 = create_popup(nlines, ncols);
 	scrollok(mywin2 -> win, FALSE); /* supposed to always return OK, according to the manpage */
 
@@ -267,13 +267,16 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 			int index = 0;
 			int lines_used = 0;
 
-			ui_inverse_on(mywin1);
-			mvwprintw(mywin1 -> win, nlines + 1, 1, "%s - %d buffered lines", shorten_filename(header, max(24, ncols - 24)), cur_lb.curpos);
-			ui_inverse_off(mywin1);
+			if (mywin1)
+			{
+				ui_inverse_on(mywin1);
+				mvwprintw(mywin1 -> win, nlines + 1, 1, "%s - %d buffered lines", shorten_filename(header, max(24, ncols - 24)), cur_lb.curpos);
+				ui_inverse_off(mywin1);
 
-			if (!no_linewrap) ui_inverse_on(mywin1);
-			mvwprintw(mywin1 -> win, nlines + 1, ncols - 8, "LINEWRAP");
-			if (!no_linewrap) ui_inverse_off(mywin1);
+				if (!no_linewrap) ui_inverse_on(mywin1);
+				mvwprintw(mywin1 -> win, nlines + 1, ncols - 8, "LINEWRAP");
+				if (!no_linewrap) ui_inverse_off(mywin1);
+			}
 
 			werase(mywin2 -> win);
 
@@ -356,6 +359,30 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 			no_linewrap = !no_linewrap;
 			redraw = 2;
 			line_offset = 0;
+		}
+		else if (c == KEY_F(9) || c == 23)	/* ^w */
+		{
+			if (fullscreen)
+			{
+				delete_popup(mywin2);
+
+				mywin1 = create_popup(max_y - 4, max_x - 4);
+				mywin2 = create_popup(nlines, ncols);
+				scrollok(mywin2 -> win, FALSE); /* supposed to always return OK, according to the manpage */
+			}
+			else
+			{
+				delete_popup(mywin1);
+				delete_popup(mywin2);
+
+				mywin1 = NULL;
+				mywin2 = create_popup(max_y, max_x);
+				scrollok(mywin2 -> win, FALSE); /* supposed to always return OK, according to the manpage */
+			}
+
+			fullscreen = ! fullscreen;
+
+			redraw = 2;
 		}
 		else if (c == 't')
 		{
@@ -695,7 +722,8 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 	}
 
 	delete_popup(mywin2);
-	delete_popup(mywin1);
+	if (mywin1)
+		delete_popup(mywin1);
 
 	myfree(find);
 

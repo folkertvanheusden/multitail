@@ -612,6 +612,7 @@ char *help_scrollback_help[] = {
 		" ^t^     show a list of window-nrs and what they",
 		"       contain. can also display statistics.",
 		" ^s^     save the buffer to a file",
+		" ^F9^/^ctrl+w^ switch to full screen mode (and back)",
 		"Press ^ctrl+g^ to abort.",
 		NULL
 	};

@@ -65,7 +65,7 @@ package: clean
 	# source package
 	rm -rf multitail-$(VERSION)*
 	mkdir multitail-$(VERSION)
-	cp conversion-scripts/* *.conf *.c *.h multitail.1 manual*.html Makefile makefile.* Changes INSTALL license.txt readme.txt thanks.txt version multitail-$(VERSION)
+	cp conversion-scripts/* *.conf *.c *.h multitail.1 manual*.html Makefile makefile.* INSTALL license.txt readme.txt thanks.txt version multitail-$(VERSION)
 	tar czf multitail-$(VERSION).tgz multitail-$(VERSION)
 	rm -rf multitail-$(VERSION)
 
