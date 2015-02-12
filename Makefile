@@ -6,13 +6,13 @@ PREFIX=/usr
 CONFIG_FILE=$(DESTDIR)/etc/multitail.conf
 
 CC?=gcc
-DEBUG=-g -O2 -Wall # -D_DEBUG # -pg #  -D_DEBUG  #-pg -W -pedantic # -pg #-fprofile-arcs
+DEBUG+=-g -Wall # -D_DEBUG # -pg #  -D_DEBUG  #-pg -W -pedantic # -pg #-fprofile-arcs
 ifeq ($(UTF8_SUPPORT),yes)
 LDFLAGS+=-lpanelw -lncursesw -lutil -lm
-CFLAGS+=-funsigned-char -D`uname` -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\" -DUTF8_SUPPORT -D_FORTIFY_SOURCE=2
+CFLAGS+=-funsigned-char -D`uname` -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\" -DUTF8_SUPPORT -D_FORTIFY_SOURCE=2 -O3
 else
 LDFLAGS+=-lpanel -lncurses -lutil -lm
-CFLAGS+=-funsigned-char -D`uname` -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\" -D_FORTIFY_SOURCE=2
+CFLAGS+=-funsigned-char -D`uname` -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\" -D_FORTIFY_SOURCE=2 -O3
 endif
 
 OBJS=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o selbox.o stripstring.o color.o misc.o ui.o exec.o diff.o config.o cmdline.o globals.o history.o xclip.o
@@ -65,7 +65,7 @@ package: clean
 	# source package
 	rm -rf multitail-$(VERSION)*
 	mkdir multitail-$(VERSION)
-	cp conversion-scripts/* *.conf *.c *.h multitail.1 manual*.html Makefile makefile.* INSTALL license.txt readme.txt thanks.txt version multitail-$(VERSION)
+	cp -a conversion-scripts *.conf *.c *.h multitail.1 manual*.html Makefile makefile.* INSTALL license.txt readme.txt thanks.txt version multitail-$(VERSION)
 	tar czf multitail-$(VERSION).tgz multitail-$(VERSION)
 	rm -rf multitail-$(VERSION)
 
