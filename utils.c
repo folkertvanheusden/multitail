@@ -353,7 +353,7 @@ char * getusername(void)
 		if (logname)
 		{
 			strncpy(username, logname, 128);
-			logname[127] = 0x00;
+			username[127] = 0x00;
 		}
 	}
 
