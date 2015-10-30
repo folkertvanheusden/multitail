@@ -601,7 +601,11 @@ char *help_scrollback_help[] = {
 		"lines. This size can be set with the ^-m^ command-",
 		"line parameter or the ^m^-key in the main menu.",
 		" ^c^     set colors",
+#ifdef __APPLE__
+		" ^x^     copy contents to clipboard (pbcopy)",
+#else
 		" ^x^     copy contents to X clipboard (xclip)",
+#endif
 		" ^f^/^/^   search for a string in the buffer",
 		" ^n^     find the next occurence",
 		" ^Y^     toggle linewrap. if linewrap is disabled,",
