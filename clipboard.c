@@ -17,10 +17,11 @@
 #include "utils.h"
 #include "term.h"
 #include "ui.h"
+#include "clipboard.h"
 
-char *xclip = "/usr/bin/xclip";
+char *clipboard = "/usr/bin/" CLIPBOARD_NAME;
 
-void send_to_xclip(char *what)
+void send_to_clipboard_binary(char *what)
 {
 	int fds[2] = { 0 };
 	pid_t pid = -1;
@@ -52,13 +53,13 @@ void send_to_xclip(char *what)
                 setpgid(0, 0);
 #endif
 
-		if (execl(xclip, xclip, NULL) == -1)
-			error_exit(TRUE, FALSE, "execl of %s failed\n", xclip);
+		if (execl(clipboard, clipboard, NULL) == -1)
+			error_exit(TRUE, FALSE, "execl of %s failed\n", clipboard);
 
 		exit(1);
 	}
 
-	WRITE(fds[1], what, strlen(what), "xclip");
+	WRITE(fds[1], what, strlen(what), CLIPBOARD_NAME);
 
 	close(fds[1]);
 	close(fds[0]);
@@ -66,8 +67,8 @@ void send_to_xclip(char *what)
 
 void send_to_clipboard(buffer *pb)
 {
-	if (file_exist(xclip) == -1)
-		error_popup("Copy to clipboard", -1, "xclip program not found");
+	if (file_exist(clipboard) == -1)
+		error_popup("Copy to clipboard", -1, CLIPBOARD_NAME " program not found");
 	else if (getenv("DISPLAY") == NULL)
 		error_popup("Copy to clipboard", -1, "DISPLAY environment variable not set");
 	else
@@ -77,7 +78,11 @@ void send_to_clipboard(buffer *pb)
 		int loop = 0;
 		NEWWIN *mywin = create_popup(9, 40);
 
+#ifdef __APPLE__
+		win_header(mywin, "Copy buffer to clipboard");
+#else
 		win_header(mywin, "Copy buffer to X clipboard");
+#endif
 		mydoupdate();
 
 		for(loop=0; loop<pb -> curpos; loop++)
@@ -96,7 +101,7 @@ void send_to_clipboard(buffer *pb)
 			len_out += len;
 		}
 
-		send_to_xclip(data);
+		send_to_clipboard_binary(data);
 
 		free(data);
 

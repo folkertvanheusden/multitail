@@ -19,7 +19,7 @@
 #include "ui.h"
 #include "misc.h"
 #include "globals.h"
-#include "xclip.h"
+#include "clipboard.h"
 
 int scrollback_search_to_new_window(buffer *pbuf, char *org_title, char *find_str, mybool_t case_insensitive);
 
