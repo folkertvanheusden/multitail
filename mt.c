@@ -617,8 +617,14 @@ void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end,
 
 #ifdef UTF8_SUPPORT
 		const char *dummy = &use_string[offset];
-		wchar_t wcur = 0;
-		mbsrtowcs(&wcur, &dummy, 1, NULL);
+
+		wchar_t wcur = '?';
+		static mbstate_t state;
+
+		if (mbsrtowcs(&wcur, &dummy, 1, &state) == -1) {
+			wcur = '?';
+			memset(&state, 0x00, sizeof(mbstate_t));
+		}
 #else
 		char wcur = use_string[offset];
 #endif
