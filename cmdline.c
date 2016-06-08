@@ -181,7 +181,7 @@ void argv_set_window_widths(char *widths)
 		split++;
 		vertical_split = (int *)myrealloc(vertical_split, split * sizeof(int));
 
-		cur_width = get_value_arg("-sw", pnt, VAL_POSITIVE);
+		cur_width = get_value_arg("-sw", pnt, VAL_ZERO_POSITIVE);
 		widths = NULL;
 
 		if (cur_width < 4)
@@ -217,7 +217,7 @@ void argv_set_n_windows_per_column(char *pars)
 		index++;
 		n_win_per_col = (int *)myrealloc(n_win_per_col, index * sizeof(int));
 
-		cur_n = get_value_arg("-sn", pnt, VAL_POSITIVE);
+		cur_n = get_value_arg("-sn", pnt, VAL_ZERO_POSITIVE);
 		pars = NULL;
 
 		if (cur_n < 0)

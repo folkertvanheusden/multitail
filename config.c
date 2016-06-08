@@ -22,7 +22,7 @@
 #include "exec.h"
 #include "globals.h"
 #include "config.h"
-#include "xclip.h"
+#include "clipboard.h"
 
 /* "local global" */
 int cur_colorscheme_nr = -1;
@@ -842,7 +842,15 @@ void set_xclip(int linenr, char *cmd, char *par)
 	if (file_exist(par) == -1)
 		error_exit(TRUE, FALSE, "xclip binary '%s' does not exist");
 
-	xclip = strdup(par);
+	clipboard = strdup(par);
+}
+
+void set_pbcopy(int linenr, char *cmd, char *par)
+{
+	if (file_exist(par) == -1)
+		error_exit(TRUE, FALSE, "pbcopy binary '%s' does not exist");
+
+	clipboard = strdup(par);
 }
 
 void set_map_delete_as_backspace(int linenr, char *cmd, char *par)
@@ -1120,7 +1128,10 @@ config_file_keyword cf_entries[] = {
 	{ "warn_closed", set_warn_closed },
 	{ "window_number", set_window_number },
 	{ "wordwrapmaxlength", set_wordwrapmaxlength },
-	{ "xclip", set_xclip }
+	{ "xclip", set_xclip },
+#ifdef __APPLE__
+        { "pbcopy", set_pbcopy },
+#endif
 };
 
 int find_config_entry_in_dispatch_table(char *cmd_name)
