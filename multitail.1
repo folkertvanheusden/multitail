@@ -83,10 +83,10 @@ For -q/-Q: only create windows for files created after MultiTail was started.
 Close windows when more then 'x' seconds no new data was processed.
 .TP
 .B "\-a x"
-Write the output also to file 'x' (like 'tee') AFTER it was filtered by MultiTail.
+Write the output also to file 'x' (like 'tee') AFTER it was filtered by MultiTail. Note: you need to put "-a file" BEFORE to the file you're monitoring!
 .TP
 .B "\-A x"
-Write the output also to file 'x' (like 'tee') BEFORE it was filtered by MultiTail.
+Write the output also to file 'x' (like 'tee') BEFORE it was filtered by MultiTail. Also see the note for "-a".
 .TP
 .B "-g x"
 Send the output also to command 'x' AFTER it was filtered by MultiTail.
