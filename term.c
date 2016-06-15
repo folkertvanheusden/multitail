@@ -699,9 +699,12 @@ int find_or_init_colorpair(int fgcolor, int bgcolor, char ignore_errors)
 	return 0;
 }
 
+
 int colorstr_to_nr(char *str)
 {
 	int loop;
+    int err;
+    regex_t regex_is_color;
 
 	if (str[0] == 0x00) return -1;
 
@@ -710,7 +713,24 @@ int colorstr_to_nr(char *str)
 		if (color_names[loop] && strcmp(color_names[loop], str) == 0)
 			return loop;
 	}
+    
+    err = regcomp(&regex_is_color, "^[[:digit:]]{1,3}$", REG_EXTENDED);
+    if (err == 0) {
+        int match_color;    
+        match_color = regexec(&regex_is_color, str, 0, NULL, 0);
+        regfree(&regex_is_color);
 
+        if (match_color == 0) {
+            int color;
+            char *end;
+            color = strtol(str,&end,10);
+            /* prevent the use of more thant 255 colors */            
+            if (color < 255) {
+                return color;
+            }
+        }
+    }
+    
 	if (use_colors)
 		error_exit(FALSE, FALSE, "'%s' is not recognized as a color\n", str);
 
