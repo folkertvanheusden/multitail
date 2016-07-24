@@ -1,5 +1,7 @@
 include version
 
+PLATFORM=$(shell uname | sed -e 's/_.*//' | tr '[:upper:]' '[:lower:]' | sed -e 's/\//_/g')
+
 UTF8_SUPPORT=yes
 DESTDIR=
 PREFIX=/usr
@@ -7,12 +9,17 @@ CONFIG_FILE=$(DESTDIR)/etc/multitail.conf
 
 CC?=gcc
 DEBUG+=-g -Wall # -D_DEBUG # -pg #  -D_DEBUG  #-pg -W -pedantic # -pg #-fprofile-arcs
+ifeq ($(PLATFORM),darwin)
+LDFLAGS+=-lcurses -lpanel -lutil -lm
+CFLAGS+=-funsigned-char -D`uname` -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\" -DUTF8_SUPPORT -D_FORTIFY_SOURCE=2 -O3
+else
 ifeq ($(UTF8_SUPPORT),yes)
 LDFLAGS+=-lpanelw -lncursesw -lutil -lm
 CFLAGS+=-funsigned-char -D`uname` -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\" -DUTF8_SUPPORT -D_FORTIFY_SOURCE=2 -O3
 else
 LDFLAGS+=-lpanel -lncurses -lutil -lm
 CFLAGS+=-funsigned-char -D`uname` -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\" -D_FORTIFY_SOURCE=2 -O3
+endif
 endif
 
 OBJS=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o selbox.o stripstring.o color.o misc.o ui.o exec.o diff.o config.o cmdline.o globals.o history.o clipboard.o
