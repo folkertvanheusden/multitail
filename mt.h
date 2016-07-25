@@ -59,11 +59,14 @@ typedef enum { SCHEME_TYPE_EDIT = 0, SCHEME_TYPE_FILTER } filter_edit_scheme_t;
 #define __USE_BSD	/* manpage says _BSD_SOURCE, stdlib.h says __USE_BSD */
 #endif
 
-#ifdef UTF8_SUPPORT
+#if defined(UTF8_SUPPORT) && !defined(__APPLE__)
 	#include <ncursesw/panel.h>
 	#include <ncursesw/ncurses.h>
 #else
-	#if defined(sun) || defined(__sun) || defined(scoos) || defined(_HPUX_SOURCE) || defined(AIX) || defined(__CYGWIN__)
+	#if defined(__APPLE__)
+        #include <curses.h>
+        #include <panel.h>
+    #elif defined(sun) || defined(__sun) || defined(scoos) || defined(_HPUX_SOURCE) || defined(AIX) || defined(__CYGWIN__)
 		#include <ncurses/panel.h>
 		#include <ncurses/ncurses.h>
 	#else
