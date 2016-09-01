@@ -137,6 +137,7 @@ extern mybool_t show_severity_facility;
 extern char *severities[];
 extern char *facilities[];
 extern char *syslog_ts_format;
+extern char scrollback_fullscreen_default;
 extern char scrollback_no_colors;
 extern int syslog_port;
 extern char scrollback_search_new_window;

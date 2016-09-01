@@ -1010,6 +1010,11 @@ void set_show_severity_facility(int linenr, char *cmd, char *par)
 	show_severity_facility = config_yes_no(par);
 }
 
+void set_scrollback_fullscreen_default(int linenr, char *cmd, char *par)
+{
+	scrollback_fullscreen_default = config_yes_no(par);
+}
+
 void set_scrollback_no_colors(int linenr, char *cmd, char *par)
 {
 	scrollback_no_colors = config_yes_no(par);
@@ -1101,6 +1106,7 @@ config_file_keyword cf_entries[] = {
 	{ "reuse_searchstring", set_reuse_searchstring },
 	{ "rule", add_filterscheme_rule },
 	{ "scheme", scheme },
+	{ "scrollback_fullscreen_default", set_scrollback_fullscreen_default },
 	{ "scrollback_no_colors", set_scrollback_no_colors },
 	{ "scrollback_search_new_window", set_scrollback_search_new_window },
 	{ "scrollback_show_winnrs", set_scrollback_show_winnrs },

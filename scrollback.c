@@ -211,12 +211,60 @@ void scrollback_displayline(int window_nr, NEWWIN *win, buffer *pbuf, int buffer
 	}
 }
 
+
+void compute_text_dimensions(int *nlines, int *ncols, char fullscreen)
+{
+	if (fullscreen)
+	{
+		*nlines = max_y;
+		*ncols = max_x;
+	}
+	else
+	{
+		*nlines = max_y - 6;
+		*ncols = max_x - 6;
+	}
+}
+
+void create_scrollback_windows(NEWWIN **mywin1, NEWWIN **mywin2, int nlines, int ncols, char fullscreen)
+{
+	/* Delete existing windows, if any. */
+	if (*mywin1)
+	{
+		delete_popup(*mywin1);	
+	}
+	
+	if (*mywin2)
+	{
+		delete_popup(*mywin2);	
+	}
+
+	/* Re-create windows, according to fullscreen flag */
+	if (fullscreen)
+	{
+		*mywin1 = NULL;
+		*mywin2 = create_popup(max_y, max_x);
+		scrollok((*mywin2) -> win, FALSE); /* supposed to always return OK, according to the manpage */
+
+	}
+	else
+	{
+		*mywin1 = create_popup(max_y - 4, max_x - 4);
+		*mywin2 = create_popup(nlines, ncols);
+		scrollok((*mywin2) -> win, FALSE); /* supposed to always return OK, according to the manpage */
+	}
+}
+
 int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 {
 	int rc = 0;
 	char *find = NULL;
-	NEWWIN *mywin1, *mywin2;
-	int nlines = max_y - 6, ncols = max_x - 6;
+	char fullscreen = scrollback_fullscreen_default;
+	NEWWIN *mywin1 = NULL, *mywin2 = NULL;
+
+	int nlines, ncols;
+	compute_text_dimensions(&nlines, &ncols, fullscreen);
+
 	int offset = max(0, pbuf -> curpos - nlines); // FIXME: aantal regels laten afhangen van lengte
 	char redraw = 2;
 	int line_offset = 0;
@@ -224,7 +272,6 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 	mybool_t case_insensitive = re_case_insensitive;
 	buffer cur_lb;
 	int loop = 0;
-	char fullscreen = 0;
 
 	memset(&cur_lb, 0x00, sizeof(cur_lb));
 
@@ -254,9 +301,7 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 		find = mystrdup(global_highlight_str);
 	}
 
-	mywin1 = create_popup(max_y - 4, max_x - 4);
-	mywin2 = create_popup(nlines, ncols);
-	scrollok(mywin2 -> win, FALSE); /* supposed to always return OK, according to the manpage */
+	create_scrollback_windows(&mywin1, &mywin2, nlines, ncols, fullscreen);
 
 	for(;;)
 	{
@@ -362,25 +407,11 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 		}
 		else if (c == KEY_F(9) || c == 23)	/* ^w */
 		{
-			if (fullscreen)
-			{
-				delete_popup(mywin2);
-
-				mywin1 = create_popup(max_y - 4, max_x - 4);
-				mywin2 = create_popup(nlines, ncols);
-				scrollok(mywin2 -> win, FALSE); /* supposed to always return OK, according to the manpage */
-			}
-			else
-			{
-				delete_popup(mywin1);
-				delete_popup(mywin2);
-
-				mywin1 = NULL;
-				mywin2 = create_popup(max_y, max_x);
-				scrollok(mywin2 -> win, FALSE); /* supposed to always return OK, according to the manpage */
-			}
-
 			fullscreen = ! fullscreen;
+						
+			compute_text_dimensions(&nlines, &ncols, fullscreen);
+
+			create_scrollback_windows(&mywin1, &mywin2, nlines, ncols, fullscreen);
 
 			redraw = 2;
 		}

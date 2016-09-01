@@ -145,6 +145,7 @@ char exit_key = 3;
 char default_sb_showwinnr = 0;
 char reuse_searchstring = 1;
 char need_died_procs_check = 0;
+char scrollback_fullscreen_default = 0;
 char scrollback_no_colors = 0;
 char scrollback_search_new_window = 1;
 mybool_t posix_tail = 0;
