@@ -1,35 +1,48 @@
 include version
 
-PLATFORM=$(shell uname | sed -e 's/_.*//' | tr '[:upper:]' '[:lower:]' | sed -e 's/\//_/g')
+PLATFORM=$(shell uname)
+NCURSES=$(pkg-config --libs --cflags ncurses)
+# -D_DARWIN_C_SOURCE -I/opt/local/include -L/opt/local/lib -lncurses
 
 UTF8_SUPPORT=yes
 DESTDIR=
-PREFIX=/usr
-CONFIG_FILE=$(DESTDIR)/etc/multitail.conf
+PREFIX=/opt/local
+CONFIG_FILE=$(DESTDIR)$(PREFIX)/etc/multitail.conf
 
 CC?=gcc
-DEBUG+=-g -Wall # -D_DEBUG # -pg #  -D_DEBUG  #-pg -W -pedantic # -pg #-fprofile-arcs
-ifeq ($(PLATFORM),darwin)
-LDFLAGS+=-lcurses -lpanel -lutil -lm
-CFLAGS+=-funsigned-char -D`uname` -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\" -DUTF8_SUPPORT -D_FORTIFY_SOURCE=2 -O3
+CFLAGS+=--std=c99 -Wall -Wextra -Wno-unused-parameter -funsigned-char -O3
+CPPFLAGS+=-I$(PREFIX)/include -D$(PLATFORM) -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\" -D_FORTIFY_SOURCE=2
+
+# build dependency files while compile (*.d)
+CPPFLAGS+= -MMD -MP
+
+DEBUG:=-g -D_DEBUG #-pg -W -pedantic # -pg #-fprofile-arcs
+
+ifeq ($(PLATFORM),Darwin)
+LDFLAGS+=-L$(PREFIX)/lib -lcurses -lpanel -lutil -lm
+CFLAGS+=-DUTF8_SUPPORT
 else
 ifeq ($(UTF8_SUPPORT),yes)
 LDFLAGS+=-lpanelw -lncursesw -lutil -lm
-CFLAGS+=-funsigned-char -D`uname` -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\" -DUTF8_SUPPORT -D_FORTIFY_SOURCE=2 -O3
+CFLAGS+=-DUTF8_SUPPORT
 else
 LDFLAGS+=-lpanel -lncurses -lutil -lm
-CFLAGS+=-funsigned-char -D`uname` -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\" -D_FORTIFY_SOURCE=2 -O3
 endif
 endif
 
-OBJS=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o selbox.o stripstring.o color.o misc.o ui.o exec.o diff.o config.o cmdline.o globals.o history.o clipboard.o
+OBJS:=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o selbox.o stripstring.o color.o misc.o ui.o exec.o diff.o config.o cmdline.o globals.o history.o clipboard.o
+DEPENDS:= $(OBJS:%.o=%.d)
 
+
+.PHONY: all check install uninstall clean distclean package
 all: multitail
+
+pcredemo: LDFLAGS+=-lpcre
 
 multitail: $(OBJS)
 	$(CC) $(OBJS) $(LDFLAGS) -o multitail
 
-multitail_ccmalloc: $(OBJS)
+ccmultitail: $(OBJS)
 	ccmalloc --no-wrapper $(CC) -Wall -W $(OBJS) $(LDFLAGS) -o ccmultitail
 
 install: multitail
@@ -43,9 +56,9 @@ install: multitail
 	### COPIED multitail.conf.new, YOU NEED TO REPLACE THE multitail.conf
 	### YOURSELF WITH THE NEW FILE
 	#
-	mkdir -p $(DESTDIR)/etc/multitail/
+	mkdir -p $(DESTDIR)$(PREFIX)/etc/multitail/
 	cp multitail.conf $(CONFIG_FILE).new
-	cp conversion-scripts/* $(DESTDIR)/etc/multitail/
+	cp conversion-scripts/* $(DESTDIR)$(PREFIX)/etc/multitail/
 #rm -f $(DESTDIR)$(PREFIX)/share/man/man1/multitail.1.gz
 #gzip -9 $(DESTDIR)$(PREFIX)/share/man/man1/multitail.1
 	#
@@ -66,7 +79,7 @@ uninstall: clean
 	rm -rf $(DESTDIR)$(PREFIX)/share/doc/multitail-$(VERSION)
 
 clean:
-	rm -f $(OBJS) multitail core gmon.out *.da ccmultitail
+	rm -f $(OBJS) multitail core gmon.out *.da ccmultitail pcredemo
 
 package: clean
 	# source package
@@ -85,11 +98,14 @@ thanks:
 	echo
 	echo Oh, blatant plug: http://keetweej.vanheusden.com/wishlist.html
 
+### cppcheck: unusedFunction check can't be used with '-j' option. Disabling unusedFunction check.
 check:
-	cppcheck -v --force -j 3 --enable=all --inconclusive -I. . 2> err.txt
-	#
+	#XXX TBD to use cppechk --check-config $(CPPFLAGS) -I/usr/include
+	cppcheck --std=c99 --verbose --force --enable=all --inconclusive --template=gcc \
+		'--suppress=variableScope' --xml --xml-version=2 . 2> cppcheck.xml
+	cppcheck-htmlreport --file=cppcheck.xml --report-dir=cppcheck
 	make clean
-	scan-build make
+	-scan-build make
 
 coverity:
 	make clean
@@ -98,3 +114,12 @@ coverity:
 	tar vczf ~/site/coverity/multitail.tgz README cov-int/
 	putsite -q
 	/home/folkert/.coverity-mt.sh
+
+distclean: clean
+	rm -rf cov-int cppcheck cppcheck.xml *.d *~ tags
+
+# include dependency files for any other rule:
+ifneq ($(filter-out clean distclean,$(MAKECMDGOALS)),)
+-include $(DEPENDS)
+endif
+

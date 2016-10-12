@@ -1,3 +1,6 @@
+# dependency files
+*.d
+
 # Object files
 *.o
 *.ko
@@ -24,3 +27,6 @@
 
 # Ignore the built binary
 multitail
+ccmultitail
+cppcheck
+cppcheck.xml
