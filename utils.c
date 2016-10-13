@@ -434,9 +434,8 @@ char * shorten_filename(char *in, int max_len)
 double get_ts(void)
 {
 	struct timeval ts;
-	struct timezone tz;
 
-	if (gettimeofday(&ts, &tz) == -1)
+	if (gettimeofday(&ts, NULL) == -1)
 		error_exit(TRUE, FALSE, "gettimeofday() failed");
 
 	return (((double)ts.tv_sec) + ((double)ts.tv_usec)/1000000.0);
