@@ -34,9 +34,9 @@
 /* syslog receive */
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <netdb.h>
 #ifdef UTF8_SUPPORT
 #include <wchar.h>
 #include <wctype.h>
@@ -3214,8 +3214,6 @@ char process_input_data(int win_nr, proginfo *cur, char *data_in, int new_data_o
 
 	if (strchr(&data_in[new_data_offset], '\n'))
 	{
-		char emitted = 0;
-
 		if (cur -> cont) /* reconnect lines with '\' */
 		{
 			char *contsearch = pnt;
@@ -3225,6 +3223,16 @@ char process_input_data(int win_nr, proginfo *cur, char *data_in, int new_data_o
 				memmove(contsearch, contsearch + 2, strlen(contsearch + 2) + 1);
 			}
 		}
+
+		if (cur -> restart.is_restarted && cur -> restart.restart_clear)
+		{
+delete_be_in_buffer(&lb[win_nr]);
+			cur -> restart.is_restarted = 0;
+			werase(pi[win_nr].data -> win);
+		}
+
+		update_panels();
+
 
 		/* display lines */
 		for(;*pnt;)
@@ -3275,20 +3283,6 @@ char process_input_data(int win_nr, proginfo *cur, char *data_in, int new_data_o
 
 				statusline_update_needed |= emit_to_buffer_and_term(win_nr, cur, pnt);
 			}
-
-			if (!emitted)
-			{
-				emitted = 1;
-
-				if (cur -> restart.is_restarted && cur -> restart.restart_clear)
-				{
-					cur -> restart.is_restarted = 0;
-					werase(pi[win_nr].data -> win);
-				}
-
-				update_panels();
-			}
-
 			pnt = end + 1;
 		}
 	}

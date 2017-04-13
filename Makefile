@@ -10,7 +10,7 @@ PREFIX=/opt/local
 CONFIG_FILE=$(DESTDIR)$(PREFIX)/etc/multitail.conf
 
 CC?=gcc
-CFLAGS+=--std=c99 -Wall -Wextra -Wno-unused-parameter -funsigned-char -O3
+CFLAGS+=-Wall -Wextra -Wno-unused-parameter -funsigned-char -O3
 CPPFLAGS+=-I$(PREFIX)/include -D$(PLATFORM) -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\" -D_FORTIFY_SOURCE=2
 
 # build dependency files while compile (*.d)
