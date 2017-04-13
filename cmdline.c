@@ -304,13 +304,14 @@ int argv_add_re(char *mode, char *pars[], char invert_regex, re **pre_cur, int *
 	return n_pars_used;
 }
 
-int argv_color_settings(char *mode, char *pars[], char *allcolor, char *curcolor, int *field_index, char **field_delimiter, myattr_t *cdef, term_t *cur_term_emul, int_array_t *cur_color_schemes, myattr_t *alt_col_cdev1, myattr_t *alt_col_cdev2)
+int argv_color_settings(char *mode, char *pars[], char *allcolor, char *curcolor, int *field_index, char **field_delimiter, myattr_t *cdef, term_t *cur_term_emul, int_array_t *cur_color_schemes, myattr_t *alt_col_cdev1, myattr_t *alt_col_cdev2, char *doall)
 {
 	int n_pars_used = 0;
-	char cur_mode = mode[2], doall = 0;
+	char cur_mode = mode[2];
 
+	*doall = 0;
 	if (mode[1] == 'C')
-		doall = 1;
+		*doall = 1;
 
 	if (cur_mode == 's')	/* syslog-file coloring? */
 	{
@@ -368,7 +369,7 @@ int argv_color_settings(char *mode, char *pars[], char *allcolor, char *curcolor
 		error_exit(FALSE, FALSE, "Invalid -c mode: '%c'.\n", cur_mode);
 	}
 
-	if (doall)
+	if (*doall)
 	{
 		*allcolor = cur_mode;
 		*curcolor = 'n';
@@ -494,7 +495,7 @@ void do_commandline(int argc, char *argv[])
 	char no_marker_of_other_window = 0;
 	char bufferwhat = -1;
 	int cur_beep_interval = -1;
-
+	char doallterm = 0;
 	char do_add_timestamp = 0;
 	int_array_t conversions = { NULL, 0, 0 };
 
@@ -777,7 +778,7 @@ void do_commandline(int argc, char *argv[])
 		}
 		else if (argv[loop][0] == '-' && toupper(argv[loop][1]) == 'C')
 		{
-			loop += argv_color_settings(argv[loop], &argv[loop + 1], &allcolor, &curcolor, &field_index, &field_delimiter, &cdef, &cur_term_emul, &cur_color_schemes, &alt_col_cdev1, &alt_col_cdev2);
+			loop += argv_color_settings(argv[loop], &argv[loop + 1], &allcolor, &curcolor, &field_index, &field_delimiter, &cdef, &cur_term_emul, &cur_color_schemes, &alt_col_cdev1, &alt_col_cdev2, &doallterm);
 		}
 		else if (strcmp(argv[loop], "-f") == 0)
 		{
@@ -1069,7 +1070,8 @@ void do_commandline(int argc, char *argv[])
 				loop++;
 
 			cur -> cdef.term_emul = cur_term_emul;
-			cur_term_emul = TERM_IGNORE;
+			if (doallterm == 0)
+				cur_term_emul = TERM_IGNORE;
 
 			/* redirect input also to a file or pipe */
 			cur -> n_redirect = n_redirect;
