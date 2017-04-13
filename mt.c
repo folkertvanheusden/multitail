@@ -3098,6 +3098,8 @@ int check_paths(void)
 			} /* check all matched files */
 
 			cdg[loop].last_check = now;
+
+			globfree(&files);
 		} /* time for a check? */
 	} /* check all search patterns  */
 
