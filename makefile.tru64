@@ -5,7 +5,7 @@ CONFIG_FILE=$(DESTDIR)/etc/multitail.conf
 LDFLAGS=-lutil -lm -lpanel -lncurses
 CFLAGS=-Ae -DOSF1 -O -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\"
 
-OBJS=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o selbox.o stripstring.o color.o misc.o ui.o exec.o diff.o config.o cmdline.o globals.o history.o
+OBJS=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o selbox.o stripstring.o color.o misc.o ui.o exec.o diff.o config.o cmdline.o globals.o history.o clipboard.o
 
 all: multitail
 

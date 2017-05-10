@@ -8,7 +8,7 @@ DEBUG=#-g -D_DEBUG #-pg #-fprofile-arcs
 CFLAGS=${EXTRA_CFLAGS} -O2 -I/usr/local/include/ -DVERSION=\"$(VERSION)\" $(DEBUG) -DCONFIG_FILE=\"$(CONFIG_FILE)\"
 LDFLAGS=${EXTRA_LDFLAGS} -L/usr/local/lib/ -lsocket -lpanel -lncurses -lnsl -lm $(DEBUG)
 
-OBJS=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o color.o stripstring.o selbox.o misc.o ui.o exec.o diff.o config.o cmdline.o globals.o history.o
+OBJS=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o color.o stripstring.o selbox.o misc.o ui.o exec.o diff.o config.o cmdline.o globals.o history.o clipboard.o
 
 all: multitail
 
