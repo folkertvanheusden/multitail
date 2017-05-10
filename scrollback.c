@@ -265,7 +265,7 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 	int nlines, ncols;
 	compute_text_dimensions(&nlines, &ncols, fullscreen);
 
-	int offset = max(0, pbuf -> curpos - nlines); // FIXME: aantal regels laten afhangen van lengte
+	int offset = max(0, pbuf -> curpos - nlines); /* FIXME: aantal regels laten afhangen van lengte */
 	char redraw = 2;
 	int line_offset = 0;
 	char show_winnr = default_sb_showwinnr;
@@ -467,7 +467,7 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 					c == 'y' ||
 					c == 25  || /* ^y */
 					c == 'k' ||
-					/* c == 11  || *//* ^k */
+					/* c == 11  || */ /* ^k */
 					c == 16)    /* ^p */
 				&& (offset > 0 || (!no_linewrap && line_offset > 0)))
 		{
