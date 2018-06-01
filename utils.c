@@ -175,10 +175,10 @@ int mykillpg(pid_t pid, int sigtype)
 /** stop_process
  * - in:      int pid  pid of process
  * - returns: nothing
- * this function sends a TERM-signal to the given process, sleeps for 1009 microseconds
+ * this function sends a TERM-signal to the given process, sleeps for 1000 microseconds
  * and then sends a KILL-signal to the given process if it still exists. the TERM signal
- * is send so the process gets the possibility to gracefully exit. if it doesn't do that
- * in 100 microseconds, it is terminated
+ * is sent so the process gets the possibility to gracefully exit. if it doesn't do that
+ * in 1000 microseconds, it is terminated
  */
 void stop_process(pid_t pid)
 {
