@@ -201,15 +201,23 @@ void stop_process(pid_t pid)
 		/* ...and then really terminate the process */
 		if (mykillpg(pid, SIGKILL) == -1)
 		{
+#ifdef __APPLE__
 			/* don't exit if the error is EPERM: macOS doesn't allow
 			   you to kill a process that has been already killed
 			   (i.e. zombies), which is what we did with the second
 			   mykillpg above. */
 			if (errno != ESRCH && errno != EPERM)
+#else
+			if (errno != ESRCH)
+#endif
 				error_exit(TRUE, FALSE, "Problem stopping child process with PID %d (SIGKILL).\n", pid);
 		}
 	}
+#ifdef __APPLE__
 	else if (errno != ESRCH && errno != EPERM)
+#else
+	else if (errno != ESRCH)
+#endif
 	{
 		error_exit(TRUE, FALSE, "Problem stopping child process with PID %d (SIGTERM).\n", pid);
 	}
@@ -223,6 +231,7 @@ void stop_process(pid_t pid)
 			error_exit(TRUE, FALSE, "waitpid() failed\n");
 	}
 
+#ifdef __APPLE__
 	/* since we ignored the case of a EPERM error above,
 	   check if the process got stopped regardless or
 	   if we actually failed to stop it */
@@ -243,6 +252,7 @@ void stop_process(pid_t pid)
 
 	if (!process_gone)
 		error_exit(TRUE, FALSE, "Could not confirm that child process with PID %d has been stopped.\n", pid);
+#endif
 }
 
 /** delete_array
