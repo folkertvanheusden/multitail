@@ -201,12 +201,18 @@ void stop_process(pid_t pid)
 		/* ...and then really terminate the process */
 		if (mykillpg(pid, SIGKILL) == -1)
 		{
-			if (errno != ESRCH)
+			/* don't exit if the error is EPERM: macOS doesn't allow
+			   you to kill a process that has been already killed
+			   (i.e. zombies), which is what we did with the second
+			   mykillpg above. */
+			if (errno != ESRCH && errno != EPERM)
 				error_exit(TRUE, FALSE, "Problem stopping child process with PID %d (SIGKILL).\n", pid);
 		}
 	}
-	else if (errno != ESRCH)
+	else if (errno != ESRCH && errno != EPERM)
+	{
 		error_exit(TRUE, FALSE, "Problem stopping child process with PID %d (SIGTERM).\n", pid);
+	}
 
 	/* wait for the last remainder of the died process to go away,
 	 * otherwhise we'll find zombies on our way
@@ -216,6 +222,27 @@ void stop_process(pid_t pid)
 		if (errno != ECHILD)
 			error_exit(TRUE, FALSE, "waitpid() failed\n");
 	}
+
+	/* since we ignored the case of a EPERM error above,
+	   check if the process got stopped regardless or
+	   if we actually failed to stop it */
+	BOOL process_gone = FALSE;
+	for (int i = 0; i < 10; i++)
+	{
+		if (i != 0)
+			usleep(1000);
+		if (mykillpg(pid, 0) == -1)
+		{
+				if (errno == ESRCH)
+				{
+						process_gone = TRUE;
+						break;
+				}
+		}
+	}
+
+	if (!process_gone)
+		error_exit(TRUE, FALSE, "Could not confirm that child process with PID %d has been stopped.\n", pid);
 }
 
 /** delete_array
