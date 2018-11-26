@@ -184,11 +184,13 @@ void stop_process(pid_t pid)
 {
 	assert(pid > 1);
 
+#ifndef __APPLE__
 	if (mykillpg(pid, SIGTERM) == -1)
 	{
 		if (errno != ESRCH)
 			error_exit(TRUE, FALSE, "Problem stopping child process with PID %d (SIGTERM).\n", pid);
 	}
+#endif
 
 	usleep(1000);
 
