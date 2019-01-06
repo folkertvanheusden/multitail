@@ -20,11 +20,14 @@ add_definitions(-DCONFIG_FILE=\"/etc/multitail.conf\")
 add_definitions(-DVERSION=\"${VERSION}\")
 add_definitions(-D${CMAKE_C_PLATFORM_ID})
 
+set(CURSES_NEED_NCURSES TRUE)
+
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
     message(CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME})
     find_library(PANEL_LIBRARY panel)
 elseif(${UTF8_SUPPORT})
     find_library(PANEL_LIBRARY panelw)
+    set(CURSES_NEED_WIDE TRUE)
 else()
     find_library(PANEL_LIBRARY panel)
 endif()
@@ -40,7 +43,7 @@ endif()
 set(EXTRA_LIBS "-lutil -lm")
 
 ## if(CMAKE_COMPILER_IS_GNUCC)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --std=c99 -Wall -Wextra -Wno-unused-parameter")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --std=c99 -Wall -Wextra -Wno-unused-parameter -D_GNU_SOURCE")
 ## endif()
 
 #
