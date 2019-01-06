@@ -288,9 +288,8 @@ int argv_add_re(char *mode, char *pars[], char invert_regex, re **pre_cur, int *
 
 	/* wether to invert the reg exp or not */
 	if ((regex_mode == 'v' || regex_mode == 'm') && invert_regex)
-	{
 		error_exit(FALSE, FALSE, "-e[m] / -ev cannot be used together with -v\n");
-	}
+
 	(*pre)[*n_re].invert_regex = invert_regex;
 
 	/* what to execute (if...) */
@@ -611,7 +610,7 @@ void do_commandline(int argc, char *argv[])
 			char *prio, *fac, *addr;
 			char filtered;
 
-			// -U[af][as] <facil> <prio> host[:port]
+			/* -U[af][as] <facil> <prio> host[:port] */
 			if (argv[loop][2] != 'a' && argv[loop][2] != 'f')
 				error_exit(FALSE, FALSE, "-Ux where x needs to be either 'a' or 'f'");
 

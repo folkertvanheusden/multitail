@@ -1,6 +1,6 @@
 include version
 
-CONFIG_FILE=$(DESTDIR)/etc/multitail.conf
+CONFIG_FILE=$(DESTDIR)/usr/local/etc/multitail.conf
 
 DEBUG=#-g -D_DEBUG #-pg #-fprofile-arcs
 LDFLAGS=-lpanel -lncurses -lm $(DEBUG)
@@ -14,15 +14,15 @@ multitail: $(OBJS)
 	$(CC) -Wall -W $(OBJS) $(LDFLAGS) -o multitail
 
 install: multitail
-	cp multitail $(DESTDIR)/usr/bin
-	cp multitail.1 $(DESTDIR)/usr/share/man/man1/multitail.1
+	cp multitail $(DESTDIR)/usr/local/bin
+	cp multitail.1 $(DESTDIR)/usr/local/share/man/man1/multitail.1
 	#
 	### COPIED multitail.conf.new, YOU NEED TO REPLACE THE multitail.conf
 	### YOURSELF WITH THE NEW FILE
 	#
-	cp multitail.conf $(DESTDIR)/etc/multitail.conf.new
-	mkdir -p $(DESTDIR)/usr/share/doc/multitail-$(VERSION)
-	cp *.txt INSTALL manual.html $(DESTDIR)/usr/share/doc/multitail-$(VERSION)
+	cp multitail.conf $(DESTDIR)/usr/local/etc/multitail.conf.new
+	mkdir -p $(DESTDIR)/usr/local/share/doc/multitail-$(VERSION)
+	cp *.txt INSTALL manual.html $(DESTDIR)/usr/local/share/doc/multitail-$(VERSION)
 	#
 	# +-=-------------------------------------------------------------=-+
 	# | There's a mailinglist!                                          |
@@ -35,25 +35,12 @@ install: multitail
 	# http://www.vanheusden.com/wishlist.php
 
 uninstall: clean
-	rm -f $(DESTDIR)/usr/bin/multitail
-	rm -f $(DESTDIR)/usr/share/man/man1/multitail.1
-	rm -rf $(DESTDIR)/usr/share/doc/multitail-$(VERSION)
+	rm -f $(DESTDIR)/usr/local/bin/multitail
+	rm -f $(DESTDIR)/usr/local/share/man/man1/multitail.1
+	rm -rf $(DESTDIR)/usr/local/share/doc/multitail-$(VERSION)
 
 clean:
 	rm -f $(OBJS) multitail core
-
-macosxbinpackage: multitail
-	# as it is rather tricky to install something in /etc on MacOS X,
-	# we're skipping it here
-	rm -rf usr
-	mkdir -p usr/bin
-	mkdir -p usr/share/man/man1
-	mkdir -p usr/share/doc/multitail-$(VERSION)
-	cp multitail usr/bin
-	cp multitail.1 usr/share/man/man1
-	cp *.txt INSTALL manual.html usr/share/doc/multitail-$(VERSION)
-	tar cvzf multitail-$(VERSION)-macosx.tgz usr
-	rm -rf usr
 
 package: clean
 	# source package

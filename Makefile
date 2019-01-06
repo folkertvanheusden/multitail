@@ -10,7 +10,7 @@ PREFIX=/opt/local
 CONFIG_FILE=$(DESTDIR)$(PREFIX)/etc/multitail.conf
 
 CC?=gcc
-CFLAGS+=-Wall -Wextra -Wno-unused-parameter -funsigned-char -O3
+CFLAGS+=-Wall -Wextra -Wno-unused-parameter -funsigned-char -O3 -g
 CPPFLAGS+=-I$(PREFIX)/include -D$(PLATFORM) -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\" -D_FORTIFY_SOURCE=2
 
 # build dependency files while compile (*.d)
@@ -23,10 +23,10 @@ LDFLAGS+=-L$(PREFIX)/lib -lcurses -lpanel -lutil -lm
 CFLAGS+=-DUTF8_SUPPORT
 else
 ifeq ($(UTF8_SUPPORT),yes)
-LDFLAGS+=-lpanelw -lncursesw -lutil -lm
+LDFLAGS+=-lpanelw -lncursesw -lutil -lm -g
 CFLAGS+=-DUTF8_SUPPORT
 else
-LDFLAGS+=-lpanel -lncurses -lutil -lm
+LDFLAGS+=-lpanel -lncurses -lutil -lm -g
 endif
 endif
 
