@@ -457,6 +457,9 @@ char find_highlight_matches(regmatch_t *matches, char use_regex, int offset)
 {
 	int match_offset;
 
+	if (!matches)
+		return 0;
+
 	for(match_offset=0; match_offset<MAX_N_RE_MATCHES; match_offset++)
 	{
 		char matching;
