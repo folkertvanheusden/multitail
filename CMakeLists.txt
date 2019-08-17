@@ -1,7 +1,14 @@
-cmake_minimum_required(VERSION 3.6.1)
+cmake_minimum_required(VERSION 3.9)
+
+## use ccache if found
+find_program(CCACHE_EXECUTABLE "ccache" HINTS /usr/local/bin /opt/local/bin)
+if(CCACHE_EXECUTABLE AND NOT CMAKE_TOOLCHAIN_FILE)
+    message(STATUS "use ccache")
+    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_EXECUTABLE}" CACHE PATH "ccache" FORCE)
+endif()
 
 #=====================
-project(multitail C)
+project(multitail LANGUAGES C)
 set(VERSION VERSION=6.4.3)
 #=====================
 
@@ -12,20 +19,21 @@ set(VERSION VERSION=6.4.3)
 #
 
 option(UTF8_SUPPORT "Build with UTF8 support" on)
-option(CURSES_NEED_NCURSES "Build with ncurses" on)
 option(USE_CPPCHECK "Looking for cppcheck program ..." on)
+
+#XXX option(CURSES_NEED_NCURSES "Build with ncurses" on)
+set(CURSES_NEED_NCURSES TRUE)
 
 add_definitions(-D_FORTIFY_SOURCE=2)
 add_definitions(-DCONFIG_FILE=\"/etc/multitail.conf\")
 add_definitions(-DVERSION=\"${VERSION}\")
 add_definitions(-D${CMAKE_C_PLATFORM_ID})
 
-set(CURSES_NEED_NCURSES TRUE)
 
-if(${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
-    message(CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME})
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    message(STATUS "CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
     find_library(PANEL_LIBRARY panel)
-elseif(${UTF8_SUPPORT})
+elseif(UTF8_SUPPORT)
     find_library(PANEL_LIBRARY panelw)
     set(CURSES_NEED_WIDE TRUE)
 else()
@@ -42,9 +50,14 @@ if(UTF8_SUPPORT)
 endif()
 set(EXTRA_LIBS "-lutil -lm")
 
-## if(CMAKE_COMPILER_IS_GNUCC)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --std=c99 -Wall -Wextra -Wno-unused-parameter -D_GNU_SOURCE")
-## endif()
+if(UNIX)
+    if(CMAKE_C_COMPILER_ID MATCHES "(Apple)?[Cc]lang")
+        message(STATUS "CMAKE_C_COMPILER_ID=${CMAKE_C_COMPILER_ID}")
+    elseif(NOT CMAKE_COMPILER_IS_GNUC)
+        message(FATAL_ERROR "Compiler is not GNU gcc! Aborting...")
+    endif()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --std=gnu99 -Wall -Wextra -Wno-unused-parameter -D_GNU_SOURCE")
+endif()
 
 #
 # Where to put all the RUNTIME targets when built.  This variable is used to
@@ -121,11 +134,11 @@ install(DIRECTORY conversion-scripts DESTINATION ect/multitail)
 if(USE_CPPCHECK)
     find_program(CPPCHECK cppcheck)
     find_program(HTMLREPORT cppcheck-htmlreport)
-    if (CPPCHECK AND HTMLREPORT )
+    if(CPPCHECK AND HTMLREPORT)
         message(STATUS "cppchek found at '${CPPCHECK}'; you may use target 'check' to run it!")
         add_custom_target(check
             ${CPPCHECK} --std=c99 --verbose --force --enable=all --inconclusive --template=gcc
-        	--suppress=variableScope --xml --xml-version=2 . 2> cppcheck.xml
+            --suppress=variableScope --xml --xml-version=2 . 2> cppcheck.xml
             COMMAND ${HTMLREPORT} --file=cppcheck.xml --report-dir=cppcheck
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} VERBATIM)
     endif()
