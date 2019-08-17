@@ -46,7 +46,7 @@ void info(void)
 	{
 		line++;
 		mvwprintw(mywin -> win, line++, 2, "Running on:");
-#ifdef _GNU_SOURCE
+#if defined(_GNU_SOURCE) && !defined(__APPLE__)
 		mvwprintw(mywin -> win, line++, 2, "%s/%s %s %s", uinfo.nodename, uinfo.sysname, uinfo.machine, uinfo.domainname);
 #else
 		mvwprintw(mywin -> win, line++, 2, "%s/%s %s", uinfo.nodename, uinfo.sysname, uinfo.machine);
