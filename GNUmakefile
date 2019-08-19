@@ -22,7 +22,7 @@ checkAllHeader?='$(CURDIR)/.*'
 CHECKS?='-*,misc-*,boost-*,cert-*,-misc-unused-parameters'
 
 PROJECT:=$(shell basename $$PWD)
-CXX:=$(shell which clang++)
+C:=$(shell which clang)
 BUILD_TYPE?=Debug
 # GENERATOR:=Xcode
 GENERATOR?=Ninja
@@ -45,7 +45,7 @@ check: setup .configure compile_commands.json
 
 
 .configure: CMakeLists.txt
-	cd $(BUILD_DIR) && cmake -G $(GENERATOR) -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_COMPILER=${CXX} $(CURDIR)
+	cd $(BUILD_DIR) && cmake -G $(GENERATOR) -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_C_COMPILER=${C} $(CURDIR)
 	touch $@
 
 setup: $(BUILD_DIR) .clang-tidy compile_commands.json

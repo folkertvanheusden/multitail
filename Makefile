@@ -37,8 +37,6 @@ DEPENDS:= $(OBJS:%.o=%.d)
 .PHONY: all check install uninstall clean distclean package
 all: multitail
 
-pcredemo: LDFLAGS+=-lpcre
-
 multitail: $(OBJS)
 	$(CC) $(OBJS) $(LDFLAGS) -o multitail
 
@@ -79,7 +77,7 @@ uninstall: clean
 	rm -rf $(DESTDIR)$(PREFIX)/share/doc/multitail-$(VERSION)
 
 clean:
-	rm -f $(OBJS) multitail core gmon.out *.da ccmultitail pcredemo
+	rm -f $(OBJS) multitail core gmon.out *.da ccmultitail
 
 package: clean
 	# source package

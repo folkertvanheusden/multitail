@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.9)
 find_program(CCACHE_EXECUTABLE "ccache" HINTS /usr/local/bin /opt/local/bin)
 if(CCACHE_EXECUTABLE AND NOT CMAKE_TOOLCHAIN_FILE)
     message(STATUS "use ccache")
-    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_EXECUTABLE}" CACHE PATH "ccache" FORCE)
+    set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_EXECUTABLE}" CACHE PATH "ccache" FORCE)
 endif()
 
 #=====================
@@ -18,46 +18,62 @@ set(VERSION VERSION=6.4.3)
 #$ make DESTDIR=/tmp/multitail install
 #
 
-option(UTF8_SUPPORT "Build with UTF8 support" on)
-option(USE_CPPCHECK "Looking for cppcheck program ..." on)
+#---------------------------------------------------------------------------------------
+# Compiler config
+#---------------------------------------------------------------------------------------
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED OFF)
+set(CMAKE_C_EXTENSIONS ON)
 
-#XXX option(CURSES_NEED_NCURSES "Build with ncurses" on)
-set(CURSES_NEED_NCURSES TRUE)
+option(COMPILER_WARNINGS_ARE_ERRORS "To be pedantic! ;-)" OFF)
+if(COMPILER_WARNINGS_ARE_ERRORS)
+  if(MSVC)
+    # warning level 4 and all warnings as errors
+    add_compile_options(/W4 /WX)
+  else()
+    # lots of warnings and all warnings as errors
+    add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+  endif()
+endif()
+
+
+message(STATUS "CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    option(UTF8_SUPPORT "Build with UTF8 support" ON)
+endif()
+option(USE_CPPCHECK "Looking for cppcheck program ..." ON)
+
 
 add_definitions(-D_FORTIFY_SOURCE=2)
 add_definitions(-DCONFIG_FILE=\"/etc/multitail.conf\")
 add_definitions(-DVERSION=\"${VERSION}\")
 add_definitions(-D${CMAKE_C_PLATFORM_ID})
+message(STATUS "CMAKE_C_PLATFORM_ID=${CMAKE_C_PLATFORM_ID}")
 
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    message(STATUS "CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
-    find_library(PANEL_LIBRARY panel)
-elseif(UTF8_SUPPORT)
-    find_library(PANEL_LIBRARY panelw)
+# Set ``CURSES_NEED_WIDE`` to ``TRUE`` before the
+# ``find_package(Curses)`` call if unicode functionality is required.
+if(UTF8_SUPPORT)
     set(CURSES_NEED_WIDE TRUE)
+    find_library(PANEL_LIBRARY panelw REQUIRED)
+    add_definitions(-DUTF8_SUPPORT)
+    add_definitions(-DCURSES_NEED_WIDE)
 else()
-    find_library(PANEL_LIBRARY panel)
+    find_library(PANEL_LIBRARY panel REQUIRED)
 endif()
 
-find_package(Curses)
-if(${CURSES_FOUND})
+
+# Set ``CURSES_NEED_NCURSES`` to ``TRUE`` before the
+# ``find_package(Curses)`` call if NCurses functionality is required.
+set(CURSES_NEED_NCURSES TRUE)
+find_package(curses REQUIRED)
+if(CURSES_FOUND)
+    message(STATUS "CURSES_LIBRARIES=${CURSES_LIBRARIES}")
     include_directories(${CURSES_INCLUDE_DIRS})
 endif()
 
-if(UTF8_SUPPORT)
-    add_definitions(-DUTF8_SUPPORT)
-endif()
 set(EXTRA_LIBS "-lutil -lm")
 
-if(UNIX)
-    if(CMAKE_C_COMPILER_ID MATCHES "(Apple)?[Cc]lang")
-        message(STATUS "CMAKE_C_COMPILER_ID=${CMAKE_C_COMPILER_ID}")
-    elseif(NOT CMAKE_COMPILER_IS_GNUC)
-        message(FATAL_ERROR "Compiler is not GNU gcc! Aborting...")
-    endif()
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --std=gnu99 -Wall -Wextra -Wno-unused-parameter -D_GNU_SOURCE")
-endif()
 
 #
 # Where to put all the RUNTIME targets when built.  This variable is used to
@@ -116,6 +132,7 @@ add_executable(multitail
 )
 target_link_libraries(multitail ${CURSES_LIBRARIES} ${PANEL_LIBRARY} ${EXTRA_LIBS})
 
+
 # install the bin
 install(TARGETS multitail DESTINATION bin)
 # install the config file
@@ -127,7 +144,7 @@ install(FILES manual.html DESTINATION share/doc/multitail-${VERSION})
 install(FILES license.txt DESTINATION share/doc/multitail-${VERSION})
 install(FILES readme.txt DESTINATION share/doc/multitail-${VERSION})
 install(FILES thanks.txt DESTINATION share/doc/multitail-${VERSION})
-#FIXME cp conversion-scripts/* etc/multitail/
+# cp conversion-scripts/* etc/multitail/
 install(DIRECTORY conversion-scripts DESTINATION ect/multitail)
 
 
