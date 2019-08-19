@@ -18,11 +18,29 @@ set(VERSION VERSION=6.4.3)
 #$ make DESTDIR=/tmp/multitail install
 #
 
-option(UTF8_SUPPORT "Build with UTF8 support" on)
-option(USE_CPPCHECK "Looking for cppcheck program ..." on)
+#---------------------------------------------------------------------------------------
+# Compiler config
+#---------------------------------------------------------------------------------------
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED OFF)
+set(CMAKE_C_EXTENSIONS ON)
+
+option(COMPILER_WARNINGS_ARE_ERRORS "To be pedantic! ;-)" OFF)
+if(COMPILER_WARNINGS_ARE_ERRORS)
+  if(MSVC)
+    # warning level 4 and all warnings as errors
+    add_compile_options(/W4 /WX)
+  else()
+    # lots of warnings and all warnings as errors
+    add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+  endif()
+endif()
+
+option(UTF8_SUPPORT "Build with UTF8 support" ON)
+option(USE_CPPCHECK "Looking for cppcheck program ..." ON)
 
 #XXX option(CURSES_NEED_NCURSES "Build with ncurses" on)
-set(CURSES_NEED_NCURSES TRUE)
+set(CURSES_NEED_NCURSES TRUE)   ###XXX where is this used? CK
 
 add_definitions(-D_FORTIFY_SOURCE=2)
 add_definitions(-DCONFIG_FILE=\"/etc/multitail.conf\")
@@ -32,15 +50,16 @@ add_definitions(-D${CMAKE_C_PLATFORM_ID})
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     message(STATUS "CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
-    find_library(PANEL_LIBRARY panel)
+    find_library(PANEL_LIBRARY panel REQUIRED)
 elseif(UTF8_SUPPORT)
-    find_library(PANEL_LIBRARY panelw)
-    set(CURSES_NEED_WIDE TRUE)
+    find_library(PANEL_LIBRARY panelw REQUIRED)
+    set(CURSES_NEED_WIDE TRUE)  ###XXX where is this used? CK
+    add_definitions(-DCURSES_NEED_WIDE)
 else()
-    find_library(PANEL_LIBRARY panel)
+    find_library(PANEL_LIBRARY panel REQUIRED)
 endif()
 
-find_package(Curses)
+find_package(Curses REQUIRED)
 if(${CURSES_FOUND})
     include_directories(${CURSES_INCLUDE_DIRS})
 endif()
@@ -50,14 +69,6 @@ if(UTF8_SUPPORT)
 endif()
 set(EXTRA_LIBS "-lutil -lm")
 
-if(UNIX)
-    if(CMAKE_C_COMPILER_ID MATCHES "(Apple)?[Cc]lang")
-        message(STATUS "CMAKE_C_COMPILER_ID=${CMAKE_C_COMPILER_ID}")
-    elseif(NOT CMAKE_COMPILER_IS_GNUC)
-        message(FATAL_ERROR "Compiler is not GNU gcc! Aborting...")
-    endif()
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --std=gnu99 -Wall -Wextra -Wno-unused-parameter -D_GNU_SOURCE")
-endif()
 
 #
 # Where to put all the RUNTIME targets when built.  This variable is used to
