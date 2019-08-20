@@ -32,7 +32,9 @@ if(COMPILER_WARNINGS_ARE_ERRORS)
     add_compile_options(/W4 /WX)
   else()
     # lots of warnings and all warnings as errors
-    add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+    add_compile_options(-Wall -Wextra -Wpedantic -Werror -Wno-unused-parameter
+      -Wno-gnu-zero-variadic-macro-arguments -Wno-gnu-conditional-omitted-operand
+    )
   endif()
 endif()
 
@@ -57,7 +59,7 @@ if(UTF8_SUPPORT)
     set(CURSES_NEED_WIDE TRUE)
     find_library(PANEL_LIBRARY panelw REQUIRED)
     add_definitions(-DUTF8_SUPPORT)
-    add_definitions(-DCURSES_NEED_WIDE)
+    add_definitions(-DNCURSES_WIDECHAR)
 else()
     find_library(PANEL_LIBRARY panel REQUIRED)
 endif()
@@ -66,7 +68,7 @@ endif()
 # Set ``CURSES_NEED_NCURSES`` to ``TRUE`` before the
 # ``find_package(Curses)`` call if NCurses functionality is required.
 set(CURSES_NEED_NCURSES TRUE)
-find_package(curses REQUIRED)
+find_package(Curses REQUIRED)
 if(CURSES_FOUND)
     message(STATUS "CURSES_LIBRARIES=${CURSES_LIBRARIES}")
     include_directories(${CURSES_INCLUDE_DIRS})

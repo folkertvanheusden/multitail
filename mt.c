@@ -38,7 +38,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #ifdef UTF8_SUPPORT
-//FIXME #include <ncurses.h>
 #include <wchar.h>
 #include <wctype.h>
 #endif
@@ -703,8 +702,8 @@ void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end,
 		if (!is_control_or_extended_ascii)
 		{
 #if defined(UTF8_SUPPORT) && defined(NCURSES_WIDECHAR)
-// FIXME warning: implicit declaration of function ‘waddnwstr’; did you mean ‘waddnstr’? [-Wimplicit-function-declaration]
-// see /usr/include/curses.h
+// FIXME warning: implicit declaration of function ‘waddnwstr’ is invalid in C99  [-Wimplicit-function-declaration]
+// see /usr/include/ncurses.h
 			waddnwstr(win -> win, &wcur, 1);
 #else
 			wprintw(win -> win, "%c", wcur);
