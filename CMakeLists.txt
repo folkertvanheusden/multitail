@@ -25,7 +25,7 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED OFF)
 set(CMAKE_C_EXTENSIONS ON)
 
-option(COMPILER_WARNINGS_ARE_ERRORS "To be pedantic! ;-)" OFF)
+option(COMPILER_WARNINGS_ARE_ERRORS "To be pedantic! ;-)" ON)
 if(COMPILER_WARNINGS_ARE_ERRORS)
   if(MSVC)
     # warning level 4 and all warnings as errors
@@ -34,6 +34,7 @@ if(COMPILER_WARNINGS_ARE_ERRORS)
     # lots of warnings and all warnings as errors
     add_compile_options(-Wall -Wextra -Wpedantic -Werror -Wno-unused-parameter
       -Wno-gnu-zero-variadic-macro-arguments -Wno-gnu-conditional-omitted-operand
+      -Wno-sign-compare # FIXME!
     )
   endif()
 endif()
@@ -63,11 +64,13 @@ if(UTF8_SUPPORT)
 else()
     find_library(PANEL_LIBRARY panel REQUIRED)
 endif()
+message(STATUS "PANEL_LIBRARY=${PANEL_LIBRARY}")
 
 
 # Set ``CURSES_NEED_NCURSES`` to ``TRUE`` before the
 # ``find_package(Curses)`` call if NCurses functionality is required.
 set(CURSES_NEED_NCURSES TRUE)
+find_file(CURSES_INCLUDE_FILE ncurses.h)
 find_package(Curses REQUIRED)
 if(CURSES_FOUND)
     message(STATUS "CURSES_LIBRARIES=${CURSES_LIBRARIES}")

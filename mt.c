@@ -1353,7 +1353,6 @@ void update_statusline(NEWWIN *status, int win_nr, proginfo *cur)
 {
 	if (mode_statusline > 0 && status != NULL && cur != NULL)
 	{
-		int dx;
 		myattr_t attrs = statusline_attrs;
 		int statusline_len = 0;
 		off64_t	fsize = (off64_t)-1;

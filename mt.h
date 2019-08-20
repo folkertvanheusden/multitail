@@ -64,7 +64,7 @@ typedef enum { SCHEME_TYPE_EDIT = 0, SCHEME_TYPE_FILTER } filter_edit_scheme_t;
 	#include <ncursesw/ncurses.h>
 #else
 	#if defined(__APPLE__)
-        #include <curses.h>
+        #include <ncurses.h>
         #include <panel.h>
     #elif defined(sun) || defined(__sun) || defined(scoos) || defined(_HPUX_SOURCE) || defined(AIX) || defined(__CYGWIN__)
 		#include <ncurses/panel.h>
