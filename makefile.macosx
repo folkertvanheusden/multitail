@@ -2,12 +2,14 @@ include version
 
 CONFIG_FILE=$(DESTDIR)/usr/local/etc/multitail.conf
 
-DEBUG=#-g -D_DEBUG #-pg #-fprofile-arcs
+DEBUG:=#XXX -g -D_DEBUG #-pg -Wpedantic # -pg #-fprofile-arcs
 LDFLAGS=-lpanel -lm $(DEBUG)
 CPPFLAGS:=$(shell pkg-config --cflags ncurses)
 NCURSES_LIB:=$(shell pkg-config --libs ncurses)
-UNAME:=$(shell uname)
-CFLAGS=-O2 -Wall -Wextra -std=c99 -D$(UNAME) -DVERSION=\"$(VERSION)\" $(DEBUG) -DCONFIG_FILE=\"$(CONFIG_FILE)\"
+# pkg-config --libs --cflags ncurses
+# -D_DARWIN_C_SOURCE -I/opt/local/include -L/opt/local/lib -lncurses
+PLATFORM:=$(shell uname)
+CFLAGS=-O2 -Wall -Wextra -std=c99 -D$(PLATFORM) -DVERSION=\"$(VERSION)\" $(DEBUG) -DCONFIG_FILE=\"$(CONFIG_FILE)\"
 
 OBJS=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o selbox.o stripstring.o color.o misc.o ui.o exec.o diff.o config.o cmdline.o globals.o history.o clipboard.o
 

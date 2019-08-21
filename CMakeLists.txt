@@ -32,15 +32,15 @@ if(COMPILER_WARNINGS_ARE_ERRORS)
     add_compile_options(/W4 /WX)
   else()
     # lots of warnings and all warnings as errors
-    add_compile_options(-Wall -Wextra -Wpedantic -Werror -Wno-unused-parameter
+    add_compile_options(-Wall -Wextra -Wpedantic -Werror
       -Wno-gnu-zero-variadic-macro-arguments -Wno-gnu-conditional-omitted-operand
+      -Wno-unused-parameter # FIXME!
       -Wno-sign-compare # FIXME!
     )
   endif()
 endif()
 
 
-message(STATUS "CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     option(UTF8_SUPPORT "Build with UTF8 support" ON)
 endif()
@@ -73,7 +73,7 @@ set(CURSES_NEED_NCURSES TRUE)
 find_file(CURSES_INCLUDE_FILE ncurses.h)
 find_package(Curses REQUIRED)
 if(CURSES_FOUND)
-    message(STATUS "CURSES_LIBRARIES=${CURSES_LIBRARIES}")
+    message(STATUS "CURSES_NCURSES_LIBRARY=${CURSES_NCURSES_LIBRARY}")
     include_directories(${CURSES_INCLUDE_DIRS})
 endif()
 
@@ -157,11 +157,16 @@ if(USE_CPPCHECK)
     find_program(CPPCHECK cppcheck)
     find_program(HTMLREPORT cppcheck-htmlreport)
     if(CPPCHECK AND HTMLREPORT)
-        message(STATUS "cppchek found at '${CPPCHECK}'; you may use target 'check' to run it!")
-        add_custom_target(check
+        message(STATUS "cppchek found at '${CPPCHECK}'; you may use target 'cppcheck' to run it!")
+        add_custom_target(cppcheck
             ${CPPCHECK} --std=c99 --verbose --force --enable=all --inconclusive --template=gcc
             --suppress=variableScope --xml --xml-version=2 . 2> cppcheck.xml
             COMMAND ${HTMLREPORT} --file=cppcheck.xml --report-dir=cppcheck
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} VERBATIM)
     endif()
 endif()
+
+
+include(CMakePrintSystemInformation)
+message("CMAKE_C_LIBRARY_ARCHITECTURE ${CMAKE_C_LIBRARY_ARCHITECTURE}")
+
