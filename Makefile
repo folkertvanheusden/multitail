@@ -21,7 +21,7 @@ CPPFLAGS+= -MMD -MP
 
 
 ifeq ($(PLATFORM),Darwin)
-    LDFLAGS+=--lpanel $(NCURSES_LIB) -lutil -lm
+    LDFLAGS+=-lpanel $(NCURSES_LIB) -lutil -lm
 else
 ifeq ($(UTF8_SUPPORT),yes)
     LDFLAGS+=-lpanelw -lncursesw -lutil -lm
