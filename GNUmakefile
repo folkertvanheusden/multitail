@@ -6,7 +6,7 @@
 # Disable the built-in implicit rules.
 MAKEFLAGS+= --no-builtin-rules
 
-.PHONY: setup all test check format clean distclean
+.PHONY: setup all test check cppcheck install format clean distclean
 
 
 # see https://www.kdab.com/clang-tidy-part-1-modernize-source-code-using-c11c14/
@@ -22,22 +22,18 @@ checkAllHeader?='$(CURDIR)/.*'
 CHECKS?='-*,misc-*,boost-*,cert-*,-misc-unused-parameters'
 
 PROJECT:=$(shell basename $$PWD)
-C:=$(shell which clang)
+CC:=$(shell which clang)
 BUILD_TYPE?=Debug
 # GENERATOR:=Xcode
 GENERATOR?=Ninja
-BUILD_DIR:=../.build-$(PROJECT)-Debug
+BUILD_DIR:=../.build-$(PROJECT)-$(BUILD_TYPE)
 
 all: setup .configure
 	cmake --build $(BUILD_DIR)
-	# $(MAKE) -C $(BUILD_DIR) $@ --no-print-directory
-	## ninja -C $(BUILD_DIR) $@ -v
 
 test: all
 	cd $(BUILD_DIR) && ctest -C $(BUILD_TYPE) --rerun-failed --output-on-failure .
 	cd $(BUILD_DIR) && ctest -C $(BUILD_TYPE) .
-	# $(MAKE) -C $(BUILD_DIR) $@ --no-print-directory
-	## ninja -C $(BUILD_DIR) $@ -v
 
 check: setup .configure compile_commands.json
 	run-clang-tidy.py -header-filter=$(checkAllHeader) -checks=$(CHECKS) | tee run-clang-tidy.log 2>&1
@@ -45,7 +41,8 @@ check: setup .configure compile_commands.json
 
 
 .configure: CMakeLists.txt
-	cd $(BUILD_DIR) && cmake -G $(GENERATOR) -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_C_COMPILER=${C} $(CURDIR)
+	cd $(BUILD_DIR) && cmake -G $(GENERATOR) -Wdev -Wdeprecated \
+      -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_C_COMPILER=${CC} $(CURDIR)
 	touch $@
 
 setup: $(BUILD_DIR) .clang-tidy compile_commands.json
@@ -59,12 +56,16 @@ $(BUILD_DIR): GNUmakefile
 
 
 format: .clang-format
-	find . -type f -name '*.h' -o -name '*.c' -o -name '*.cpp' | xargs clang-format -style=file -i
+	find . -type f -name '*.h' -o -name '*.c' | xargs clang-format -style=file -i
+
+cppcheck: $(BUILD_DIR)
+	cmake --build $(BUILD_DIR) --target $@
+
+install: $(BUILD_DIR)
+	cmake --build $(BUILD_DIR) --target $@
 
 clean: $(BUILD_DIR)
 	cmake --build $(BUILD_DIR) --target $@
-	# $(MAKE) -C $(BUILD_DIR) $@ --no-print-directory
-	## ninja -C $(BUILD_DIR) $@
 
 distclean:
 	rm -rf $(BUILD_DIR) .configure compile_commands.json *~ .*~ tags

@@ -1,47 +1,49 @@
 include version
 
-PLATFORM=$(shell uname)
-NCURSES=$(pkg-config --libs --cflags ncurses)
-# -D_DARWIN_C_SOURCE -I/opt/local/include -L/opt/local/lib -lncurses
+PLATFORM:=$(shell uname)
+CPPFLAGS:=$(shell pkg-config --cflags ncurses)
+NCURSES_LIB:=$(shell pkg-config --libs ncurses)
+DEBUG:=#XXX -g -D_DEBUG ###-pg -Wpedantic ## -pg #-fprofile-arcs
+# pkg-config --libs --cflags ncurses
+# -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=600 -lncurses -ltinfo
 
-UTF8_SUPPORT=yes
+UTF8_SUPPORT:=yes
 DESTDIR=
-PREFIX=/opt/local
+PREFIX=/usr/local
 CONFIG_FILE=$(DESTDIR)$(PREFIX)/etc/multitail.conf
 
 CC?=gcc
-CFLAGS+=-Wall -Wextra -Wno-unused-parameter -funsigned-char -O3 -g
-CPPFLAGS+=-I$(PREFIX)/include -D$(PLATFORM) -DVERSION=\"$(VERSION)\" -DCONFIG_FILE=\"$(CONFIG_FILE)\" -D_FORTIFY_SOURCE=2
+CFLAGS+=-Wall -Wno-unused-parameter -funsigned-char -O3
+CPPFLAGS+=-D$(PLATFORM) -DVERSION=\"$(VERSION)\" $(DEBUG) -DCONFIG_FILE=\"$(CONFIG_FILE)\" -D_FORTIFY_SOURCE=2
 
 # build dependency files while compile (*.d)
 CPPFLAGS+= -MMD -MP
 
-DEBUG:=-g -D_DEBUG #-pg -W -pedantic # -pg #-fprofile-arcs
 
 ifeq ($(PLATFORM),Darwin)
-LDFLAGS+=-L$(PREFIX)/lib -lcurses -lpanel -lutil -lm
-CFLAGS+=-DUTF8_SUPPORT
+    LDFLAGS+=-lpanel $(NCURSES_LIB) -lutil -lm
 else
 ifeq ($(UTF8_SUPPORT),yes)
-LDFLAGS+=-lpanelw -lncursesw -lutil -lm -g
-CFLAGS+=-DUTF8_SUPPORT
+    LDFLAGS+=-lpanelw -lncursesw -lutil -lm
+    CPPFLAGS+=-DUTF8_SUPPORT
 else
-LDFLAGS+=-lpanel -lncurses -lutil -lm -g
+    LDFLAGS+=-lpanel -lncurses -lutil -lm
 endif
 endif
+
 
 OBJS:=utils.o mt.o error.o my_pty.o term.o scrollback.o help.o mem.o cv.o selbox.o stripstring.o color.o misc.o ui.o exec.o diff.o config.o cmdline.o globals.o history.o clipboard.o
 DEPENDS:= $(OBJS:%.o=%.d)
 
 
-.PHONY: all check install uninstall clean distclean package
+.PHONY: all check install uninstall coverity clean distclean package thanks
 all: multitail
 
 multitail: $(OBJS)
 	$(CC) $(OBJS) $(LDFLAGS) -o multitail
 
 ccmultitail: $(OBJS)
-	ccmalloc --no-wrapper $(CC) -Wall -W $(OBJS) $(LDFLAGS) -o ccmultitail
+	ccmalloc --no-wrapper -Wextra $(CC) $(OBJS) $(LDFLAGS) -o ccmultitail
 
 install: multitail
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
