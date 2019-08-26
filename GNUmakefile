@@ -22,7 +22,7 @@ checkAllHeader?='$(CURDIR)/.*'
 CHECKS?='-*,misc-*,boost-*,cert-*,-misc-unused-parameters'
 
 PROJECT:=$(shell basename $$PWD)
-CC:=$(shell which clang)
+# XXX CC:=$(shell which clang)
 BUILD_TYPE?=Debug
 # GENERATOR:=Xcode
 GENERATOR?=Ninja

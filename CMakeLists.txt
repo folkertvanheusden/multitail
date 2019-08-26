@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.6)
 
 ## use ccache if found
 find_program(CCACHE_EXECUTABLE "ccache" HINTS /usr/local/bin /opt/local/bin)
@@ -25,7 +25,7 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED OFF)
 set(CMAKE_C_EXTENSIONS ON)
 
-option(COMPILER_WARNINGS_ARE_ERRORS "To be pedantic! ;-)" ON)
+option(COMPILER_WARNINGS_ARE_ERRORS "To be pedantic! ;-)" OFF)
 if(COMPILER_WARNINGS_ARE_ERRORS)
   if(MSVC)
     # warning level 4 and all warnings as errors
@@ -33,7 +33,8 @@ if(COMPILER_WARNINGS_ARE_ERRORS)
   else()
     # lots of warnings and all warnings as errors
     add_compile_options(-Wall -Wextra -Wpedantic -Werror
-      -Wno-gnu-zero-variadic-macro-arguments -Wno-gnu-conditional-omitted-operand
+      # XXX -Wno-gnu-zero-variadic-macro-arguments
+      # XXX -Wno-gnu-conditional-omitted-operand
       -Wno-unused-parameter # FIXME!
       -Wno-sign-compare # FIXME!
     )
