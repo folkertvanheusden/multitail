@@ -52,6 +52,7 @@ void add_redir_to_proc(char mode, char *proc, redirect_t **predir, int *n_redire
 	assert(mode == 'G' || mode == 'g');
 
 	*predir = (redirect_t *)myrealloc(*predir, (*n_redirect + 1) * sizeof(redirect_t));
+	memset(&(*predir)[*n_redirect], 0x00, sizeof(redirect_t));
 
 	if ((*predir)[*n_redirect].type != REDIRECTTO_NONE) error_exit(FALSE, FALSE, "One can only set one redirection-type per (sub-)window.\n");
 
@@ -86,6 +87,7 @@ void add_redir_to_socket(char filtered, char *prio, char *fac, char *address, re
     int s, sfd = -1;
 
 	*predir = (redirect_t *)myrealloc(*predir, (*n_redirect + 1) * sizeof(redirect_t));
+	memset(&(*predir)[*n_redirect], 0x00, sizeof(redirect_t));
 
 	assert(filtered == 1 || filtered == 0);
 
