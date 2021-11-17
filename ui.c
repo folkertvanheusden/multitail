@@ -1085,7 +1085,7 @@ int toggle_colors(void)
 
 			dummy = mystrdup(cur -> filename);
 			dummy[min(strlen(dummy), 40)] = 0x00;
-			mvwprintw(mywin -> win, 3, 1, dummy);
+			mvwprintw(mywin -> win, 3, 1, "%s", dummy);
 
 			col = ask_colors(mywin, 4, cur -> cdef.colorize, &cur -> cdef.field_nr, &cur -> cdef.field_del, &cur -> cdef.color_schemes, &cur -> cdef.attributes, &cur -> cdef.term_emul);
 			if (col != (char)-1)
@@ -1164,7 +1164,7 @@ int edit_regexp(void)
 				char dummy[18];
 				strncpy(dummy, (cur -> pre)[loop].cmd, min(17, strlen((cur -> pre)[loop].cmd)));
 				dummy[17]=0x00;
-				mvwprintw(mywin -> win, 4 + loop, 42, dummy);
+				mvwprintw(mywin -> win, 4 + loop, 42, "%s", dummy);
 				wmove(mywin -> win, 4 + loop, 41);
 			}
 			if (loop == cur_re)

@@ -1486,14 +1486,8 @@ void update_statusline(NEWWIN *status, int win_nr, proginfo *cur)
 				else
 				{
 					cur_len = 13;
-					/* is this trick still neccessary as I moved from off_t to off64_t? */
-#if 0
-					/* this trick is because on MacOS X 'off_t' is specified as a 64 bit integer */
-#endif
-					if (sizeof(off64_t) == 8)
-						mvwprintw(status -> win, 0, win_width - (strlen(timestamp) + cur_len), "%10lld - %s", fsize, timestamp);
-					else
-						mvwprintw(status -> win, 0, win_width - (strlen(timestamp) + cur_len), "%10ld - %s", fsize, timestamp);
+					/* Accomodate for both 32-bit and 64-bit off_t. */
+					mvwprintw(status -> win, 0, win_width - (strlen(timestamp) + cur_len), "%10lld - %s", (long long)fsize, timestamp);
 				}
 
 				total_info_len = statusline_len + cur_len;
@@ -1770,7 +1764,7 @@ void create_windows(void)
 		menu_win = mynewwin(max_y, max_x, 0, 0);
 		werase(menu_win -> win);
 
-		wprintw(menu_win -> win, version_str);
+		wprintw(menu_win -> win, "%s", version_str);
 		wprintw(menu_win -> win, "\n\n");
 
 		wprintw(menu_win -> win, "%s\n", F1);
