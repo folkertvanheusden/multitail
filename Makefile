@@ -10,7 +10,20 @@ DEBUG:=#XXX -g -D_DEBUG ###-pg -Wpedantic ## -pg #-fprofile-arcs
 UTF8_SUPPORT:=yes
 DESTDIR=
 PREFIX=/usr/local
-CONFIG_FILE=$(DESTDIR)$(PREFIX)/etc/multitail.conf
+BINDIR=$(PREFIX)/bin
+SHAREDIR=$(PREFIX)/share
+MANDIR=$(SHAREDIR)/man
+MAN1DIR=$(MANDIR)/man1
+DOCDIR=$(SHAREDIR)/doc/multitail-$(VERSION)
+
+SYSCONFDIR=/etc
+CONFIG_FILE=$(SYSCONFDIR)/multitail.conf
+CONFIG_DIR=$(SYSCONFDIR)/multitail
+
+INSTALL = install
+INSTALL_DATA = $(INSTALL) -m 0644
+INSTALL_EXEC = $(INSTALL) -m 0755
+INSTALL_DIR = $(INSTALL) -m 0755 -d
 
 CC?=gcc
 CFLAGS+=-Wall -Wno-unused-parameter -funsigned-char -O3
@@ -46,21 +59,21 @@ ccmultitail: $(OBJS)
 	ccmalloc --no-wrapper -Wextra $(CC) $(OBJS) $(LDFLAGS) -o ccmultitail
 
 install: multitail
-	mkdir -p $(DESTDIR)$(PREFIX)/bin
-	cp multitail $(DESTDIR)$(PREFIX)/bin
-	mkdir -p $(DESTDIR)$(PREFIX)/share/man/man1
-	cp multitail.1 $(DESTDIR)$(PREFIX)/share/man/man1/multitail.1
-	mkdir -p $(DESTDIR)$(PREFIX)/share/doc/multitail-$(VERSION)
-	cp *.txt INSTALL manual*.html $(DESTDIR)$(PREFIX)/share/doc/multitail-$(VERSION)
+	$(INSTALL_DIR) $(DESTDIR)$(BINDIR)
+	$(INSTALL_DIR) $(DESTDIR)$(MAN1DIR)
+	$(INSTALL_DIR) $(DESTDIR)$(DOCDIR)
+	$(INSTALL_EXEC) multitail $(DESTDIR)$(BINDIR)
+	$(INSTALL_DATA) multitail.1 $(DESTDIR)$(MAN1DIR)/multitail.1
+	$(INSTALL_DATA) *.txt INSTALL manual*.html $(DESTDIR)$(DOCDIR)
 	#
 	### COPIED multitail.conf.new, YOU NEED TO REPLACE THE multitail.conf
 	### YOURSELF WITH THE NEW FILE
 	#
-	mkdir -p $(DESTDIR)$(PREFIX)/etc/multitail/
-	cp multitail.conf $(CONFIG_FILE).new
-	cp conversion-scripts/* $(DESTDIR)$(PREFIX)/etc/multitail/
-#rm -f $(DESTDIR)$(PREFIX)/share/man/man1/multitail.1.gz
-#gzip -9 $(DESTDIR)$(PREFIX)/share/man/man1/multitail.1
+	$(INSTALL_DIR) $(DESTDIR)$(CONFIG_DIR)
+	$(INSTALL_DATA) multitail.conf $(DESTDIR)$(CONFIG_FILE).new
+	$(INSTALL_EXEC) conversion-scripts/* $(DESTDIR)$(CONFIG_DIR)
+#rm -f $(DESTDIR)$(MAN1DIR)/multitail.1.gz
+#gzip -9 $(DESTDIR)$(MAN1DIR)/multitail.1
 	#
 	# There's a mailinglist!
 	# Send an e-mail to minimalist@vanheusden.com with in the subject
@@ -73,10 +86,11 @@ install: multitail
 	# update the examples page.
 
 uninstall: clean
-	rm -f $(DESTDIR)$(PREFIX)/bin/multitail
-	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/multitail.1.gz
-#	rm -f $(CONFIG_FILE)
-	rm -rf $(DESTDIR)$(PREFIX)/share/doc/multitail-$(VERSION)
+	rm -f $(DESTDIR)$(BINDIR)/multitail
+	rm -f $(DESTDIR)$(MAN1DIR)/multitail.1
+#	rm -f $(DESTDIR)$(CONFIG_FILE)
+	rm -rf $(DESTDIR)$(CONFIG_DIR)
+	rm -rf $(DESTDIR)$(DOCDIR)
 
 clean:
 	rm -f $(OBJS) multitail core gmon.out *.da ccmultitail
