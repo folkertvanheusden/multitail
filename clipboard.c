@@ -1,7 +1,3 @@
-/* GPLv2 applies
- * SVN revision: $Revision$
- * (C) 2006-2019 by folkert@vanheusden.com
- */
 #define _LARGEFILE64_SOURCE
 #include <fcntl.h>
 #include <netinet/in.h>
