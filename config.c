@@ -855,7 +855,7 @@ void set_pbcopy(int linenr, char *cmd, char *par)
 
 void set_map_delete_as_backspace(int linenr, char *cmd, char *par)
 {
-	map_delete_as_backspace = config_yes_no(par);	
+	map_delete_as_backspace = config_yes_no(par);
 }
 
 void set_searchhistory_file(int linenr, char *cmd, char *par)
@@ -1255,15 +1255,18 @@ void load_configfile_wrapper(char *config_file)
 	{
 		int path_max = find_path_max();
 		char *path = mymalloc(path_max + 1);
+		char *xdg_config = getenv("XDG_CONFIG_HOME");
 		char *home = getenv("HOME");
 		struct passwd *pp = getuserinfo();
 
-		if (home)
+		if (xdg_config)
+			snprintf(path, path_max, "%s/multitail/config", xdg_config);
+		else if (home)
 			snprintf(path, path_max, "%s/.multitailrc", home);
 		else if (pp)
 			snprintf(path, path_max, "%s/.multitailrc", pp -> pw_dir);
 
-		if (pp || home)
+		if (xdg_config || home || pp)
 			do_load_config(-1, NULL, path);
 
 		myfree(path);
