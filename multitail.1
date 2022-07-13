@@ -342,6 +342,29 @@ Same as previous example. This example will store all logged entries in a buffer
 .BI "b"
  ').
 
+.SH FILES
+.TP
+.B "${XDG_CONFIG_HOME}/multitail/config"
+If
+.BI "${XDG_CONFIG_HOME}"
+is defined.
+.TP
+.B "${HOME}/.multitailrc"
+If
+.BI "${HOME}"
+is defined.
+.TP
+.B "~/.multitailrc"
+When either
+.BI "${XDG_CONFIG_HOME}"
+nor
+.BI "${HOME}"
+is defined, which will use
+.BI "(struct passwd*)pp->pw_dir"
+from the
+.BI "pwd.h"
+standard header.
+
 .SH BUGS
 As this program grew larger and larger over the time with new functionality sometimes added ad-hoc, some bugs may have been introduced. Please notify folkert@vanheusden.com if you find any.
 .PP
@@ -355,6 +378,6 @@ version 5.3 might help in that case.
 .SH NOTES
 This page describes
 .B MultiTail
-as found in the multitail-4.3.1 package; other versions may differ slightly.
+as found in the installed multitail package; other versions may differ slightly.
 Mail corrections and additions to folkert@vanheusden.com.
 Report bugs in the program to folkert@vanheusden.com.
