@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #define _LARGEFILE64_SOURCE	/* required for GLIBC to enable stat64 and friends */
 #include <ctype.h>
 #include <sys/types.h>
@@ -749,6 +750,29 @@ void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end,
 	myfree(ww);
 }
 
+char *escape(const char *what, const proginfo *const cur)
+{
+	char *temp = strdup(what);
+
+	for(;;) {
+		char *new_str = NULL;
+		char *p       = strstr(temp, "%f");
+
+		if (!p)
+			break;
+
+		*p = 0x00;
+
+		asprintf(&new_str, "%s%s%s", temp, cur -> filename, p + 2);
+
+		free(temp);
+
+		temp = new_str;
+	}
+
+	return temp;
+}
+
 void color_print(int f_index, NEWWIN *win, proginfo *cur, char *string, regmatch_t *matches, int matching_regex, mybool_t force_to_winwidth, int start_at_offset, int end_at_offset, double ts, char show_window_nr)
 {
 	char reverse = 0;
@@ -818,10 +842,13 @@ void color_print(int f_index, NEWWIN *win, proginfo *cur, char *string, regmatch
 	}
 
 	/* add a label */
-	LOG("Label\n");
 	if (cur -> label != NULL && (cur -> label)[0])
 	{
-		mx -= wprintw(win -> win, "%s", cur -> label);
+		char *temp = escape(cur -> label, cur);
+
+		mx -= wprintw(win -> win, "%s", temp);
+
+		free(temp);
 	}
 
 	if (mx <= 0) mx = 4;
