@@ -435,7 +435,7 @@ int argv_add_stripper(char *mode, char *pars[], strip_t **pstrip, int *n_strip)
 	return n_pars_used;
 }
 
-void add_glob_check(const char *check_glob, int check_interval, char merge, char new_only, const char *cs)
+void add_glob_check(const char *check_glob, int check_interval, char merge, char new_only, const char *cs, const char *label)
 {
 	cdg = (check_dir_glob *)myrealloc(cdg, sizeof(check_dir_glob) * (n_cdg + 1));
 
@@ -446,6 +446,8 @@ void add_glob_check(const char *check_glob, int check_interval, char merge, char
 	cdg[n_cdg].window_nr      = -1;
 	cdg[n_cdg].last_check     = (dtime_t)0.0;
 	cdg[n_cdg].color_scheme   = cs;
+	cdg[n_cdg].label          = label ? mystrdup(label) : NULL;
+
 	n_cdg++;
 }
 
@@ -1135,7 +1137,7 @@ void do_commandline(int argc, char *argv[])
 			if (default_color_scheme && find_colorscheme(default_color_scheme) == -1)
 				error_exit(FALSE, FALSE, "Color scheme '%s' is not known.\n", default_color_scheme);
 
-			add_glob_check(check_glob, check_interval, merge, new_only, default_color_scheme);
+			add_glob_check(check_glob, check_interval, merge, new_only, default_color_scheme, label);
 		}
 		else if (strcmp(argv[loop], "--mark-change") == 0)
 		{

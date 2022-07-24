@@ -752,7 +752,7 @@ void do_color_print(proginfo *cur, char *use_string, int prt_start, int prt_end,
 
 char *escape(const char *what, const proginfo *const cur)
 {
-	char *temp = strdup(what);
+	char *temp = strdup(what ? what : "");
 
 	for(;;) {
 		char *new_str = NULL;
@@ -3044,9 +3044,9 @@ void create_new_win(proginfo **cur, int *nr)
 
 int check_paths(void)
 {
-	int new_wins = 0;
-	int loop = 0;
-	dtime_t now = get_ts();
+	int     new_wins = 0;
+	int     loop     = 0;
+	dtime_t now      = get_ts();
 
 	for(loop=0; loop<n_cdg; loop++)
 	{
@@ -3077,8 +3077,8 @@ int check_paths(void)
 						((cdg[loop].new_only && last_mod >= mt_started) || !cdg[loop].new_only)
 				   )
 				{
-					proginfo *cur = NULL;
-					int win_nr = -1;
+					proginfo *cur    = NULL;
+					int       win_nr = -1;
 
 					/* create new structure containing all info and such */
 					if (!cdg[loop].in_one_window)
@@ -3104,8 +3104,9 @@ int check_paths(void)
 
 					/* fill in */
 					cur -> wt = WT_FILE;
-					cur -> filename = mystrdup(files.gl_pathv[fi]);
-					cur -> line_wrap = default_linewrap;
+					cur -> label      = mystrdup(cdg[loop].label ? cdg[loop].label : "");
+					cur -> filename   = mystrdup(files.gl_pathv[fi]);
+					cur -> line_wrap  = default_linewrap;
 					cur -> win_height = -1;
 					cur -> statistics.sccfirst = 1;
 					set_default_parameters_if_not_given_do(cur, win_nr);

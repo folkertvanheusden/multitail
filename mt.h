@@ -132,11 +132,13 @@ typedef struct
 
 typedef struct
 {
-	char *glob_str;
-	int check_interval;
-	dtime_t last_check;
+	char        *glob_str;
+	int          check_interval;
+	dtime_t      last_check;
 	time_field_t new_only;
-	const char *color_scheme;
+	const char  *color_scheme;
+
+	const char  *label;
 
 	char in_one_window;
 	int window_nr;	/* if 'in_one_window' is set, merge into the window 'window_nr' */
