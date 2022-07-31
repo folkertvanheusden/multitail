@@ -3103,7 +3103,7 @@ int check_paths(void)
 					}
 
 					/* fill in */
-					cur -> wt = WT_FILE;
+					cur -> wt         = WT_FILE;
 					cur -> label      = mystrdup(cdg[loop].label ? cdg[loop].label : "");
 					cur -> filename   = mystrdup(files.gl_pathv[fi]);
 					cur -> line_wrap  = default_linewrap;

@@ -1441,6 +1441,7 @@ void usage(void)
 	help_header("line prefixes");
 	format_help(NULL, "--basename", "only display the filename (and not the path) in the statusline");
 	format_help(NULL, "--label x", "put in front of each line");
+	format_help(NULL, "--all-label x", "put in front of each line for all following windows");
 	format_help("-S prepend", NULL, "show subwindow number in merged output");
 	fprintf(stderr, "\n");
 

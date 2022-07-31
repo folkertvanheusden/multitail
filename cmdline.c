@@ -501,6 +501,7 @@ void do_commandline(int argc, char *argv[])
 	char doallterm = 0;
 	char do_add_timestamp = 0;
 	int_array_t conversions = { NULL, 0, 0 };
+	char all_label = 0;
 
 	/* first, before we load the main configfile, see if we should load the global
 	 * file or not
@@ -815,6 +816,12 @@ void do_commandline(int argc, char *argv[])
 		else if (strcasecmp(argv[loop], "--label") == 0)
 		{
 			label = mystrdup(argv[++loop]);
+			all_label = 0;
+		}
+		else if (strcasecmp(argv[loop], "--all-label") == 0)
+		{
+			label = mystrdup(argv[++loop]);
+			all_label = 1;
 		}
 		else if (strcasecmp(argv[loop], "-i") == 0 || argv[loop][0] != '-' ||
 				strcasecmp(argv[loop], "-l") == 0 ||
@@ -1085,8 +1092,10 @@ void do_commandline(int argc, char *argv[])
 			cur -> beep.beep_interval = cur_beep_interval;
 			cur_beep_interval = -1;
 
-			cur -> label = label;
-			label = NULL;
+			cur -> label = label ? strdup(label) : NULL;
+
+			if (!all_label)
+				label = NULL;
 		}
 		else if (strcmp(argv[loop], "-du") == 0)
 		{
