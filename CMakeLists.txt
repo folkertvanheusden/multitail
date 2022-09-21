@@ -147,11 +147,11 @@ install(FILES multitail.conf DESTINATION etc RENAME multitail.conf.new)
 install(FILES multitail.1 DESTINATION share/man/man1)
 # install doc files
 install(FILES manual.html DESTINATION share/doc/multitail-${VERSION})
-install(FILES license.txt DESTINATION share/doc/multitail-${VERSION})
+install(FILES LICENSE DESTINATION share/doc/multitail-${VERSION})
 install(FILES readme.txt DESTINATION share/doc/multitail-${VERSION})
 install(FILES thanks.txt DESTINATION share/doc/multitail-${VERSION})
 # cp conversion-scripts/* etc/multitail/
-install(DIRECTORY conversion-scripts DESTINATION ect/multitail)
+install(DIRECTORY conversion-scripts DESTINATION etc/multitail)
 
 
 if(USE_CPPCHECK)
