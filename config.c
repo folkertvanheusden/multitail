@@ -4,6 +4,7 @@
 #include <regex.h>
 #include <string.h>
 #include <strings.h>
+#include <dirent.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1244,8 +1245,27 @@ void do_load_config(int dummynr, char *dummy, char *file)
 void load_configfile_wrapper(char *config_file)
 {
 	/* load configurationfile (if any) */
-	if (load_global_config)
+	if (load_global_config) {
+		DIR *dir = opendir("/etc/multitail/cfg.d");
+		int path_max = find_path_max();
+		char *path = mymalloc(path_max + 1);
+
 		do_load_config(-1, NULL, CONFIG_FILE);
+
+		for(;dir;) {
+			struct dirent *de = readdir(dir);
+			if (!de)
+				break;
+
+			snprintf(path, path_max, "/etc/multitail/cfg.d/%s", de->d_name);
+
+			do_load_config(-1, NULL, path);
+		}
+
+		free(path);
+
+		closedir(dir);
+	}
 
 	if (config_file)
 	{
