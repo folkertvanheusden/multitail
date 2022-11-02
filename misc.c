@@ -477,7 +477,7 @@ void heartbeat(void)
 	mydoupdate();
 }
 
-void do_check_for_mail()
+void do_check_for_mail(dtime_t time)
 {
 	if (check_for_mail > 0 && mail_spool_file != NULL)
 	{
