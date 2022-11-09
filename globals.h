@@ -19,7 +19,7 @@ extern int n_pars_per_file;
 extern char mail;
 extern int check_for_mail;
 extern char tab_width;
-extern dtime_t mt_started;
+extern time_t mt_started;
 extern int *vertical_split;
 extern int *n_win_per_col;
 extern proginfo *terminal_index;
