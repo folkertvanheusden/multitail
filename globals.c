@@ -81,7 +81,7 @@ double heartbeat_t = 0.0;
 off64_t msf_prev_size = 0;
 
 dtime_t msf_last_check = 0;
-dtime_t mt_started;
+time_t mt_started;
 
 pid_t children_list[MAX_N_SPAWNED_PROCESSES];
 pid_t tail_proc = 0;	/* process used by checker-proc */
