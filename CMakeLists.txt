@@ -9,7 +9,8 @@ endif()
 
 #=====================
 project(multitail LANGUAGES C)
-set(VERSION VERSION=6.4.3)
+# set VERSION using version file
+file (STRINGS "version" VERSION)
 #=====================
 
 # usage:
