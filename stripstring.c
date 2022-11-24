@@ -154,7 +154,7 @@ int edit_strippers(void)
 		memset(linebuf, ' ', sizeof(linebuf) - 1);
 		linebuf[sizeof(linebuf) - 1] = 0x00;
 		for(loop=4; loop<22; loop++)
-			mvwprintw(mywin -> win, loop, 1, linebuf);
+			mvwprintw(mywin -> win, loop, 1, "%s", linebuf);
 
 		/* display them lines */
 		for(loop=0; loop<cur -> n_strip; loop++)

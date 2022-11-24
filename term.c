@@ -159,7 +159,7 @@ char * edit_string(NEWWIN *win, int win_y, int win_x, int win_width, int max_wid
 		string[copy_len] = 0x00;
 
 		str_pos = dummy;
-		mvwprintw(win -> win, win_y, win_x, &string[dummy]);
+		mvwprintw(win -> win, win_y, win_x, "%s", &string[dummy]);
 		x = strlen(string) - dummy;
 	}
 	else
@@ -608,7 +608,7 @@ void escape_print(NEWWIN *win, int y, int x, char *str)
 void win_header(NEWWIN *win, char *str)
 {
 	wattron(win -> win, A_BOLD);
-	mvwprintw(win -> win, 1, 2, str);
+	mvwprintw(win -> win, 1, 2, "%s", str);
 	wattroff(win -> win, A_BOLD);
 }
 
