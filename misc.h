@@ -1,4 +1,4 @@
-#import "mt.h"
+#include "mt.h"
 
 void info(void);
 void statistics_menu(void);
