@@ -172,3 +172,5 @@ endif()
 include(CMakePrintSystemInformation)
 message("CMAKE_C_LIBRARY_ARCHITECTURE ${CMAKE_C_LIBRARY_ARCHITECTURE}")
 
+
+set(CMAKE_BUILD_TYPE RelWithDebInfo)

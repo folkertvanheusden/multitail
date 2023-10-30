@@ -1264,7 +1264,8 @@ void load_configfile_wrapper(char *config_file)
 
 		free(path);
 
-		closedir(dir);
+		if (dir)
+			closedir(dir);
 	}
 
 	if (config_file)
