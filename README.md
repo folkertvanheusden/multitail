@@ -2,7 +2,7 @@ What is it?
 -----------
 MultiTail allows you to monitor logfiles and command output in multiple windows in a terminal, colorize, filter and merge. http://vanheusden.com/multitail/
 
-Check http://www.vanheusden.com/multitail/ for new(er) versions.
+Check http://www.vanheusden.com/multitail/ for screenshots and more info.
 
 
 Help?
