@@ -51,6 +51,4 @@ License
 See the LICENSE file.
 
 
-For help, suggestions or anything else you can write to: folkert@vanheusden.com
-Please consider using PGP. Key-ID is: 1f28d8ae, this key is available on most
-public PGP key servers and also here: http://www.vanheusden.com/key.txt
+For suggestions, write to: mail@vanheusden.com
