@@ -10,7 +10,13 @@ endif()
 #=====================
 project(multitail LANGUAGES C)
 # set VERSION using version file
-file (STRINGS "version" VERSION)
+file (STRINGS "version" VERSION_CONTENT)
+if(VERSION_CONTENT MATCHES "VERSION=([0-9]+\\.[0-9]+\\.[0-9]+)")
+    set(VERSION "${CMAKE_MATCH_1}")
+    message(STATUS "Project version: ${VERSION}")
+else()
+    message(FATAL_ERROR "Unable to extract version from ./version")
+endif()
 #=====================
 
 # usage:
