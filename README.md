@@ -44,4 +44,4 @@ License
 See the LICENSE file.
 
 
-For suggestions, write to: mail@vanheusden.com
+For fixes, updates and tweaks please send a PR via github.
