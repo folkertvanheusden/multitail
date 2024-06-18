@@ -466,7 +466,7 @@ char *help_window_closed[] = {
 char *help_write_script[] = {
 		"This function writes a script to disk which will",
 		"start MultiTail in the same state it now is. This",
-		"is usefull in case you did a lot of configuring",
+		"is useful in case you did a lot of configuring",
 		"with the menu-interface, you then don't have to",
 		"find out what commandline switches to set.",
 		"Here you have to enter the filename for the script",
@@ -1405,7 +1405,7 @@ void usage(void)
 	format_help("-Cs", NULL, "colorize all following files with syslog-scheme");
 	format_help("-C", NULL, "colorize all following files");
 	format_help("-Cf/-cf field delimiter", NULL, "colorize next/all file(s) depending on the given field number. fields are delimited with the given field-delimiter");
-	format_help("-ci color", NULL, "use 'color' (red, green, etc), usefull when merging multiple inputs");
+	format_help("-ci color", NULL, "use 'color' (red, green, etc), useful when merging multiple inputs");
 	format_help("-c-", NULL, "do NOT colorize the following file");
 	format_help("-C-", NULL, "do NOT colorize the following files");
 	format_help("-cT term", NULL, "interpret terminal-codes from file/command (for terminal type 'term')");
