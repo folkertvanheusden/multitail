@@ -363,8 +363,6 @@ char * amount_to_str(long long int amount)
 {
 	char *out = mymalloc(AMOUNT_STR_LEN);	/* ...XB\0 */
 
-	assert(amount >= 0);
-
 	if (amount >= M_GB)	/* GB */
 		snprintf(out, AMOUNT_STR_LEN, "%dGB", (int)((amount + M_GB - 1) / M_GB));
 	else if (amount >= M_MB)	/* MB */
