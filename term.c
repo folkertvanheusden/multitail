@@ -16,7 +16,11 @@
 #include <stropts.h>
 #endif
 #ifndef AIX
+#if defined(__FreeBSD__)
+#include <termios.h>
+#else
 #include <sys/termios.h> /* needed on Solaris 8 */
+#endif
 #endif
 #include <sys/socket.h>
 #include <netinet/in.h>

@@ -16,7 +16,11 @@ MANDIR=$(SHAREDIR)/man
 MAN1DIR=$(MANDIR)/man1
 DOCDIR=$(SHAREDIR)/doc/multitail-$(VERSION)
 
-SYSCONFDIR=/etc
+ifeq ($(PLATFORM),FreeBSD)
+    SYSCONFDIR=$(PREFIX)/etc
+else
+    SYSCONFDIR=/etc
+endif
 CONFIG_FILE=$(SYSCONFDIR)/multitail.conf
 CONFIG_DIR=$(SYSCONFDIR)/multitail
 
