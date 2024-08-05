@@ -24,7 +24,11 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #ifndef AIX
+#if defined(__FreeBSD__)
+#include <termios.h>
+#else
 #include <sys/termios.h> /* needed on Solaris 8 */
+#endif
 #endif
 #include <sys/time.h>
 #include <sys/wait.h>

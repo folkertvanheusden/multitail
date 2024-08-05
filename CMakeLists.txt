@@ -52,11 +52,17 @@ endif()
 if(NOT CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     option(UTF8_SUPPORT "Build with UTF8 support" ON)
 endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+    set(CURSES_INCLUDE_PATH "/usr/include")
+    add_definitions(-DCONFIG_FILE=\"/usr/local/etc/multitail.conf\")
+else ()
+    add_definitions(-DCONFIG_FILE=\"/etc/multitail.conf\")
+endif()
 option(USE_CPPCHECK "Looking for cppcheck program ..." ON)
 
 
 add_definitions(-D_FORTIFY_SOURCE=2)
-add_definitions(-DCONFIG_FILE=\"/etc/multitail.conf\")
 add_definitions(-DVERSION=\"${VERSION}\")
 add_definitions(-D${CMAKE_C_PLATFORM_ID})
 message(STATUS "CMAKE_C_PLATFORM_ID=${CMAKE_C_PLATFORM_ID}")
