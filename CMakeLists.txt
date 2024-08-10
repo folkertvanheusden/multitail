@@ -53,12 +53,6 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     option(UTF8_SUPPORT "Build with UTF8 support" ON)
 endif()
 
-if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-    set(CURSES_INCLUDE_PATH "/usr/include")
-    add_definitions(-DCONFIG_FILE=\"/usr/local/etc/multitail.conf\")
-else ()
-    add_definitions(-DCONFIG_FILE=\"/etc/multitail.conf\")
-endif()
 option(USE_CPPCHECK "Looking for cppcheck program ..." ON)
 
 
@@ -79,26 +73,6 @@ else()
     find_library(PANEL_LIBRARY panel REQUIRED)
 endif()
 message(STATUS "PANEL_LIBRARY=${PANEL_LIBRARY}")
-
-
-# Set ``CURSES_NEED_NCURSES`` to ``TRUE`` before the
-# ``find_package(Curses)`` call if NCurses functionality is required.
-set(CURSES_NEED_NCURSES TRUE)
-find_file(CURSES_INCLUDE_FILE ncurses.h)
-find_package(Curses REQUIRED)
-if(CURSES_FOUND)
-    message(STATUS "CURSES_NCURSES_LIBRARY=${CURSES_NCURSES_LIBRARY}")
-    include_directories(${CURSES_INCLUDE_DIRS})
-endif()
-
-set(EXTRA_LIBS "-lutil -lm")
-
-
-#
-# Where to put all the RUNTIME targets when built.  This variable is used to
-# initialize the RUNTIME_OUTPUT_DIRECTORY property on all the targets.
-#
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
 
 # use the lib to build bin
@@ -149,7 +123,47 @@ add_executable(multitail
     utils.h
     version.h
 )
-target_link_libraries(multitail ${CURSES_LIBRARIES} ${PANEL_LIBRARY} ${EXTRA_LIBS})
+
+set(EXTRA_LIBS "-lutil -lm")
+
+if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+    set(CURSES_INCLUDE_PATH "/usr/include")
+    add_definitions(-DCONFIG_FILE=\"/usr/local/etc/multitail.conf\")
+    if (EXISTS "/usr/local/include/gnu/regex.h")
+        add_library(gnuregex SHARED IMPORTED)
+        set_target_properties(
+            gnuregex PROPERTIES
+            IMPORTED_LOCATION "/usr/local/lib/libgnuregex.so"
+            INTERFACE_INCLUDE_DIRECTORIES "/usr/local/include/gnu")
+    else()
+        message(FATAL_ERROR "/usr/local/include/gnu/regex.h missing, did you install libgnuregex?")
+    endif()
+else ()
+    add_definitions(-DCONFIG_FILE=\"/etc/multitail.conf\")
+endif()
+
+# Set ``CURSES_NEED_NCURSES`` to ``TRUE`` before the
+# ``find_package(Curses)`` call if NCurses functionality is required.
+set(CURSES_NEED_NCURSES TRUE)
+find_file(CURSES_INCLUDE_FILE ncurses.h)
+find_package(Curses REQUIRED)
+if(CURSES_FOUND)
+    message(STATUS "CURSES_NCURSES_LIBRARY=${CURSES_NCURSES_LIBRARY}")
+    include_directories(${CURSES_INCLUDE_DIRS})
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+    target_link_libraries(multitail gnuregex ${CURSES_LIBRARIES} ${PANEL_LIBRARY} ${EXTRA_LIBS})
+else()
+    target_link_libraries(multitail ${CURSES_LIBRARIES} ${PANEL_LIBRARY} ${EXTRA_LIBS})
+endif()
+
+#
+# Where to put all the RUNTIME targets when built.  This variable is used to
+# initialize the RUNTIME_OUTPUT_DIRECTORY property on all the targets.
+#
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+
 
 
 # install the bin
@@ -186,3 +200,5 @@ message("CMAKE_C_LIBRARY_ARCHITECTURE ${CMAKE_C_LIBRARY_ARCHITECTURE}")
 
 
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
+
+# vim: ft=cmake:sw=4:ts=4:smarttab:expandtab
