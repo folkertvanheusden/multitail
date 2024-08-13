@@ -170,7 +170,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
         message(STATUS "libpcreposix found")
         include_directories(${CURSES_INCLUDE_DIRS})
     else()
-        message(STATUS "libpcreposix NOT found")
+        message(FATAL_ERROR "libpcreposix NOT found")
     endif()
 endif()
 
