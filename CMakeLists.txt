@@ -158,6 +158,22 @@ else()
     target_link_libraries(multitail ${CURSES_LIBRARIES} ${PANEL_LIBRARY} ${EXTRA_LIBS})
 endif()
 
+if(CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
+    include(FindPkgConfig)
+
+    pkg_check_modules(PCREPOSIX REQUIRED libpcreposix)
+    target_link_libraries(multitail ${PCREPOSIX_LIBRARIES})
+    target_include_directories(multitail PUBLIC ${PCREPOSIX_INCLUDE_DIRS})
+    target_compile_options(multitail PUBLIC ${PCREPOSIX_CFLAGS_OTHER})
+
+    if(PCREPOSIX_FOUND)
+        message(STATUS "libpcreposix found")
+        include_directories(${CURSES_INCLUDE_DIRS})
+    else()
+        message(STATUS "libpcreposix NOT found")
+    endif()
+endif()
+
 #
 # Where to put all the RUNTIME targets when built.  This variable is used to
 # initialize the RUNTIME_OUTPUT_DIRECTORY property on all the targets.

@@ -15,6 +15,7 @@ How to compile
 By default multitail requires the ncursesw library (ncursesW!) to compile and run.
 You can choose to use the non-wide char version (ncurses) by setting UTF8_SUPPORT to "no"
 in the makefile. Note that this disables UTF8 support.
+On Cygwin, you need the libpcre-devel package.
 
 
 Tips
