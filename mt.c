@@ -850,7 +850,8 @@ void color_print(int f_index, NEWWIN *win, proginfo *cur, char *string, regmatch
 	{
 		char *temp = escape(cur -> label, cur);
 
-		mx -= wprintw(win -> win, "%s", temp);
+		wprintw(win -> win, "%s", temp);
+		mx -= strlen(temp);
 
 		free(temp);
 	}
