@@ -1,4 +1,4 @@
-First, too build type:
+First, to build the binary, using:
 make
 
 To install type (might need sudo):
