@@ -108,15 +108,20 @@ char *do_convert(char *what, int what_len, int type, script *pscript)
 			{
 				if (resolv_ip_addresses)
 				{
-					struct hostent *ht;
-					in_addr_t addr = inet_addr(what);
-					if ((int)addr == -1)
+					struct sockaddr_in sa;
+					char host[NI_MAXHOST];
+
+					memset(&sa, 0, sizeof(sa));
+					sa.sin_family = AF_INET;
+
+					if (inet_pton(AF_INET, what, &sa.sin_addr) != 1)
 						return mystrdup(what);
 
-					if ((ht = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET)) == NULL)
+					if (getnameinfo((struct sockaddr *)&sa, sizeof(sa),
+							host, sizeof(host), NULL, 0, NI_NAMEREQD) != 0)
 						return mystrdup(what);
 
-					return mystrdup(ht -> h_name);
+					return mystrdup(host);
 				}
 
 				return mystrdup(what);
