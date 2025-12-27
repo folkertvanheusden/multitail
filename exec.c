@@ -272,7 +272,7 @@ int start_proc(proginfo *cur, int initial_tail)
 	return -1;
 }
 
-int execute_program(char *execute, char bg)
+int execute_program_impl(char *execute, char bg, const char *match)
 {
 	int status;
 	pid_t child;
@@ -297,6 +297,14 @@ int execute_program(char *execute, char bg)
 
 		if (bg)
 			setup_for_childproc(open_null(), 1, "dumb");
+
+		/* If a match string is provided, set MULTITAIL_MATCH environment variable.
+		 * This is the safe way to pass matched text to shell commands,
+		 * avoiding shell injection vulnerabilities that occur with
+		 * string concatenation and quoting.
+		 */
+		if (match != NULL)
+			setenv("MULTITAIL_MATCH", match, 1);
 
 		/* start process */
 		if (-1 == execlp(shell, shell, "-c", execute, (void *)NULL)) error_exit(TRUE, FALSE, "Error while starting \"%s -c '%s'\".\n", execute);
@@ -327,6 +335,16 @@ int execute_program(char *execute, char bg)
 	}
 
 	return 0;
+}
+
+int execute_program(char *execute, char bg)
+{
+	return execute_program_impl(execute, bg, NULL);
+}
+
+int execute_program_with_match(char *execute, char bg, const char *match)
+{
+	return execute_program_impl(execute, bg, match);
 }
 
 void init_children_reaper(void)

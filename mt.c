@@ -906,32 +906,18 @@ void color_print(int f_index, NEWWIN *win, proginfo *cur, char *string, regmatch
 
 void check_filter_exec(char *cmd, char *matching_string)
 {
-	int str_index, par_len = strlen(matching_string);
-	int cmd_len = strlen(cmd);
-	char *command = mymalloc(cmd_len + 1/* cmd + space */
-			+ 1 + (par_len * 2) + 1 + 1); /* "string"\0 */
-	int loop;
-
-	memcpy(command, cmd, cmd_len);
-	str_index = cmd_len;
-	command[str_index++] = ' ';
-	command[str_index++] = '\"';
-	for(loop=0; loop<par_len; loop++)
-	{
-		if (matching_string[loop] == '"' || matching_string[loop] == '`')
-		{
-			command[str_index++] = '\\';
-		}
-
-		command[str_index++] = matching_string[loop];
-	}
-	command[str_index++] = '\"';
-	command[str_index] = 0x00;
-
-	if (execute_program(command, 1) == -1)
-		error_popup("Execute triggered by filter", -1, "Failed to execute command '%s'.", command);
-
-	myfree(command);
+	/* Pass the matching string via the MULTITAIL_MATCH environment variable.
+	 * This is secure and avoids shell injection vulnerabilities
+	 * that occur with string concatenation and quoting.
+	 * 
+	 * Users should reference the matched text in their command
+	 * using $MULTITAIL_MATCH (for POSIX shells) or the appropriate
+	 * syntax for their shell.
+	 * 
+	 * Example: multitail -ex ERROR 'echo "Found: $MULTITAIL_MATCH"'
+	 */
+	if (execute_program_with_match(cmd, 1, matching_string) == -1)
+		error_popup("Execute triggered by filter", -1, "Failed to execute command '%s'.", cmd);
 }
 
 /* check if the current line matches with a regular expression
