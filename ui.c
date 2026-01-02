@@ -129,7 +129,7 @@ void edit_color(int index)
 		else if (c == 'r' || c == 'g' || c == 'b')
 		{
 			int y = -1;
-			char val_str[5] = { 0 };
+			char val_str[8] = { 0 };
 			int val = -1;
 			char *newval = NULL;
 
@@ -1161,8 +1161,7 @@ int edit_regexp(void)
 			if (toupper((cur -> pre)[loop].use_regex) == 'X')
 			{
 				char dummy[18];
-				strncpy(dummy, (cur -> pre)[loop].cmd, min(17, strlen((cur -> pre)[loop].cmd)));
-				dummy[17]=0x00;
+				snprintf(dummy, sizeof(dummy), "%s", (cur -> pre)[loop].cmd);
 				mvwprintw(mywin -> win, 4 + loop, 42, "%s", dummy);
 				wmove(mywin -> win, 4 + loop, 41);
 			}
@@ -2161,7 +2160,7 @@ int set_window_sizes(void)
 				if (window != -1)
 				{
 					char *str;
-					char oldval[5] = { 0 };
+					char oldval[12] = { 0 };
 
 					if (pi[window].win_height > -1)
 						snprintf(oldval, sizeof(oldval), "%d", pi[window].win_height);

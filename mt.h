@@ -26,7 +26,7 @@
 #define SL_ATTR		(2)
 
 #define LOADAVG_STR_LEN		(20)
-#define AMOUNT_STR_LEN		(3 + 2 + 1)
+#define AMOUNT_STR_LEN		16
 
 #ifndef __GNUC__
         #define __PRETTY_FUNCTION__	"(unknown)"
