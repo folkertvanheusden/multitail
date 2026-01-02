@@ -1,4 +1,3 @@
-#define _LARGEFILE64_SOURCE	/* required for GLIBC to enable stat64 and friends */
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

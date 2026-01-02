@@ -56,6 +56,7 @@ endif()
 option(USE_CPPCHECK "Looking for cppcheck program ..." ON)
 
 
+add_definitions(-D_LARGEFILE64_SOURCE)
 add_definitions(-D_FORTIFY_SOURCE=2)
 add_definitions(-DVERSION=\"${VERSION}\")
 add_definitions(-D${CMAKE_C_PLATFORM_ID})
