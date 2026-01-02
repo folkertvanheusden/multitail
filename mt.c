@@ -766,7 +766,8 @@ char *escape(const char *what, const proginfo *const cur)
 
 		*p = 0x00;
 
-		asprintf(&new_str, "%s%s%s", temp, cur -> filename, p + 2);
+		if (asprintf(&new_str, "%s%s%s", temp, cur -> filename, p + 2) == -1)
+			error_exit(FALSE, FALSE, "Out of memory in escape()\n");
 
 		free(temp);
 
