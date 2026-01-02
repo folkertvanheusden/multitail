@@ -3336,6 +3336,7 @@ int recv_from_fd(int fd, char **buffer, int new_data_offset, int read_size)
 	socklen_t ssa_len = sizeof(sa);
 	char *recv_buffer = mymalloc(read_size + 1);
 	char time_buffer[TIMESTAMP_EXTEND_BUFFER];
+	char resolved_host[NI_MAXHOST];
 	char *host = "";
 	char *facility = "";
 	char *severity = "";
@@ -3349,11 +3350,9 @@ int recv_from_fd(int fd, char **buffer, int new_data_offset, int read_size)
 
 	if (resolv_ip_addresses == MY_TRUE)
 	{
-		struct sockaddr_in *sai = (struct sockaddr_in *)&sa;
-		struct hostent *he = gethostbyaddr(&(sai -> sin_addr.s_addr), sizeof(sai -> sin_addr.s_addr), AF_INET);
-
-		if (he != NULL && he -> h_name != NULL)
-			host = he -> h_name;
+		if (getnameinfo(&sa, ssa_len, resolved_host, sizeof(resolved_host),
+		                NULL, 0, NI_NAMEREQD) == 0)
+			host = resolved_host;
 		else
 			host = "?";
 	}
