@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.14)
 
 ## use ccache if found
 find_program(CCACHE_EXECUTABLE "ccache" HINTS /usr/local/bin /opt/local/bin)
@@ -9,6 +9,7 @@ endif()
 
 #=====================
 project(multitail LANGUAGES C)
+include(GNUInstallDirs)
 # set VERSION using version file
 file (STRINGS "version" VERSION_CONTENT)
 if(VERSION_CONTENT MATCHES "VERSION=([0-9]+\\.[0-9]+\\.[0-9]+)")
@@ -185,20 +186,16 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
 
 # install the bin
-install(TARGETS multitail DESTINATION bin)
+install(TARGETS multitail RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 # install the config file
 if(INSTALL_CONFIG)
     install(FILES multitail.conf DESTINATION etc RENAME multitail.conf.new)
 endif()
 # install the manual files
-install(FILES multitail.1 DESTINATION share/man/man1)
+install(FILES multitail.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 # install doc files
-install(FILES manual.html DESTINATION share/doc/multitail-${VERSION})
-install(FILES LICENSE DESTINATION share/doc/multitail-${VERSION})
-install(FILES README.md DESTINATION share/doc/multitail-${VERSION})
-install(FILES thanks.txt DESTINATION share/doc/multitail-${VERSION})
-# cp conversion-scripts/* etc/multitail/
-install(DIRECTORY conversion-scripts DESTINATION etc/multitail)
+install(FILES manual.html LICENSE README.md thanks.txt TYPE DOC)
+install(DIRECTORY conversion-scripts TYPE DOC)
 
 
 if(USE_CPPCHECK)
