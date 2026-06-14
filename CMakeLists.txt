@@ -33,6 +33,7 @@ set(CMAKE_C_STANDARD_REQUIRED OFF)
 set(CMAKE_C_EXTENSIONS ON)
 
 option(COMPILER_WARNINGS_ARE_ERRORS "To be pedantic! ;-)" OFF)
+option(INSTALL_CONFIG "Install multitail.conf" ON)
 if(COMPILER_WARNINGS_ARE_ERRORS)
   if(MSVC)
     # warning level 4 and all warnings as errors
@@ -186,7 +187,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 # install the bin
 install(TARGETS multitail DESTINATION bin)
 # install the config file
-install(FILES multitail.conf DESTINATION etc RENAME multitail.conf.new)
+if(INSTALL_CONFIG)
+    install(FILES multitail.conf DESTINATION etc RENAME multitail.conf.new)
+endif()
 # install the manual files
 install(FILES multitail.1 DESTINATION share/man/man1)
 # install doc files
