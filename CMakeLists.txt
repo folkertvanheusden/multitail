@@ -127,11 +127,12 @@ add_executable(multitail
     version.h
 )
 
+target_compile_definitions(multitail PRIVATE CONFIG_FILE="${CMAKE_INSTALL_FULL_SYSCONFDIR}/multitail.conf")
+
 set(EXTRA_LIBS "-lutil -lm")
 
 if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
     set(CURSES_INCLUDE_PATH "/usr/include")
-    add_definitions(-DCONFIG_FILE=\"/usr/local/etc/multitail.conf\")
     if (EXISTS "/usr/local/include/gnu/regex.h")
         add_library(gnuregex SHARED IMPORTED)
         set_target_properties(
@@ -141,8 +142,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
     else()
         message(FATAL_ERROR "/usr/local/include/gnu/regex.h missing, did you install libgnuregex?")
     endif()
-else ()
-    add_definitions(-DCONFIG_FILE=\"/etc/multitail.conf\")
 endif()
 
 # Set ``CURSES_NEED_NCURSES`` to ``TRUE`` before the
