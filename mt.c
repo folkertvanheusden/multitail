@@ -3239,6 +3239,12 @@ static void collapse_cr_overwrite(char *buf)
 	{
 		if (*src == '\r')
 		{
+			if (src[1] == 0x00)
+			{
+				/* Need the next read to know whether this is CRLF or overwrite. */
+				*dst++ = *src++;
+				continue;
+			}
 			if (src[1] == '\n')
 			{
 				/* Windows CRLF: drop CR, keep LF via the normal path */
