@@ -2426,8 +2426,6 @@ void version(void)
 {
 	printf("%s", version_str);
 	printf("\n\nThank you for using MultiTail.\n");
-	printf("If you have any suggestion on how I can improve this program,\n");
-	printf("do not hesitate to contact me at folkert@vanheusden.com\n");
 	printf("Website is available at: http://www.vanheusden.com/multitail/\n\n\n");
 }
 
