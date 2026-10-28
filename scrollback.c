@@ -264,7 +264,7 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 	int nlines, ncols;
 	compute_text_dimensions(&nlines, &ncols, fullscreen);
 
-	int offset = max(0, pbuf -> curpos - nlines); /* FIXME: aantal regels laten afhangen van lengte */
+	int offset = 0;
 	char redraw = 2;
 	int line_offset = 0;
 	char show_winnr = default_sb_showwinnr;
@@ -293,6 +293,9 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 		cur_lb.be[cur_lb.curpos].ts    = (pbuf -> be)[loop].ts;
 		cur_lb.curpos++;
 	}
+
+	/* cur_lb skips empty entries, so it can hold fewer lines than pbuf */
+	offset = max(0, cur_lb.curpos - nlines); /* FIXME: aantal regels laten afhangen van lengte */
 
 	LOG("---\n");
 	if (global_highlight_str)
@@ -560,13 +563,28 @@ int scrollback_do(int window_nr, buffer *pbuf, int *winnrs, char *header)
 					}
 					else
 					{
-						n_lines_to_move -= get_lines_needed((cur_lb.be)[offset].Bline, ncols);
-						offset++;
+						int lines_needed = get_lines_needed((cur_lb.be)[offset].Bline, ncols);
+
+						/* stop inside this (wrapped) line */
+						if (lines_needed > n_lines_to_move)
+						{
+							line_offset = n_lines_to_move * ncols;
+							n_lines_to_move = 0;
+						}
+						else
+						{
+							n_lines_to_move -= lines_needed;
+							offset++;
+						}
 					}
 				}
 
-				if (n_lines_to_move < 0)
-					line_offset = (-n_lines_to_move) * ncols;
+				/* do not run past the last line */
+				if (offset >= cur_lb.curpos)
+				{
+					offset = cur_lb.curpos - 1;
+					line_offset = 0;
+				}
 			}
 
 			redraw = 2;
